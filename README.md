@@ -23,6 +23,8 @@ AIの入口はルートの[AGENTS.md](AGENTS.md)です。作業手順は[開発�
 
 ## 初回確認の範囲
 
+今回のハッカソンは2人で開発します。互いの作業・判断・検証結果を、それぞれが使うAIにも引き継ぐための[AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)を用意しています。必要な原則だけを使い、固定的な役職や承認体制は追加しません。この文書の参照は開発・実験の開始許可ではありません。
+
 READMEの初回プロンプトは内容の理解と判断までを扱います。開発・起動・テスト・録音を自動開始しません。別の明示的な依頼があれば、その範囲で進めます。
 
 ## クローンして内容を確認する
@@ -67,7 +69,7 @@ READMEと、存在する場合は適用されるAGENTS.mdを読み、
 |---|---|
 | `docs/product/` | 製品方針、シナリオ、TEAM_CONCEPT |
 | `docs/development/` | 開発手順、Codexの参考、検証計画、現在地 |
-| `docs/decisions/` | [AIの判断境界案](docs/decisions/AI_DECISION_BOUNDARIES.md)。未採用であり有効な規則ではない |
+| `docs/decisions/` | [AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)と[AIの判断境界案](docs/decisions/AI_DECISION_BOUNDARIES.md)。後者は未採用であり有効な規則ではない |
 | `docs/history/` | [点検記録](docs/history/HANDOFF_AUDIT.md)、[基盤引き継ぎ](docs/history/FOUNDATION_HANDOFF.md)、[共有レポート](docs/history/TEAM_PROGRESS.md)。必要時に読む履歴 |
 
 履歴の「今回」「次の作業」、過去の許可、レビュー回数、ハッシュは当時の記録です。この共有版の実行指示や検証結果ではありません。本文中の「共有対象外」は、ファイルを同梱していないことを示します。
