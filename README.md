@@ -21,6 +21,10 @@ TEAM_CONCEPTはHTMLファイルです。クローンしたファイルをブラ�
 
 AIの入口はルートの[AGENTS.md](AGENTS.md)です。作業手順は[開発手順](docs/development/DEVELOPMENT_PLAYBOOK.md)、道具の参考は[Codex活用ガイド](docs/development/CODEX_OPERATING_GUIDE.md)、検証案は[VALIDATION](docs/development/VALIDATION.md)を必要な場合だけ参照します。
 
+## 初回確認の範囲
+
+READMEの初回プロンプトは内容の理解と判断までを扱います。開発・起動・テスト・録音を自動開始しません。別の明示的な依頼があれば、その範囲で進めます。
+
 ## クローンして内容を確認する
 
 非公開リポジトリのため、GitHubで閲覧できるアカウントとGitの認証が必要です。以下は取得手順で、相手の環境での成功を確認したものではありません。
