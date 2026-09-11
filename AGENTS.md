@@ -8,7 +8,7 @@
 - Codexの道具・モデル・レビューの選定は[活用ガイド](docs/development/CODEX_OPERATING_GUIDE.md)。社員の実践と有効な指示を混同しない。
 - 最初の内容確認はREADME、現在地は[進捗](docs/development/WORKFLOW.md)。[引き継ぎ](docs/history/FOUNDATION_HANDOFF.md)は履歴です。過去のGoal依頼を自動再実行しない。
 - 詳細な判断境界の[提案](docs/decisions/AI_DECISION_BOUNDARIES.md)は未採用。参照しただけで権限を広げない。現依頼で明示された判断を優先する。
-- 今回は2人で開発するハッカソンです。互いの作業・判断・証拠を各AIへ引き継ぐため、[AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)の限定した原則を使う。AIDD-FWは参考資料であり、既存の正本・現在の依頼を上書きしない。固定的な役職・承認体制やセットアップは導入しない。
+- 今回は2人で開発するハッカソンです。互いの作業・判断・証拠を各AIへ引き継ぐため、[AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)の限定した原則を使う。AIDD-FWは参考資料であり、既存の正本・現在の依頼を上書きしない。固定的な役職・承認体制やAIDD-FWセットアップは導入しない。必要な仕事には[AIDD-Lite v1の使い方](docs/development/aidd-lite/GUIDE.md)から5つのskillと2つの委任用役割を参照する。選択や配置は実行・委任の許可を増やさない。
 
 ## 進行とスコープ管理
 

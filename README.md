@@ -21,6 +21,10 @@ TEAM_CONCEPTはHTMLファイルです。クローンしたファイルをブラ�
 
 AIの入口はルートの[AGENTS.md](AGENTS.md)です。作業手順は[開発手順](docs/development/DEVELOPMENT_PLAYBOOK.md)、道具の参考は[Codex活用ガイド](docs/development/CODEX_OPERATING_GUIDE.md)、検証案は[VALIDATION](docs/development/VALIDATION.md)を必要な場合だけ参照します。
 
+## AIDD-Liteを使う
+
+依頼に応じて調査・設計・実装・レビュー・引き継ぎのskillを選べます。[使い方と呼び出し例](docs/development/aidd-lite/GUIDE.md)、[利用確認の結果](docs/development/aidd-lite/ACCEPTANCE.md)を参照してください。2つのagentは許可された委任時に使う役割定義です。製品の仕様やMVPを自動確定する仕組みではありません。
+
 ## 初回確認の範囲
 
 今回のハッカソンは2人で開発します。互いの作業・判断・検証結果を、それぞれが使うAIにも引き継ぐための[AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)を用意しています。必要な原則だけを使い、固定的な役職や承認体制は追加しません。この文書の参照は開発・実験の開始許可ではありません。
