@@ -1,0 +1,6 @@
+interface:
+  display_name: "実装・修正・検証"
+  short_description: "今回のハッカソンで実装・修正・検証を正本と証拠に沿って進める"
+  default_prompt: "$aidd-lite-implement を使い、今回の依頼範囲に沿って実装・修正・検証を進めてください。"
+policy:
+  allow_implicit_invocation: true

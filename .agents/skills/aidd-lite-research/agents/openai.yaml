@@ -1,0 +1,6 @@
+interface:
+  display_name: "調査・検証計画"
+  short_description: "今回のハッカソンで調査・検証計画を正本と証拠に沿って進める"
+  default_prompt: "$aidd-lite-research を使い、今回の依頼範囲に沿って調査・検証計画を進めてください。"
+policy:
+  allow_implicit_invocation: true
