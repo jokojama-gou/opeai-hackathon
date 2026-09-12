@@ -4,6 +4,8 @@
 
 ## 入口と選択
 
+今回の開発は[開発開始ガイド](DEVELOPMENT_START.md)を参照する。MVP_SPEC 2.0のK01〜K10に沿う着手順、Mac/SwiftUI・Windows/RNの分担、共通契約の受け渡し、各AIへの依頼例をまとめている。仕様の採用状態はMVP_SPECとWORKFLOWに従う。旧音声探索を自動再開しない。
+
 リポジトリルートをCodexのプロジェクトとして開き、必要なskillを明示します。
 
 | 依頼 | skill | 例 |

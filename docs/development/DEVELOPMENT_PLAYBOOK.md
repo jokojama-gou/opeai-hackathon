@@ -21,6 +21,8 @@
 |---|---|---|
 | AIの進め方・現在依頼の境界 | [AGENTS.md](../../AGENTS.md) | 有効な作業規則。全資料の毎回読解を要求しない |
 | プロダクトの意味・方針・理由 | [PRODUCT_CORE.md](../product/PRODUCT_CORE.md) | 製品正本。製品判断ではD01〜D17と関連S/Oを読む |
+| MVPの機能・画面・API・受入条件 | [MVP_SPEC 2.0](../product/MVP_SPEC.md) | 最新の採用提案。採否と実装済みを区別し、§11のK01〜K10で作業を選ぶ |
+| 二人の担当・着手順 | [ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)、[開発開始ガイド](aidd-lite/DEVELOPMENT_START.md) | Go君のWindows/RN・共通APIと、依頼者のMac/SwiftUI・workerの受け渡し |
 | 今回までの作業と証拠 | [WORKFLOW.md](WORKFLOW.md)、[基盤の引き継ぎ](../history/FOUNDATION_HANDOFF.md) | 過去の「次の作業」は新しい実行許可ではない |
 | 必要なユーザー判断 | [HANDOFF_AUDIT.md](../history/HANDOFF_AUDIT.md) | U1回答済み、U2以降は正本・最新決定と照合 |
 | 裁量を広げる案 | [AI_DECISION_BOUNDARIES.md](../decisions/AI_DECISION_BOUNDARIES.md) | 未採用案。参考にできるが承認根拠にはしない |
@@ -135,6 +137,12 @@ AGENTS.mdから移した有効な手順です。開始・範囲変更・調査�
 - **判断境界**：人間の決定のない箇所は案のまま。次の作業案を実行許可としない。コンテクスト圧縮は利用可能な操作がある場合だけ。
 - **検証・完了**：次のAIが目的、正本、許可範囲、未決定、次の判断へ辿れる。新しい会話で試していなければ、引き継ぎ成功の実証とはしない。
 - **記録先**：WORKFLOWの短い作業記録と、[FOUNDATION_HANDOFF.md](../history/FOUNDATION_HANDOFF.md)の入口・現在地。
+
+## MVP 2.0を二人で進めるとき
+
+今回のKとM/U/受入ID、仕様・契約・fixtureの版を両担当で揃える。詳細な着手順と依存はロードマップ§7、各AIへの依頼例と引き継ぎ項目は開発開始ガイドに一本化する。旧音声探索の再開を前提にせず、未検証事項を該当Kで確認する。G1〜G5は製品内の処理役割であり、開発AIの委任許可ではない。
+
+完了判定はMVP_SPEC §8/§14/§15のAC01〜AC19・C01〜C09・A01〜A15に対応する証拠を揃える。本文だけでなくToDo/保存/メモ/日次・件数・生成入力の失効、外部予定の別管理を確認する。K02の人工画面やM01〜M08の成立だけで2.0完成としない。
 
 ## 決定と資料を更新する
 

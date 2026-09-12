@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>会話を残す — 共有の体験試作</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f5f1;color:#243b34;font:16px/1.7 system-ui,sans-serif}main{max-width:1060px;margin:auto;padding:40px 24px}h1{font-size:clamp(26px,4vw,40px);line-height:1.3;letter-spacing:-.04em;margin:12px 0}h2{font-size:21px;margin:10px 0}h3{font-size:17px;margin:12px 0}.eyebrow{font-size:12px;letter-spacing:.15em;color:#52695f}.lead{max-width:680px;color:#52695f}.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:28px 0}.phones{display:grid;grid-template-columns:1fr 1fr;gap:24px}.phone{background:white;border:1px solid #dbe2d9;border-radius:24px;overflow:hidden;box-shadow:0 14px 38px #243b3408}.top{padding:18px 24px;background:#edf1e9;display:flex;justify-content:space-between}.inside{padding:24px}.muted{color:#5d7067;font-size:14px}.card{padding:18px;background:#f7f8f4;border-radius:14px;margin:16px 0}.badge{font-size:12px;border-radius:20px;background:#dbeadd;padding:4px 10px}.status{border-left:3px solid #728f72;padding-left:14px;margin:20px 0}button{font:inherit;cursor:pointer;border-radius:12px;border:1px solid #b9c9bd;padding:10px 16px;background:#fff;color:#243b34}button:hover{background:#edf1e9}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #b46b19;outline-offset:3px}.primary{background:#2a5747;color:white;border-color:#2a5747}.primary:hover{background:#1f4337}.full{display:block;width:100%;margin:10px 0}.plain{border:none;background:transparent;text-decoration:underline}.check{display:flex;gap:12px;padding:16px 0;align-items:flex-start}.check input{width:20px;height:20px;flex-shrink:0;margin-top:5px}.hint{font-size:13px;color:#65766b;margin-top:30px;border-top:1px solid #dbe2d9;padding-top:18px}dialog{max-width:440px;width:calc(100% - 32px);border:1px solid #dbe2d9;border-radius:20px;padding:28px;color:#243b34}dialog::backdrop{background:#18382a66}#announcement{min-height:28px}.history{margin-top:24px}a{color:#2a5747}@media(max-width:720px){main{padding:24px 16px}.phones{grid-template-columns:1fr}.inside{padding:20px}}
+</style>
+<main>
+<div class="eyebrow">CONVERSATION / INTERACTION STUDY</div>
+<h1>会話の記録を、誰と残す？</h1>
+<p class="lead">まずは今回だけ。よく話す相手なら、次回から自動に。<br>左右の画面を操作して、2人の共有確認を試せます。</p>
+<div class="toolbar"><button class="primary" id="next">次の会話を試す</button><button id="reset">最初から</button><span class="muted">架空データ・実録音／通信／保存なし</span></div>
+<p id="announcement" role="status" aria-live="polite"></p>
+<div class="phones" id="phones"></div>
+<section class="history" aria-label="これまでの会話"><h2>これまでの会話</h2><div id="history" class="muted"></div></section>
+<aside class="hint">試す順番：①両方とも今回だけ許可 → 次の会話　②両方で自動共有を選ぶ → 次の会話　③片方から解除 → 次の会話。<br>この試作は録音終了後の、同一会話・本人・参加区間が確認できた状態を模擬します。自動になるのは共有で、録音は本人が開始します。本人認証・音声照合・通信失敗・複数人の権限は再現していません。</aside>
+</main>
+<dialog id="revokeDialog" aria-labelledby="dialogTitle"><h2 id="dialogTitle">自動共有を解除しますか？</h2><p>これから新たに共有する内容は、毎回、双方の確認が必要になります。</p><p class="muted">すでに共有した記録は取り消しません。録音は停止しません。</p><button id="confirmRevoke" class="primary full">解除する</button><button id="back" class="full">戻る</button></dialog>
+<script type="module">
+import { initialState, transition } from './sharing-state.mjs';
+let state = initialState();
+let drafts = [false, false];
+const names = ['A', 'B'];
+const phones = document.querySelector('#phones');
+const dialog = document.querySelector('#revokeDialog');
+function render(message = '') {
+  phones.innerHTML = names.map((name, i) => {
+    const other = names[1-i];
+    const declined = state.answers.includes('decline');
+    const waiting = state.answers[i] !== null;
+    let content;
+    if (state.shared) {
+      content = `<div class="status"><strong>この範囲を${other}さんと共有中</strong><p class="muted">${state.trusted ? `${other}さんとの自動共有が有効です。一緒に記録した会話だけが対象です。` : '次回は共有前に確認します。自動共有は有効ではありません。'}</p></div>${state.trusted ? `<button class="full" data-action="manage" data-person="${i}">自動共有を管理</button>` : ''}`;
+    } else if (declined) {
+      content = '<div class="status"><strong>今回は共有していません</strong><p class="muted">自分の記録はそのまま使えます。</p></div>';
+    } else if (waiting) {
+      content = `<div class="status"><strong>${other}さんの確認待ちです</strong><p class="muted">まだ共有していません。${state.answers[i] === 'always' ? '自動共有も、双方が選ぶまで有効になりません。' : '今回だけの共有を許可しています。'}</p></div><button class="full" data-action="cancel" data-person="${i}">今回の許可を取り消す</button>`;
+    } else {
+      content = `<h2>${other}さんと、この会話を共有しますか？</h2><p class="muted">一緒に話したと確認できた部分だけを共有します。前後の会話や、他の履歴は共有されません。</p><label class="check"><input id="always${i}" type="checkbox" ${drafts[i] ? 'checked' : ''}><span>今後も${other}さんとの会話を自動共有する<br><span class="muted">双方が選ぶと、次回から確認を省けます。録音は毎回、自分で開始します。後から解除できます。</span></span></label><button class="primary full" data-action="allow" data-person="${i}">この範囲の共有を許可</button><button class="full" data-action="decline" data-person="${i}">今回は共有しない</button><button class="plain full" data-action="later" data-person="${i}">あとで</button>`;
+    }
+    return `<section class="phone" aria-label="${name}さんの画面"><div class="top"><strong>${name}さんの画面</strong><span class="badge">会話 ${state.round}</span></div><div class="inside"><span class="eyebrow">YOUR CONVERSATION</span><div class="card"><strong>今日の会話</strong><div class="muted">共有対象：14:10〜14:32<br>あなたの記録から確認した範囲</div></div>${content}</div></section>`;
+  }).join('');
+  document.querySelector('#history').textContent = state.history.length ? state.history.map(item => `会話 ${item.round}：${item.shared ? '共有済み' : '未共有'}`).join(' ／ ') : 'まだありません。';
+  document.querySelector('#announcement').textContent = message;
+}
+phones.addEventListener('change', event => { if (event.target.id === 'always0') drafts[0] = event.target.checked; if (event.target.id === 'always1') drafts[1] = event.target.checked; });
+phones.addEventListener('click', event => {
+  const button = event.target.closest('button[data-action]');
+  if (!button) return;
+  const person = Number(button.dataset.person);
+  const action = button.dataset.action;
+  if (action === 'manage') { dialog.showModal(); return; }
+  if (action === 'later') {
+    document.querySelector('#announcement').textContent = `${names[person]}さんは確認を保留しました。共有は開始していません。`;
+    return;
+  }
+  state = transition(state, action === 'cancel' ? { type: 'cancel', person } : { type: 'answer', person, value: action === 'decline' ? 'decline' : document.querySelector(`#always${person}`).checked ? 'always' : 'once' });
+  render(state.shared ? '双方の許可が揃い、今回の共有が成立しました。' : '確認状態を更新しました。');
+  document.querySelector('#announcement').tabIndex = -1;
+  document.querySelector('#announcement').focus();
+});
+document.querySelector('#next').onclick = () => { drafts = [false, false]; state = transition(state, { type: 'next' }); render('次の会話の録音・照合が完了した状態です（模擬）。'); };
+document.querySelector('#reset').onclick = () => { drafts = [false, false]; state = initialState(); render('最初の状態に戻しました。'); };
+document.querySelector('#back').onclick = () => dialog.close();
+document.querySelector('#confirmRevoke').onclick = () => { state = transition(state, { type: 'revoke' }); dialog.close(); render('解除しました。新しい共有には毎回確認が必要です。共有済みの記録は残ります。'); document.querySelector('#next').focus(); };
+render();
+</script>
+</html>
