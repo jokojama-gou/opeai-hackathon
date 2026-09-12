@@ -2,20 +2,66 @@
 
 > 共有版（2026-09-11）。旧企画資料から参照先を整理して移管しました。今後の正本はこのリポジトリです。元のローカル資料は移管前の記録として保持し、並行更新しません。
 
-更新日: 2026-09-11。方針の参照元: [PRODUCT_CORE.md](../product/PRODUCT_CORE.md)。作業ルール: [AGENTS.md](../../AGENTS.md)。検証準備: [VALIDATION.md](VALIDATION.md)。
+更新日: 2026-09-12。方針の参照元: [PRODUCT_CORE.md](../product/PRODUCT_CORE.md)。作業ルール: [AGENTS.md](../../AGENTS.md)。検証準備: [VALIDATION.md](VALIDATION.md)。
 
 ## 現在の状態（共有版）
 
+<<<<<<< Updated upstream
 - Mac/Windows開発計画の共有（2026-09-12）: [全体ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)を更新。依頼者がMac/SwiftUI、Go君がWindows/React Nativeと共通UIデザインを担当するユーザー決定を反映した。共通API・音声処理の作業分担、7段階の完了条件、OS共通デザインと操作の差分、Swift採用条件を具体化。次は人工データで「履歴→会話詳細」を最初の単位とし、デザイン依頼・共通データ・両担当の着手タスクを具体化する。関連O02、MVP・処理場所等の未決定は維持。前回内容はmainへ取込済みのため、今回の依頼により後続差分をPRなしで共有する。別作業の未コミット仕様・音声検証資料は対象外で、ロードマップには未共有資料として明記。文書整理であり、製品実装・実機検証は未実施。
 
 - 2026-09-12の開発・提出方針: ユーザーがReact NativeでAndroid/iPhoneを主軸にし、Swift版を並行開発、間に合えばSwift・難しければRN提出と明示。[全体計画案](MULTIPLATFORM_DELIVERY_PLAN.md)に共通API/認証/データ、両クライアント、限定Web、技術候補、工程割合、Swift切替条件を整理し、PRODUCT_CORE O02に明示決定を反映。designスキルで既存仕様と公式情報を机上照合。クラウド処理・MVP・詳細スタックは提案、締切/稼働/Mac/大会条件は未確認。関連D01〜D17/S01〜S05/O01〜O10。製品実装・環境導入・実音声処理・配布・commit/pushなし。独立レビューなし。次は日程と処理条件を踏まえて採用範囲を具体化する。
 
 - 目的：2人と各AIが正本を共有して開発を進めるAIDD-Lite v1の整備。現在の実装は開発支援の範囲であり、製品実装・録音の開始は含めない。
 - AI協働基盤の文書整備と、依頼者による実利用確認は終了。製品の実装・起動環境・実音声による有効性検証は未完了。
+=======
+- 目的：2人と各AIが正本を共有し、React Native・Web共通の開発環境で開発を進められる状態にする。
+- AI協働基盤の文書整備と、依頼者による実利用確認は終了。共通クライアントの起動設定・開発用画面を追加し、Web操作と3プラットフォームのバンドル生成を確認。製品機能・実機動作・実音声による有効性は未検証。
+>>>>>>> Stashed changes
 - 初回共有にルートAGENTS、製品資料、開発手順、判断案、履歴を含める。TEAM_CONCEPT.htmlを含め、説明用PDF・相談資料・実験コードは含めない。
 - 今後の正本は本リポジトリ。下の過去記録を現在の作業指示にしない。
 - 手順と初回プロンプトは[README](../../README.md)。受け手のアクセス権・Codex環境・実際のクローン後の動作は未確認。
 - 2026-09-11：ユーザーが選定資料のcommit・pushを依頼。資料の配置・参照修正を行う共有変更。製品方針・MVP・技術方式の採用は追加しない。
+
+## Supabaseアクセス準備（2026-09-12）
+
+- 依頼・変更：ユーザー提供のPATをGit対象外の `.env.supabase.local` に保存。AI IDE用に `scripts/supabase-api.ps1` と[利用手順](SUPABASE_ACCESS.md)を追加。
+- 確認・証拠：`git check-ignore` で認証ファイルの除外を確認。スクリプトから公式Management APIのプロジェクト一覧を実行し、認証成功・1件・`ACTIVE_HEALTHY`を本タスクのツール結果で確認。制限環境での初回通信は失敗、通常ネットワーク権限で成功。
+- 判断・限界：接続準備として実施。製品方式の採用判断は含まない。MCP登録・DB変更・別PCでの確認は未実施。今後の操作は各依頼の範囲で行う。
+
+## Expoのスマホアプリ書き出し設定（2026-09-12）
+
+- 記録ID：EAS-20260912。段階：実装／事前検証。依頼：Expoでもスマホアプリへ書き出せるようにする。関連O02、D14/D15。製品機能・音声処理は対象外。
+- 対象版：HEAD `54c43c9`上の前回開発環境の未コミット差分。追加で存在した`scripts/supabase-api.ps1`は変更していない。
+- 変更：EAS CLI 24.3.0をルート開発依存に固定。`apps/client/eas.json`にpreview（Android APK／iOS Ad Hoc）、production（AAB／iOSストア用）、simulatorを追加。ルートとアプリのnpmコマンド、署名鍵のGit除外、リポジトリルートの`.easignore`、README・[手順](APP_DEVELOPMENT.md)を更新。
+- 人間の判断：Expoによるスマホアプリ書き出しを指定。実装上の選択：Windowsから利用できるEAS Buildの構成。Expoの所有アカウント・projectId・ストア識別子は未指定なので仮固定せず初回設定へ残した。
+- 成功：`npm run typecheck`終了コード0。EAS同梱`@expo/eas-json`でスキーマと5組のOS／profile解決を検証。EAS CLIのIgnore実装でビルド必須ファイル5件の包含と、資料・補助スクリプト・AI設定・環境変数・署名情報・生成物6件の除外を検証。APK用npmコマンドの`--help`がEASまで到達し終了コード0（サンドボックス内のプロセス照会にAccess denied警告あり）。
+- 依存監査：EAS CLI追加後は計22件（low 1／moderate 17／high 4／critical 0）。highはEAS CLIとそのminimatch・nanoid・tar依存。監査が提示したEAS CLI 0.24.1等への破壊的な変更は適用していない。前回の10件という記録は追加前の値。
+- 証拠：本タスクの実行出力、`eas.json`、`.easignore`、`package-lock.json`。設定のローカル検証であり、APK/IPA生成の成功記録ではない。
+- 未実行：Expoログイン・プロジェクト作成／連携、署名作成、クラウドビルド、端末へのインストール、ストア提出。これらには利用するExpoアカウント、アプリ識別子、iOS実機ならApple Developerの署名設定が必要。
+- 次の手順：ルートで`npm run eas:login`→`npm run eas:init`→目的のbuildコマンド。クラウドへのソース送信・利用枠を伴う。設定整備の依頼からストア公開は実行していない。
+
+## React Native / Web開発環境（2026-09-12）
+
+### 追記：大会リンク集と対応先の指定（2026-09-12）
+
+- 記録ID：DOC-20260912-LINKS。依頼・範囲：提供PDFの内容と、対応先・Webの位置付けを文書へ追加。関連O02、D14/D15。製品動作・共有シナリオの変更はない。
+- 人間の判断：React NativeからiOS・Android・Webを作り、Webは当日にiOS・Android版の開発が終わらなかった場合の保険とする。O02の対応先を更新。機能差・Webで代替する範囲・MVPは未決定。
+- 変更・証拠：[リンク集](HACKATHON_LINKS.md)にPDFの4件のURLと出典を記録。README・PRODUCT_CORE・APP_DEVELOPMENTへ反映。開始時から存在した開発基盤の未コミット変更を保持。
+- 確認：PDF全1ページの抽出テキスト・リンク注釈と転記を照合。文書差分・追加リンクの整合性を自己確認。外部リンク先の最新内容・PDFの画像表示・製品動作は未検証。文書追加のため製品テストは対象外。
+- 次の判断：デモ内容を決める際にWebで代替する機能範囲を決める。
+
+### 開発基盤の作成時点の記録
+
+- 記録ID：ENV-20260912。段階：実装／事前検証。依頼：React Nativeの開発環境を整え、ReactでWebにも利用できるようにする。関連O02、D14/D15。製品Vケースは対象外（製品機能や音声の検証ではない）。
+- 対象版・条件：開始HEAD `54c43c9`、開始時差分なし。Windows、Node 22.20.0、npm 10.9.0。Expo 57.0.22、React 19.2.3、React Native 0.86.3、React Native Web 0.21.2、TypeScript 6.0.3。
+- 人間の判断：React NativeとWebの共通開発を指定。実装上の選択：Expo blank TypeScript、npm workspaces。MVP・最終対応OS・録音方式・処理場所は未決定。
+- 変更：`apps/client`に共通スターター、型チェック・Web/全OSバンドル生成・診断コマンド、ルートのnpm実行入口、Node/npm固定、lockfile、ignore、[開発手順](APP_DEVELOPMENT.md)。READMEとPRODUCT_COREのO02へ今回の範囲を反映。
+- 成功：依存導入、`npm run typecheck`、`npm run build:bundles`（Web 197／Android 578／iOS 582モジュール、終了コード0）。Web開発サーバーで日本語画面の描画とボタン操作後のカウンター0→1を実ブラウザで確認。
+- 修正と再確認：ルートのnpmスクリプトで追加引数が失われたため`--`を追加。`npm run web -- --host localhost`の起動を確認。
+- 未完了の確認：`npm run doctor`は21項目中20項目成功。Expo config schemaの1項目はExpo APIへのfetch失敗で確認不能（終了コード1）。`npm audit`は中程度10件、high/criticalは0。Expo→xcode→uuidの間接依存にGHSA-w5hq-g745-h8pqがあり、案内された強制修正はExpo 46への変更を伴うため適用していない。
+- 証拠：本タスクのコマンド出力・ブラウザDOMとスクリーンショット、`package-lock.json`、`apps/client/dist/metadata.json`とWeb/Android/iOSバンドル（生成物はGit対象外）。自己確認であり独立レビューではない。
+- 未検証：別PCでの`npm ci`、Android/iOS実機・エミュレーター、APK/IPA作成、Fast Refresh、製品動作。`java`/`adb`はPATH上になく、標準配置のAndroid SDKも確認できず。ネイティブSDKの導入・端末接続・外部公開・commit/pushは未実施。
+- 次の作業条件：利用するスマホ／エミュレーターでExpo Goの対応版を確認して起動する。Expo APIへ接続可能な環境でdoctorの残り1項目を再確認。製品機能の追加はその仕様に関係する未決定を確認する。
 
 ## AIDD-Lite v1の実装（2026-09-12）
 

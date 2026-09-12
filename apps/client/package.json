@@ -1,0 +1,38 @@
+{
+  "name": "@hackathon/client",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@expo/metro-runtime": "~57.0.15",
+    "expo": "~57.0.22",
+    "expo-status-bar": "~57.0.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "expo-doctor": "^1.20.4",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "build:web": "expo export --platform web",
+    "build:bundles": "expo export --platform all",
+    "doctor": "expo-doctor",
+    "eas:login": "eas login",
+    "eas:init": "eas init",
+    "eas:device": "eas device:create",
+    "build:android:apk": "eas build --platform android --profile preview",
+    "build:android:store": "eas build --platform android --profile production",
+    "build:ios:preview": "eas build --platform ios --profile preview",
+    "build:ios:store": "eas build --platform ios --profile production",
+    "build:ios:simulator": "eas build --platform ios --profile simulator"
+  },
+  "private": true
+}

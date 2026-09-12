@@ -140,7 +140,11 @@ iPhoneのアクションボタン、スマートウォッチ、スマートグ�
 | ID | 未決定事項 | 決める必要が生じる時点 |
 |---|---|---|
 | O01 | 採用した価値検証シナリオ内の具体的な作業・必須機能・デモ | 実装計画の確定前 |
+<<<<<<< Updated upstream
 | O02 | 2026-09-12ユーザー決定: React NativeでAndroid・iPhone対応を主軸とし、SwiftのiPhone版も並行開発。間に合えばSwift版、難しければReact Native版を提出する。依頼者本人がMacでSwiftUI、Go君がWindowsでReact Nativeを担当する。[全体ロードマップ](../development/MULTIPLATFORM_DELIVERY_PLAN.md)を参照。対応OSバージョン、配布方式、Expo等の詳細技術・Webの代替範囲は未確定 | 録音・近距離通信の試作と提出準備前 |
+=======
+| O02 | React Nativeを共通基盤としてiOS・Android・Webを作る（2026-09-12ユーザー指定、開発基盤はExpoで構築）。Webはハッカソン当日にiOS・Android版の開発が終わらなかった場合の保険。対象端末の詳細・OSバージョン・機能差・Webで代替する範囲は未決定。[開発環境](../development/APP_DEVELOPMENT.md) | 録音・近距離通信の試作前。Webでの代替範囲はデモ内容の確定前 |
+>>>>>>> Stashed changes
 | O03 | 音声・文字・特徴量の処理場所、送信先、保持 | 外部処理や保存の実装前 |
 | O04 | 照合候補の発見範囲、参加者の識別、端末との対応 | 自動照合・共有の実装前 |
 | O05 | 曖昧な判定の確認先、未回答、回答不一致、取消 | 確認UIと自動共有の実装前 |
