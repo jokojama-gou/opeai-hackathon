@@ -6,6 +6,8 @@
 
 ## 現在地
 
+最新の提案入口: **[MVP仕様書](docs/product/MVP_SPEC.md)**。会話整理・ToDo・予定登録・日次振り返り・保存を含む機能・画面・操作・共有/訂正・処理/保持・受入条件と担当別の実装順をまとめています。[15画面の配置見本](docs/product/prototypes/mvp-spec-wireframes.html)は架空データの補助図です。採用提案と実装済みを区別し、採否・レビュー状態は仕様書末尾とWORKFLOWを参照してください。
+
 - 製品方針とAI協働基盤の文書は整備済みです。製品仕様・MVP・技術方式には未決定事項があります。
 - React Native・Web共通の開発用スターターを`apps/client`に追加しました。製品機能・製品テスト・CIはまだありません。実音声での有効性・統合による改善も未検証です。
 - React NativeからiOS・Android・Webを作ります。Webは、ハッカソン当日にiOS・Android版の開発が終わらなかった場合の保険です。大会サイト・公式ルールなどは[ハッカソンのリンク集](docs/development/HACKATHON_LINKS.md)を参照してください。
