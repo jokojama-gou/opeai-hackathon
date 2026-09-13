@@ -13,4 +13,4 @@
 
 同日のユーザー指定により、React Nativeを共通基盤としてiOS・Android・Webを作る。Webは、ハッカソン当日にiOS・Android版の開発が終わらなかった場合に備える保険として位置付ける。
 
-対応先の判断と残る未決定事項は[PRODUCT_COREのO02](../product/PRODUCT_CORE.md#7-未決定事項と実装前の判断点)、起動・ビルド手順は[開発環境](APP_DEVELOPMENT.md)を参照する。この開発方針はPDFの記載ではなく、今回のユーザー依頼に基づく。
+対応先の判断と残る未決定事項は[PRODUCT_COREのO02](../product/PRODUCT_CORE.md#7-決定済み範囲と残る判断)、起動・ビルド手順は[開発環境](APP_DEVELOPMENT.md)を参照する。この開発方針はPDFの記載ではなく、今回のユーザー依頼に基づく。

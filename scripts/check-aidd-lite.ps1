@@ -58,4 +58,5 @@ foreach ($path in $managed) {
 }
 if ($issues.Count) { $issues | ForEach-Object { Write-Output "FAIL $_" }; exit 1 }
 Write-Output "PASS: $($managed.Count) managed files; supported metadata and local file links. Model behavior, anchors and external URLs are not checked."
+Write-Output 'Full document and used-anchor check: node scripts/check-docs.mjs (separate from metadata checks).'
 exit 0

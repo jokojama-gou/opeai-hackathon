@@ -1,0 +1,25 @@
+# 共有確認の操作検討用試作
+
+架空の2人による、今回の共有・双方の継続承認・解除を操作する試作。音声取得、本人認証、外部送信、永続保存は行わない。製品の共有権限制御の実装ではない。旧画面案の操作検討用で、MVP 2.0の全機能・受入条件への適合を示すものではない。現在の15画面配置は[mvp-spec-wireframes.html](mvp-spec-wireframes.html)、契約は[MVP_SPEC](../MVP_SPEC.md)を参照する。
+
+Node.js 22以降を用意し、リポジトリのルートで実行する。追加パッケージは不要。
+
+```powershell
+node docs/product/prototypes/serve.mjs
+```
+
+表示された `http://127.0.0.1:.../sharing.html` を同じPCのブラウザで開く。ポートは起動ごとに異なる。終了はターミナルでCtrl+C。HTMLのダブルクリックではES moduleが読み込めない場合があるため、この手順を使う。
+
+1. 左右で今回だけ許可し、「次の会話を試す」で再確認になることを見る。
+2. 左右で自動共有を選んで許可し、次の会話が自動共有になることを見る。
+3. 「自動共有を管理」から解除し、過去の共有を維持したまま次回は確認に戻ることを見る。
+
+「次の会話」は録音終了・照合済みの状態を模擬する操作。再読み込みや「最初から」で状態は消える。実機の録音や通信失敗・複数人の権限は検証していない。
+
+状態遷移テスト:
+
+```powershell
+node --test docs/product/prototypes/sharing-state.test.mjs
+```
+
+仕様は[FEATURE_SPEC_DRAFT §8](../../history/design/FEATURE_SPEC_DRAFT.md#8-共有確認継続承認解除の画面案)、製品正本は[PRODUCT_CORE](../PRODUCT_CORE.md)を参照。

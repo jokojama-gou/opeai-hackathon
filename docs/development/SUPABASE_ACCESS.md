@@ -1,6 +1,6 @@
 # AI IDEからSupabaseを操作する
 
-このPCのリポジトリルートにある `.env.supabase.local` に、`SUPABASE_ACCESS_TOKEN` を保存しています。既存の `.gitignore` の `.env.*` で除外されます。トークンの内容を表示・コピー・commitせず、アプリの公開環境変数にも入れないでください。この保存先はOneDrive配下なので、そのフォルダの同期設定が適用されます。
+元の確認PCでは、リポジトリルートの `.env.supabase.local` に `SUPABASE_ACCESS_TOKEN` を保存していました。他PCでの存在・認証成功は未確認です。既存の `.gitignore` の `.env.*` で除外されます。トークンの内容を表示・コピー・commitせず、アプリの公開環境変数にも入れないでください。元の保存先はOneDrive配下でしたが、現在の保存場所・同期設定は利用するPCごとに確認してください。
 
 PowerShellを実行できるAI IDEは、リポジトリルートから次でアクセスできます。MCPの登録やIDEの再起動は不要な、Management API経由の方式です。
 

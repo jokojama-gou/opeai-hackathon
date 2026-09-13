@@ -1,8 +1,12 @@
+<!-- archive: historical evidence; not current implementation instructions -->
+
+> 履歴資料。2026-09-13に現行入口から分離。本文は当時の判断・状態であり、現在の実装指示ではありません。現行入口は[AGENTS](../../../AGENTS.md)。
+
 # MVPの画面・データ/API契約・実装タスク案
 
-最新の実装に渡す推奨仕様は[MVP_SPEC](../product/MVP_SPEC.md) §9/§11。本書のdraft-0.1/T01〜T09は設計過程として保持し、API・原音再生・保持等の差異は最新仕様の提案を参照する。採用済みへの昇格ではない。
+最新の実装に渡す推奨仕様は[MVP_SPEC](MVP_SPEC_2_0.md) §9/§11。本書のdraft-0.1/T01〜T09は設計過程として保持し、API・原音再生・保持等の差異は最新仕様の提案を参照する。採用済みへの昇格ではない。
 
-2026-09-12 / contract draft 0.1。状態: **設計準備済み・採用と実装は未完了**。[MVP案](../product/MVP_DEFINITION_DRAFT.md) Q1〜Q3は回答待ち。資料にある方式を採用済みにせず、契約はHTTP/JSONの論理案として定義する。製品コード・環境導入・音声処理は今回開始しない。
+2026-09-12 / contract draft 0.1。状態: **設計準備済み・採用と実装は未完了**。[MVP案](MVP_DEFINITION_DRAFT.md) Q1〜Q3は回答待ち。資料にある方式を採用済みにせず、契約はHTTP/JSONの論理案として定義する。製品コード・環境導入・音声処理は今回開始しない。
 
 ## 1. 画面フロー
 
@@ -163,12 +167,10 @@ T01/T02でグループ全画面・認証SDK・クラウドDB・音声エンジ�
 
 RN Android/iPhone・SwiftUIの役割は決定済み。既存ロードマップの推奨候補はExpo/TypeScript、FastAPI/Pydantic/OpenAPI、Supabase Auth/PostgreSQL/Storage/Queues、Python worker、Render。**この準備ではいずれも新たに採用・導入しない。** 候補の現在の互換性・料金・運用成立も今回再検証していない。
 
-推奨する採用順は、まず両クライアントの人工JSONとローカル起動に必要な部分、次に共通API、最後に送信・保持要件を満たす保存/AI経路。根拠となる既存一次資料と技術候補の詳細は[MULTIPLATFORM_DELIVERY_PLAN](MULTIPLATFORM_DELIVERY_PLAN.md) §3/§11へ集約し、採用時に対象版と適合を確認する。
+推奨する採用順は、まず両クライアントの人工JSONとローカル起動に必要な部分、次に共通API、最後に送信・保持要件を満たす保存/AI経路。根拠となる既存一次資料と技術候補の詳細は[MULTIPLATFORM_DELIVERY_PLAN](../process/MULTIPLATFORM_DELIVERY_PLAN_20260912.md) §3/§11へ集約し、採用時に対象版と適合を確認する。
 
 ローカル共通API準備は製品全体の端末内処理の決定ではない。人工データはGitに置けるが、実音声・転記・秘密情報をfixtureへ混ぜない。実音声は既存の個別許可から製品外部送信許可を導かず、接続先・データ種別・保持/削除を別途決める。
 
-## 9. 次の作業依頼に使える最初の単位
+## 9. 当時の着手案（履歴）
 
-> T01を実装してください。AGENTS、WORKFLOWの最新記録、MVP_DEFINITION_DRAFTの採否状態、本書を確認し、既存変更を保持してください。contracts配下にF01/F02/F04の架空入力・期待表示・エラーと最小schemaを作り、出典ID/版の対応を確認してください。未決定仕様はdraftとして残し、製品の本人識別・認可・AI統合の成功とは表示しないでください。音声・既存転記の読込、パッケージ導入、外部送信、commit/pushは不要です。成果と確認結果をWORKFLOWへ記録してください。
-
-これは後続実装用の依頼文で、別タスクの作成・送信・T01の実行を今回行った意味ではない。
+当時はT01として人工入力・期待表示・エラーと最小schemaの作成を提案した。旧T01をそのまま依頼するテンプレートは撤去し、現在の着手は[MVP_SPEC §11](MVP_SPEC_2_0.md#11-実装順と最初のチケット)と[開発開始ガイド](../process/DEVELOPMENT_START.md)に従う。旧案の未回答を採用にしない。

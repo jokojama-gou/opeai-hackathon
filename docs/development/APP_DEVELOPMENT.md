@@ -1,6 +1,6 @@
 # React Native / Web 開発環境
 
-2026-09-12の依頼に基づく共通クライアントの開発基盤。Expo、React Native、React Native Web、TypeScriptを使い、`apps/client/App.tsx`をAndroid・iOS・Webで共有する。npm workspacesでルートから操作する。
+2026-09-13、確認済みMVP作業ツリー f461ab7 から既存スターターを選択統合。Expo、React Native、React Native Web、TypeScriptを使い、`apps/client/App.tsx`をAndroid・iOS・Webで共有する。npm workspacesでルートから操作する。
 
 ## セットアップと起動
 
@@ -79,12 +79,21 @@ UIは`react-native`の`View`・`Text`・`Pressable`などで書く。WebではRe
 
 Expoと組み合わせるライブラリは、`apps/client`から`npx expo install <package>`で互換バージョンを追加する。ロックファイルはルートのものを共有する。秘密情報はコミットしない。`EXPO_PUBLIC_`付き変数はクライアントに埋め込まれるため、API秘密鍵を入れない。
 
+## 製品実装へ進むとき
+
+大会の参照先は[リンク集](HACKATHON_LINKS.md)。必要時のクラウド管理は[Supabase操作手順](SUPABASE_ACCESS.md)を参照する。管理APIの過去の認証成功は、製品API・ローカルSupabaseの構築や現在のPCでの成功を意味しない。
+
+- K01/K02の人工データ・共通画面から着手する。独立Swiftアプリは作らない。
+- Glass部品・録音・カレンダー・SecureStore・navigation等は未導入。該当Kで既存Expo SDKに互換の依存を追加し、root lockfileを更新する。
+- 製品の権限やネイティブ設定を確認する際はexpo-dev-clientとEAS development profileを追加する。現在のpreviewは配布用でdevelopment clientではない。
+- 初回はlight固定。主タブ/録音操作面のGlassと非対応環境の代替表示はMVP_SPECのUIルールに従う。
+
 ## 決定範囲
 
 ユーザー指定のReact NativeとWeb共通開発を具体化するため、Expoのblank TypeScriptテンプレートを採用した。画面遷移が不要な段階なのでRouterは未導入。
 
-2026-09-12の追加指定により、React Nativeを共通基盤としてiOS・Android・Webを作る。Webは、ハッカソン当日にiOS・Android版の開発が終わらなかった場合の保険として用意する。大会の参照資料は[ハッカソンのリンク集](HACKATHON_LINKS.md)にまとめる。
+2026-09-12の追加指定により、React Nativeを共通基盤としてiOS・Android・Webを作る。Webは、ハッカソン当日にiOS・Android版の開発が終わらなかった場合の保険として用意する。提出条件は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)で実際の大会条件と照合する。
 
-関連はPRODUCT_COREのO02（対応先と開発基盤）とD14/D15。対象端末の詳細・OSバージョン・プラットフォーム間の機能差・Webで代替する範囲、MVP、録音・統合・共有・バックエンド・音声処理場所は未決定のまま。現在の画面は製品UIではない。実測結果は[WORKFLOW](WORKFLOW.md)の2026-09-12開発環境記録を参照する。
+仕様と採用状態は[MVP_SPEC](../product/MVP_SPEC.md)、残る判断は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、担当・実装順は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)。MVP A/B/CとRN＋Expoは採用済み。現在の画面は製品UIではなく、録音・統合・共有・APIは未実装。確認結果は[WORKFLOW](WORKFLOW.md)を参照する。
 
 公式資料: [create-expo-app](https://docs.expo.dev/more/create-expo/)、[Web開発](https://docs.expo.dev/workflow/web/)。
