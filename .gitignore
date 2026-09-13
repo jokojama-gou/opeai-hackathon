@@ -7,6 +7,8 @@ npm-debug.*
 .env
 .env.*
 !.env.example
+# Hackathon API keys shared in this private repository
+!/.env.audio-models.local
 .DS_Store
 credentials.json
 credentials/*

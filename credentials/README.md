@@ -1,10 +1,19 @@
 # 音声APIキーの共有
 
-`audio-models.env.enc.json` は取得済みAPIキーの暗号化ファイルです。AES-256-GCMとランダムな256ビット鍵を使います。平文の環境ファイルと復号鍵はGitに含めません。
+取得済みAPIキーはルートの `.env.audio-models.local` に保存しています。2026-09-14のユーザー指定により、ハッカソン当日用のキーをプライベートリポジトリで共有するため、このファイルをGit除外から外しました。
+
+`audio-models.env.enc.json` は既存の暗号化ファイルです。AES-256-GCMとランダムな256ビット鍵を使います。復号鍵 `.env.audio-models.encryption-key.local` は引き続きGit除外です。
 
 2026-09-14時点の保存対象はOpenAI・pyannote・Speechmatics・Deepgram・AssemblyAIの5社です。APIの実行確認は未実施です。残件は[認証準備の記録](../docs/development/AUDIO_API_CREDENTIALS_20260913.md)を参照してください。
 
 ## 別のPCで使う
+
+1. `.env.audio-models.local` を含むコミットをpushした後、別PCでリポジトリを取得・更新します。
+2. ルートの `.env.audio-models.local` を評価用バックエンドから読み込みます。キー値をクライアント用の公開環境変数には入れないでください。読み込みランナーは未接続です。
+
+### 暗号化ファイルから復元する場合
+
+平文ファイルが手元にない場合は、既存の復号手順も利用できます。
 
 1. リポジトリを取得します。
 2. 元のPCの `.env.audio-models.encryption-key.local` を、Gitとは別の安全な経路で受け取り、リポジトリ直下の同じ名前で保存します。このファイルを持つ人はAPIキーを復号できます。
@@ -14,7 +23,7 @@
 node scripts/audio-credentials.mjs open
 ```
 
-復号先はGit除外の `.env.audio-models.local` です。キー値をクライアント用の公開環境変数には入れず、評価用バックエンドだけで読み込んでください。
+復号先は `.env.audio-models.local` です。
 
 ## キーを追加・更新した後
 
@@ -25,4 +34,4 @@ node scripts/audio-credentials.mjs verify
 
 `seal` はローカルの環境ファイル全体を暗号化し、既存の暗号化ファイルを更新します。元のキーは残します。復号鍵がない初回だけ鍵を生成します。`verify` はファイルの改ざん検出と元データとの一致を確認し、キー値は表示しません。
 
-Gitへ追加するのは暗号化ファイルだけです。復号鍵を失うと、この暗号化ファイルからキーを復元できません。
+Gitへ追加するのは `.env.audio-models.local` と、更新した暗号化ファイルです。復号鍵を失うと、この暗号化ファイルからキーを復元できません。
