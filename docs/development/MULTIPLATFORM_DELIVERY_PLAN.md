@@ -1,203 +1,170 @@
-# React Native主軸・Swift並行開発の全体計画
+# RN＋Expoの開発ロードマップ
 
-最新の実装に渡す仕様は[MVP_SPEC 2.0](../product/MVP_SPEC.md)。M01〜M14/U01〜U15、共通契約、受入条件43件、K01〜K10に本書を同期した。採用状態は仕様書に従い、担当・提出方針は維持する。
+2026-09-13。RN＋Expo統一、明色＋Liquid Glass、MVP A/B/C採用はユーザー決定。仕様は[MVP_SPEC](../product/MVP_SPEC.md)、現在地は[WORKFLOW](WORKFLOW.md)。本書だけがKタスク・担当・依存・提出条件を定義します。
 
-作成日: 2026-09-12。状態: Mac担当の依頼者・Windows担当のGo君に向けたロードマップ。開発・提出方針はユーザー決定、下記の作業分割は今回の計画。MVP・処理方式の未決定は維持。この文書更新では製品実装・環境導入・外部送信・公開を行っていない。
+## 構成と契約
 
-2026-09-12・最新の作業順: K01から基盤K02〜K06、K09→K10→K08、全体判定K07へ接続する。依存は§7とMVP_SPEC §11。旧T01〜T09や音声探索への分岐を現在の手順にしない。追加録音・全文採点・既存録音再評価・認識環境再構築は再開しない。
+既存 `apps/client` が唯一のアプリ基盤です。独立したSwiftUIアプリは作りません。UI・状態・通信をTypeScriptで共通化し、OS固有差だけ部品境界で分けます。必要なSwift/Kotlin拡張はExpo Modulesで追加できますが、独立アプリの再開にはしません。
 
-## 1. 決まった方針と計画の前提
+API・保存・処理の仕様は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)、カレンダーは[§14](../product/MVP_SPEC.md#calendar)、5役割は[§15](../product/MVP_SPEC.md#agents)。APIが認証・区間認可を行い、workerが個別ASR・統合・生成・clip処理を担います。Windows側の共通API/ASRへ接続し、MacにASR環境を重複構築しません。
 
-- ユーザー決定: React NativeでAndroid・iPhoneに対応するアプリを第一に開発する。SwiftによるiPhoneアプリも並行して検討・開発し、ハッカソンに間に合えばSwift版、難しければReact Native版を提出する。
-- 計画上の解釈: Swift版は独立したSwiftUIクライアント。Swift採用時もAndroidはReact Native版を維持する。React Nativeもネイティブアプリであり、比較はReact Native版とSwift版で行う。
-- 前の会話の意向: Web版を保険にする。専用の第三プロジェクトを一から作らず、ExpoのWeb出力で共通画面を早期に動かす案を推奨する。
-- 仕様根拠: [PRODUCT_CORE](../product/PRODUCT_CORE.md)のD01〜D17、S01〜S05、O01〜O10。今回具体化したのはO02の開発方針。音声処理場所O03、照合・本人帰属O04、近距離通信O06、保持O07、MVPと品質基準O01/O10は別判断。
-- 2026-09-12ユーザー決定: 依頼者本人（以下「あなた」）がMacでSwiftUI、Go君がWindowsでReact Nativeを開発する。各人の稼働時間、提出日時、大会条件、Xcode/署名/開発用実機の準備状況は未確認。Macの有無や開発者のOSを再質問しない。検証用のiPhone 16／Pixel 8は既存資料で確認済みだが、開発用配布の成立とは分ける。
-- このロードマップで具体化するのは担当範囲・受け渡し・進行順と観測可能な完了条件。クラウド構成、期限割合、最初の製品画面・機能範囲は提案であり、MVP確定や外部音声処理の許可にはしない。Go君の稼働時間や作業完了を本人確認済みとは扱わない。
-- 適用FWは[採用済みAIDD-Lite](../decisions/AIDD_FW_ADOPTION.md)。本書は技術構成と実装ロードマップ、[開発開始ガイド](aidd-lite/DEVELOPMENT_START.md)は作業入口、[音声検証計画](AUDIO_VALIDATION_PLAN.md)は検証手順、[WORKFLOW](WORKFLOW.md)は最新状態を担当する。同じ手順・採点規則を本書へ複製しない。
+契約はK01のJSON schema/人工fixtureから始め、API実装時にはFastAPI/PydanticからOpenAPIを管理します。生成TS型とschemaでID・版・範囲・エラーの意味を揃えます。401/404/409/422/429、失効本文なし、再送・二重操作も該当Kで検証します。型チェックだけを認可の証明にしません。
 
-## 2. MVP 2.0の開発構成
+## 担当と編集境界
 
-方式の定義元は[MVP_SPEC §9](../product/MVP_SPEC.md#9-実装方式データ契約推奨案)。ローカルSupabase（Auth/PostgreSQL/非公開Storage）＋FastAPI＋Python workerを推奨し、Windows側のAPI/ASRへRNとSwiftを同じ明示設定のHTTPS接続先でつなぐ。MacにASR環境を重複構築しない。構成の採用・導入・実行は未実施。
+2026-09-13の最新ユーザー報告：Go君が音声に関する技術選定を進め、企画者がUI/UXを担当する。これが確定した分担。以下のAPI/worker・共通設定まで含む担当は並行開発の推奨割当であり、Go君本人の了承・選定結果・進捗を確認済みとは扱わない。最初の受け渡しで担当範囲を確認するが、UI/UXの独立作業は待たない。
 
-処理は「RN/Swift → 共通APIの認証・区間認可 → DB/非公開Storageと永続job → workerの個別ASR → 許可内文字・出典だけ生成adapterへ → 出典/manifest/権限版検査 → 閲覧者別結果」の順。
+| 担当 | 主な成果と担当案 |
+|---|---|
+| UI/UX担当（企画者） | 画面構成・文言・操作導線・状態別表示・Glass・可読性と、そのRN共通画面のAI実装。画面側のfixture/repository、iOS見た目・操作の確認。API/workerの技術選定を別途進めない |
+| 音声・基盤担当（Go君） | 音声技術選定。後続の推奨担当は録音の端末実装、ASR/統合/生成/clip、API/認証/DB/認可、共通契約とTS APIクライアント。UIの配色・配置を別実装しない |
+| 両担当 | 同じ人工入力と期待結果を先に確認し、画面と処理を小さな単位で接続。技術選定の制約がUXへ影響する場合は、理由と影響を提示して仕様を更新する |
 
-共通化するのは認証・データ・API・処理・権限判定・デザイン規則・人工ケース。SwiftUIは独立クライアントでTSXは共有しない。端末録音とログインセッションはRN/Swift間で自動移行しない。アプリ識別子・redirectを分け、提出切替は新規デモ開始前に行う。
+編集境界の推奨案を次に固定して受け渡す。apps/client以外は必要なKで作る。担当確認前にGo君の領域へ実装を追加しない。
 
-## 3. 技術の扱いと実行条件
+~~~text
+apps/client/App.tsx                                    UI/UX担当
+apps/client/src/{screens,ui,navigation}/                UI/UX担当
+apps/client/src/data/                                  UI側repository・fixture（UI/UX担当）
+apps/client/src/platform/audio/                        録音/再生の端末adapter（Go君）
+apps/client/src/platform/calendar/                     端末カレンダーadapter（Go君、K08）
+contracts/                                            正本schema・共有fixture（Go君取りまとめ、両者確認）
+packages/api-ts/                                      API通信・生成型（Go君）
+services/backend/, supabase/                          処理・API・DB（Go君）
+~~~
 
-- RNはExpo/TypeScript、SwiftはSwiftUI。録音・保存、認証、ASR/生成候補と形式上限は仕様書§9に従い、数値やモデルを別定義しない。
-- 初期jobはPostgreSQLとworkerのleaseで処理する。Supabase Queues/Renderは後続候補であり初期着手の前提にしない。§11の一次資料は過去の候補検討の出典として保持する。
-- 統合adapterとG1〜G5の共通runnerは§15に従う。G4は決定的なコード、生成モデルは共通adapterに閉じる。開発AIのサブエージェントとは別の概念。
-- 実adapter接続前に送信対象・処理先・保持・モデル版・費用上限・認証/HTTPS設定を具体化する。実行上限/冪等性は§15.5、外部カレンダーの作用は§14を適用する。
-- バージョン・導入コマンドは着手時に実環境で確認して固定する。方式の提案を導入済みとしない。自動発見/BLEは初回対象にしない。
+アプリのpackage.json・root lockfile・app/EAS設定・共通navigation登録はUI/UX担当が取りまとめる案。Go君は録音等に必要な依存・設定差分を渡し、両者が同じlockfileを同時編集しない。バックエンド側の依存設定はGo君。WORKFLOWとMVP_SPECの共通節は、その作業ごとに一人が更新する。iOS署名は企画者、Android実機確認はGo君を継続案とし、API/worker担当と同様に最初に確認する。
 
-## 4. API・データ契約の先行設計
+<a id="parallel"></a>
+## 並行作業と合流点
 
-Go君が契約を取りまとめ、あなたがSwift/workerの適合を確認する。K01は指定schemaと4fixtureから始め、実API段階ではFastAPI/PydanticからOpenAPIを管理する。JSON schemaとOpenAPIで同じ型の意味が食い違わないよう確認する。
+### 1. 最初に揃えるもの
 
-- Source/Conversation/Match/共有snapshot・jobは§9、予定候補・bindingは§14、ContextView/evidence group/manifest・ToDo/保存/確認項目/日次は§15を詳細参照元にする。
-- 正常結果だけでなく401/404/409/422/429、失効本文なし、旧版の再確認、再送/二重操作を担当Kのfixtureに含める。
-- APIが現在の認可を判定する。個人の根拠はU03、共有はU06/U07。生成入力全体のmanifest、件数・キャッシュ・遅着jobまで同じ制約を適用する。
-- ToDo/保存の本人編集・採用で根拠の期限や共有取消を無効にしない。外部保存された予定コピーは§14で別に扱う。
+選定する音声モデル名より先に、画面に必要な入出力と状態を揃える。新しい仕様書は作らず、データの意味はMVP_SPEC、コード化する契約はK01のcontractsへ置く。
 
-API変更はschema/fixture/両クライアント/workerの影響を一つの作業で示す。型生成・decode成功だけで認可や製品動作の成功としない。
-## 5. 推奨するリポジトリ構成
+| 合わせる事項 | 最小の受け渡し |
+|---|---|
+| 入力と出力 | Recording/Source/Conversation/Job、本文・話者不明・時刻不明・出典ID/版/文字範囲。詳細は[§9](../product/MVP_SPEC.md#contracts)。未取得を0/空の成功へ変換しない |
+| 録音と処理の状態 | 録音中、保存中、保存済み、送信待ち、処理中、確認待ち、失敗、中断、期限切れ。MVP_SPECの状態定義と、K01で確定するAPI enum・UI表示の対応を共有し、画面側だけで別のサーバーenumを追加しない |
+| 失敗からの操作 | 再試行可能か、本人の再確認が必要か、原文へ戻れるか。無限再試行や録音の自動再開を追加しない |
+| 技術選定による制約 | 録音形式、処理単位、時刻/話者情報の有無、遅延、端末/サーバー処理、利用条件・費用。実測/仮説/未検証を分ける |
 
-以下は将来の配置案で、今回はディレクトリや製品コードを作成しない。
+最初の共通fixtureはduplicate/conflict/pending/expiredの4件。UI/UX担当は契約未受領でもMVP_SPEC準拠の仮データと期待画面を作れる。その場合はapps/client/src/data内のUI検討用と明示し、Go君がcontractsへ揃えた後は同じ共有fixtureを参照して本文を二重管理しない。仮データをAPIが保証する契約や実音声の成果と呼ばない。
 
-```text
-apps/mobile/          Expo：Android・iPhone・限定Web
-apps/ios-swift/       SwiftUIの独立iPhoneアプリ
-services/backend/    FastAPIと共通ドメイン、workerの別起動入口
-packages/api-ts/     OpenAPIから生成したTypeScript型・クライアント
-packages/ios-core/   必要になった場合だけRN/Swift間で再利用するSwift package
-contracts/           OpenAPI出力、人工データ、エラー契約
-design/              tokens.json、画面見本、状態別文言
-supabase/            DB migration・RLS・Storage policy・job設定
-tests/contracts/     同じケースをAPIと各クライアントで確認する素材
-```
+### 2. 同時に進める順序
 
-Swift package共通化は録音/通信の独自実装が本当に必要な場合だけ行う。expo-audioと同じ機能を先に作り直さない。API/DBは一系統、画面は二系統として管理する。
-
-## 6. デザイン方針と最初の範囲案
-
-UIデザインはユーザー決定によりGo君が担当する。あなたは共通デザインをSwiftUIで実装し、iOS固有の制約や操作上の調整をGo君へ返す。OSごとに画面全体を別デザインにする必要はない。
-
-| 対象 | 共通にする部分／調整する部分 |
-| --- | --- |
-| 共通デザイン | 色、余白、文字階層、アイコン素材、カード、画面の情報構造、録音・処理・共有の状態表現をGo君が管理する |
-| iOS／Androidの操作 | 戻る操作・ジェスチャー、ナビゲーション、sheet・共有メニュー、キーボード、safe area、権限ダイアログとの接続を各OSに合わせる。標準部品で吸収できる範囲も実機で確認する |
-| RNのiOS／Android | UIコードを原則共通化し、必要な差だけPlatformや.ios/.androidファイルへ分ける。Windowsで開発してもAndroid専用の見た目になるわけではない |
-| RN／SwiftUI | デザイン仕様・素材・API契約は共有するが、RNのTSXをSwiftUIへそのまま流用はできない。あなたがSwiftUIのViewとして別実装する |
-| Web | 共通デザインを使い、ブラウザ幅・ポインター／キーボード操作を調整する。録音等の機能制約は本節末尾のWeb保険案に従う |
-
-RNの分岐方法は[公式のPlatform-Specific Code](https://reactnative.dev/docs/platform-specific-code)を参照。まず履歴・会話詳細の一組をGo君のデザインから両実装へ展開し、文字拡大と各OSの戻る操作まで確認してから画面数を増やす。
-
-共通の色・余白・角丸・文字階層・状態名を先に決め、まずU01→U06→U07で比較し、3主タブ「今日・記録・保存」とU01〜U15へ段階的に展開する。仕様上必要な状態を先に揃え、その後にSwiftUIの標準ナビゲーション・sheet・触覚等を調整する。Swift版の見た目だけを優先し、録音/共有の状態を省略しない。
-
-RN版も提出品質のデザインを作る。Swift版を作ること自体が品質向上の証明ではない。大きな文字、VoiceOver/TalkBack、暗色表示、録音中の可読性、片手操作を確認する。Androidはブランド表現を揃えつつ戻る操作等の慣習に合わせる。
-
-完成体験はMVP_SPEC §3/§10に従う。本人開始→保存→持ち寄りと確認→共有と統合→根拠/訂正→ToDo/予定/保存→日次振り返り。K02の操作デモと全体完成を分ける。グループ実画面・自動発見・全文/意味検索・同じ録音の一時停止/再開は後続で、確定した権限方針は維持する。
-
-Webの保険案は、許可された音声のファイル取込、履歴、共有確認、統合結果閲覧。ブラウザ録音は対応確認後の追加。背景録音・BLEの同等性は約束しない。手動で入力組を指定するデモを採用する場合、自動候補発見が未実装と明示し、ユーザーが妥協範囲を選ぶ。
-
-## 7. Mac・Windowsの開発ロードマップ
-
-### 今回の担当と編集境界
-
-役職を固定するものではなく、このロードマップの仕事を割り当てる。担当者のOSがサーバーの実行OSや処理先を決めるわけではない。
-
-| 仕事 | 主担当 | 受け渡すもの・協力範囲 |
-|---|---|---|
-| RNのAndroid/iPhone、限定Web | Go君／Windows | 同じAPI契約を使う画面・録音・保存・再試行。あなたはRNのiPhone実機・Xcode調査を支援 |
-| SwiftUIのiPhone | あなた／Mac | 同じデモのSwiftクライアント。UI仕上げはRNの提出可能状態を損なわない時間枠で行う |
-| 共通API、認証、DB、ジョブ受付、権限制御 | Go君 | API契約、認可テスト、migration、job状態。RNの一つの操作からAPI・DBまで通す単位で実装 |
-| 個別ASR・統合・生成・clip処理ワーカー | あなた | K03のASR adapterと正規化・Source生成、K05/K06/K10の契約・処理実装。Go君へ同じコード版と起動条件を渡し、Windowsでの接続結果を受け取る。API/DB変更はGo君へ要求する |
-| 共通デザイン・状態別の表示案 | Go君 | U01〜U15と3主タブの状態別見本、文字・色・余白の規則。あなたはSwiftUIへ反映し、iOSの制約をGo君へ共有 |
-| API定義・処理job契約の取りまとめ | Go君 | Pydantic/OpenAPIの定義元を一つに保つ。あなたはSwift生成・ワーカー入出力から適合を確認 |
-| iOS署名・配布、提出比較 | あなた | RN/Swift両方のiOS起動・配布結果。Go君はAndroidとWebを確認 |
-
-先の配置案を採用する場合、Go君はapps/mobile、design、services/backendのAPI/domain、packages/api-ts、contracts、supabaseを主に編集し、あなたはapps/ios-swift、services/backendのworker/processingを主に編集する。共通設定・依存ファイル・DB定義・WORKFLOWはその作業の担当者一人が編集する。配置はまだ製品コードとして存在せず、API/domainとworker/processingの具体的な境界は着手する単位で定める。
-
-共通処理が未成立の間、あなたの優先順位は共通処理の契約・実装→RNのiPhone支援→SwiftUIの追加演出。Go君はRNの一操作と必要なAPIを一緒に仕上げ、RN全画面とAPI全機能を同時に抱えない。手が足りなければSwift固有の新機能・Web固有機能を止め、主軸の未達項目へ時間を戻す。
-
-### 順序と完了条件
-
-チケット定義は[MVP_SPEC §11](../product/MVP_SPEC.md#11-実装順と最初のチケット)。番号順に直列化せず、依存関係で進める。日程は稼働・提出条件が判明してから置く。
-
-| 段階・依存 | Go君 / Windows | あなた / Mac | 完了条件 |
+| 段階 | UI/UX担当 | Go君 | 合流条件 |
 |---|---|---|---|
-| K01（A採用後） | schema、4fixture、期待表示 | Swift適合確認 | duplicate/conflict/pending/expiredの受理・拒否とID/版/範囲が一致 |
-| K02（K01・RN起動依存の採用後） | RNのU01→U06→U07とデザイン | SwiftUIで同じ操作 | AC06/07/15の表示部分。人工デモと明示 |
-| K03（B・実機条件） | RN/APIの録音・保存・送信、WindowsでASR workerの起動・API接続確認 | Swift録音、RN iPhone支援、ASR adapter・正規化・Source生成の実装と受け渡し | U02/U03、AC01/02/14。入力metadata→job→SourceとASR状態、失敗/再送/上限の結果が両画面へ反映される |
-| K04（K01・BのAuth/DB） | snapshot・認可とRN | SwiftのU04/U05/U09 | AC03/04/09〜12/16/19。未回答・再確認・取消・継続 |
-| K05（K01/K04・生成条件） | API接続とjob状態、確認済みMatchからContextView/根拠group・範囲被覆を確定 | 統合adapter/G1の根拠付き結果を共通契約でAPIへ返す | AC05/06、出典・再送・公開前版検査 |
-| K06（K03〜K05） | 認可・訂正・指摘API/RN | clip処理とSwift | AC07/08/13/17/18。原音・訂正・指摘解決・取消競合 |
-| K09（K01/K04、UIはK02から） | 今日・ToDo・保存/メモ・確認API/RN | U12〜U15のSwift | 人工G2/G4出力で本人操作と権限/版/期限をAPIまで確認 |
-| K10（K05/K09・目的別許可） | runner/API接続・日次選択 | G2/G3/G5生成とG4コード | A01〜A15。manifest・日付・重複・失効・再試行/費用上限 |
-| K08（K05/K10のG3実生成後） | Google executor/API/RN | SwiftのU10/U11・OS経路 | C01〜C09。人工UIはK09と並行可、実登録は条件成立後 |
-| K07（全機能接続後） | RN Android/iPhone、APIの証拠 | Swift/iPhone、workerと配布の証拠 | AC01〜19/C01〜09/A01〜15、通しデモ、RN候補→Swift切替 |
+| 最初 | U01→U06→U07の導線・文言・状態別ラフ、主タブとGlassの見本。既存M/U/ACの意味を維持 | 音声方式を比較し、出力例・欠ける情報・処理/保存条件への影響を整理 | 入出力と担当案を確認。技術名が未決定でもUI検討は進める |
+| K01/K02 | 共通fixtureで一覧→本文→出典、読込/空/失敗/確認待ち/期限切れを操作できるRN画面 | contractsとfixtureを取りまとめ、処理結果をSource/Conversationへ変換する境界を決める | 同じID/版/不明/出典と期待表示。画面内のデータ直書きをrepository経由へ置換 |
+| K03〜K06 | 録音画面の表示、保存/送信/処理状態、共有確認、再試行、出典/訂正UIをfixtureで先行 | 端末録音・API・ASR・認可・統合・clipを必要な条件成立後に接続 | まず1録音→保存→個人結果→出典、次に2入力→許可→統合。実音声/外部送信は既存条件に従う |
+| K09/K10/K08 | 今日・ToDo・保存・日次・予定確認の画面を人工出力で先行 | 生成runner・manifest失効・Google executorとAPI | 機能単位でfixtureから実adapterへ切替。成功だけでなく取消・期限・再送も同じ画面で確認 |
+| K07 | 初回体験・操作負担・可読性・iPhoneの完成確認 | 実処理・認可・Androidの完成確認 | 全43条件と両OSの証拠。人工画面だけで完成にしない |
 
-K03のASR受け渡しは、あなたがコード版・入出力契約・起動条件をGo君へ渡し、Go君がWindows側の実行版・job/Source・成功/失敗の証拠を返す。Macは人工入出力でadapter契約を確認でき、ASR環境を重複構築しない。実音声経路は許可された実装検証の条件成立後に確認し、人工状態だけではASR接続完了にしない。旧探索の再評価・環境再構築を自動再開する指示ではない。
+### 3. 画面と実処理を切り離す境界
 
-K01/K02とK09の画面準備は実音声・外部登録に依存しない。K10のG4はモデルを呼ばない。MVPの生成機能と開発AIへの委任を混同しない。
+画面はUI側repositoryを呼び、fixture版とAPI接続版を同じ呼出方法で切り替える。API接続版はpackages/api-tsを使い、端末録音はplatform/audioを呼ぶ。Reactの画面へモデル名、Python処理、サーバーURLや認証tokenを直書きしない。技術変更はGo君側のadapterへ閉じ、外向きの情報や状態が変わる場合だけ契約を更新する。
 
-### 採用判断と未達時の扱い
+fixtureは開発用と明示し、実API失敗時に自動で成功fixtureへ戻さない。API接続後の閲覧可否・共有成立はサーバーが判定し、UIの非表示だけで認可を代替しない。fixtureによる画面確認も、本番の共有/生成が完成した証拠にしない。
 
-A/B/Cの採否は仕様書§1とWORKFLOWへ記録する。旧Q1〜Q3の未回答を同意にせず、担当・OSは再質問しない。実装依頼と採用状態を開始時に照合する。
+別ブランチ・別checkoutで同じ基準版から作業し、合流する一操作ごとに対象版、fixture、期待結果、変更した契約を渡す。今回はブランチ作成・commit・pushを実行しない。共有設定や契約の変更は一人が取りまとめ、相手の作業中に無断で破壊的変更をしない。別PCの未コミット差分は自動共有されないため、共有手段と版を明示する。
 
-- 出典不正・権限漏れ・目的別許可不足は該当公開/送信を止め、担当Kで修正して同じ条件を再確認する。
-- 統合・帰属/参加確認が未達なら不明/保留を維持し、MVP_SPEC §12の限界と修正点を報告する。旧音声探索へ自動で戻らない。
-- 生成失敗・費用未設定/上限到達は§15.5で停止/再試行する。有効な本文と独立操作を維持し、無限生成や予算変更で通過させない。
-- 実行条件や配布が未成立なら独立した人工契約/画面を進め、依存する実接続だけ未実行とする。
-- 工数不足ならSwift演出/Web追加よりRNと共通基盤を優先する。M09〜M14を見本で済ませて2.0完成とせず、範囲変更はユーザー判断を記録する。
+### 4. 各AIへ渡す依頼例
 
-### 二人と各AIの受け渡し
+UI/UX担当：AGENTS・WORKFLOW・本書の並行作業を読み、MVP_SPECのU01/U06/U07とUI共通ルールを前提に、状態別の画面案を具体化する。配置案を確認してから、明示された実装範囲でfixture接続のRN画面を作る。音声技術やサーバー実装を独自に決めず、必要な出力と不足をGo君へ渡せる形に整理する。
 
-[開発開始ガイド§4](aidd-lite/DEVELOPMENT_START.md#4-一つの作業を進めるサイクル)に従い、K・M/U/受入ID、仕様/契約/fixture版、差分、実行条件、証拠、残件を渡す。
+Go君側：音声技術選定の現在の成果を確認し、採用仕様の入出力・保持/送信条件を満たすか比較する。出力例、欠ける情報、UIに影響する制約、推奨と未検証を返す。担当案を確認した後、依頼範囲のcontracts/adapter/APIを実装し、同じfixtureでUI側へ渡す。共有・保持・送信先を変える場合はその変更判断を記録する。
 
-Go君はAPI/DB契約を取りまとめ、あなたはSwift/workerの適合結果を返す。共有ファイルは一人が編集し、別checkout/作業ブランチの対象版を明示する。相手で同じ入力を試した証拠が揃うまで両PC確認済みとしない。API変更は互換性を保つか、両画面とworkerを同時に接続確認する。
+上記は依頼例であり、今回他の人やAIへ送信したものではない。技術選定の完了日やGo君の稼働時間を仮定せず、待ち時間は独立したUI検討へ使う。
 
-各AIへの準備依頼は[開発開始ガイド§6](aidd-lite/DEVELOPMENT_START.md#6-各aiへ渡す最初の依頼例)に一本化する。共有資料はAGENTS、PRODUCT_CORE、MVP_SPEC 2.0、WORKFLOW、本書、DEVELOPMENT_START。画面担当は15画面見本、必要に応じGUIDE/VALIDATIONを参照する。旧音声資料は必要な過去証拠だけ参照する。
+<a id="readiness"></a>
+### 5. 着手判定と未決定の扱い
 
-共有前に必要ファイルが受け渡す版に含まれるか確認する。未コミット・未追跡資料は相手のpullに含まれない。音声・転記・特徴量・秘密情報は共有Gitへ入れない。今回の資料更新では相手への送信やcommit/pushを実施していない。
-## 8. 提出版の切替基準
+資料だけで無条件に全工程を並行実装できる状態ではない。UI検討と音声選定は今すぐ並行できる。共通契約の作成は担当/対象版を確認して開始し、正式な画面接続はその契約の完成後に進める。以降の粒度は作業分割であり、未決定の製品仕様を新たに採用するものではない。
 
-最終判断は経過80%までを推奨。ただし大会の提出締切、署名・審査・配布の締切が早ければ、その前に置く。外部TestFlightは審査があるため最後に初回配布しない [15]。
-
-Swiftを選ぶ条件（すべて満たす案）:
-
-1. 選定済みのデモ必須機能がRN版と同じ範囲で動き、模擬部分は両版とも明示されている。
-2. Swift/iPhone＋RN/Androidで独立録音から統合・共有、ToDo/予定/保存、別会話を含む日次・根拠まで通る。AC01〜19/C01〜09/A01〜15の結果を揃える。
-3. 今回許可・継続許可・未回答・途中参加・グループ閲覧等、採用範囲の権限ケースが同じ期待結果になる。iPhoneのUIだけで共有条件を緩めない。
-4. ロック、着信等の中断、オフライン停止、再送、重複操作の選んだケースを確認し、保存失敗を成功表示しない。
-5. 実際の提出・デモ端末へ署名済みアプリを配布できる。SwiftとRNの認証redirectが混線しない。
-6. 初期状態をリセットしたデモを異なる入力で3回通す（少数回の提出準備確認であり品質保証ではない）。録音内容の採用・処理条件を満たす。
-7. デザイン・操作感を比較し、RN提出候補を置き換えるだけの利点がある。
-
-Swift不合格ならRN版を提出し、Android対応も維持する。Swift合格ならiPhone側はSwift、Android側はRNを使う方針で提出形式を大会条件に合わせる。RNも未達なら「Webなら完成」とはしない。Webの採用範囲・大会条件・実際の完成度を確認し、縮小提出か説明用デモかをユーザーが選ぶ。共通AI/APIが未完成の場合は全クライアントに影響する。
-
-## 9. 検証・費用・運用
-
-- CI: APIの認証・区間権限・遅着・重複処理をpytestで確認。OpenAPI生成差分とTS/Swiftクライアントのコンパイル、人工ケースの整合を確認。RNはJest、SwiftはSwift Testing/XCTest、操作はMaestroまたはXCUITest。各5分以内の録音・中断・保存とOSカレンダーは実機で確認する。長時間・BLEは初回範囲へ追加しない。
-- 混在確認: RN Android↔RN iPhone、RN Android↔Swift iPhone、必要時RN iPhone↔Swift iPhone。機種・OS・ビルド・入力ID・条件を記録する。1台のiPhoneに2アプリを入れただけでは2台同時録音の代替にならない。
-- ログ: recording/job/requestの匿名ID、処理時間、状態遷移、エラーコードを残す。音声・全文転記・トークンを通常ログに出さない。初期はホストの構造化ログを用い、追加監視SDKは必要時に検討する。
-- 費用枠: Apple開発者登録、必要ならGoogle Play登録、EASビルド、MacまたはmacOS CI、Supabase容量・転送、API/常駐ワーカー、AIの音声分数と文字量を別項目で見積もる。最新料金と無料枠は採用時確認。録音2台分の入力、再処理、保持期間が費用に効く。定額・無料を保証しない。
-- 現行の実験音声条件を製品クラウド送信許可へ読み替えない。[VALIDATION](VALIDATION.md)の条件を守り、O03/O07が決まるまでは人工データで準備する。
-- 当日: 使用するバイナリとバックエンド版を記録し、ネットワーク・認証・配布経路を事前確認。必要な公開・送信は別途ユーザーの明示範囲で行う。
-
-## 10. 次に必要になる判断
-
-| 判断 | 推奨・不足情報 | 必要な時点 |
+| 区分 | AIが進められること | 判断が必要な境界 |
 |---|---|---|
-| 日程・準備 | 提出日時、各人の稼働時間、Xcode/署名/開発用配布の状態。あなた=Mac、Go君=Windowsは決定済み | 担当は§7で具体化済み。日付・時間枠と配布方式の確定前 |
-| 大会条件 | 公式URLと提出形式。事前開発・指定AI/クラウド・複数アプリ提出条件を確認 | 外部サービス選定・提出準備前 |
-| 処理・保持 O03/O07 | MVP_SPEC §9/§15のローカル構成・目的別生成許可と§14の予定送信条件を具体化 | 実音声の外部処理と保存実装前 |
-| MVP O01/O10 | MVP_SPEC 2.0のA/B/C、全43受入条件と実処理/模擬の範囲を判断 | 両クライアントの機能範囲固定前 |
-| 本人帰属・発見 O04/O06 | 仕様書§3/§7の手動持ち寄り・帰属/参加確認を具体化。自動発見/BLEは後続 | K04の確認・認可実装前 |
+| 確定仕様の具体化 | 既存M/U/ACの状態表、対応テスト、人工例、画面内の部品分割を作る | 正本間で矛盾があれば該当動作を止める |
+| 局所的な実装選択 | 関数/ファイル名、純粋な表示変換、テストの配置。選択理由を引継ぎに残す | 依存追加・公開する型/enum・共通設定は取りまとめ担当へ渡す |
+| UI/UXの未確定部分 | 配色値・余白・アイコン・アニメーションの具体案と比較用モックを作る | 最終デザインとして固定する前にUI/UX担当が判断。タブ/操作/状態の意味は変更しない |
+| 技術・運用の未確定部分 | 要求との比較、必要情報の列挙、人工adapterの設計 | 音声方式、処理先、費用、実データ条件、対応OS/配布を推測で決定しない |
 
-この計画は開発の依存関係を示す。未決定を理由に画面・API人工契約・ビルド準備の独立作業まで停止する必要はない。一方、期限の経過やモデル出力を人間の判断の代用にはしない。
+開始前にWORKFLOWへ「依頼された担当と小作業／基準版と未コミット差分／編集するファイル／参照仕様と受入／未決定と停止範囲」を一行ずつ記録する。同じファイルの編集中申告がある場合は担当へ返し、重ねて編集しない。別PCは同じ資料を持つことを対象版または受け渡した差分で確認する。現在のローカル変更が相手へ共有済みとは仮定しない。
 
-## 11. 一次資料（2026-09-12確認）
+| 残る確認 | 判断者・必要な回答 | 止める部分／先行できる部分 |
+|---|---|---|
+| 契約/API/worker・設定の担当案 | 両担当が受け持つ範囲と共通ファイルの取りまとめ役を回答 | 未割当領域の実装／UI案・音声比較は先行 |
+| 公開するJSONの厳密な形 | K01担当が§9/15の各項目を型・必須/null・enum・エラーへ対応付け、両者確認。意味が未定義なら企画者へ判断依頼 | 影響する正式fixture/API接続／既知状態の表示検討は先行 |
+| 配色・配置・動きの最終形 | UI/UX担当が状態別画面案を確認 | 最終デザイン固定／仕様準拠の案・共通表示処理は先行 |
+| 音声方式と端末adapter | Go君が方式・出力例・不足・利用条件を提示。仕様変更は企画者が判断 | 実音声adapter接続／契約と人工UIは先行 |
+| 実機/運用の設定 | [後段の前提](#runtime-prerequisites)の該当担当が端末/OS、接続先、予算、許可、署名等の実値を確認 | その環境での実行と完了判定／人工検証は先行 |
 
-- [1] [Expo Development Builds](https://docs.expo.dev/develop/development-builds/introduction/?buildenv=build-with-eas): 任意OSからのクラウドiOSビルドとネイティブ開発環境の違い。
-- [2] [Expo Web](https://docs.expo.dev/workflow/web/): Web出力とReact Native for Web。
-- [3] [Expo Audio](https://docs.expo.dev/versions/latest/sdk/audio/): 録音・背景録音・キャッシュ保存の注意。
-- [4] [Expo Modules API](https://docs.expo.dev/modules/overview/): Swift/Kotlin拡張。
-- [5] [Apple AVAudioSession record](https://developer.apple.com/documentation/avfaudio/avaudiosession/category-swift.struct/record): 背景録音・中断の条件。
-- [6] [Supabase Swift SDK](https://github.com/supabase/supabase-swift)、[Expo連携](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native): 両クライアント向けSDK。
-- [7] [FastAPI Features](https://fastapi.tiangolo.com/features/): OpenAPI・Pydantic。
-- [8] [openapi-typescript](https://openapi-ts.dev/introduction): TypeScript型生成。
-- [9] [Swift OpenAPI Generator](https://www.swift.org/blog/introducing-swift-openapi-generator/): Swiftクライアント生成。
-- [10] [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)、[Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control): データ・ファイルのアクセス制御。
-- [11] [Supabase Queues](https://supabase.com/docs/guides/queues): Postgresベースの永続キュー。
-- [12] [Render Service Types](https://render.com/docs/service-types)、[Background Workers](https://render.com/docs/background-workers): API・worker・静的Webの配置候補。
-- [13] [Expo UI Universal](https://docs.expo.dev/versions/latest/sdk/ui/universal/): OS/Web別に部品を実装する共通API。
-- [14] [Expo Unit Testing](https://docs.expo.dev/develop/unit-testing/)、[Maestro](https://docs.expo.dev/eas/workflows/examples/e2e-tests/): テスト構成。
-- [15] [Apple TestFlight](https://developer.apple.com/testflight/): 外部配布前の審査。
-- [16] [react-native-ble-plx](https://github.com/dotintent/react-native-ble-plx): Peripheral／スマホ同士通信の非対応。
+不明項目に仮の値を入れて正式なschemaや成功応答にしない。仮データは検討用と明示し、正式契約の検証対象と分ける。担当が未定の場合も「誰かが対応する」と完了扱いにしない。
 
-## 12. 今回の成果と限界
+### 6. 最初の依頼を分ける単位
 
-2026-09-12、MVP_SPEC 2.0に構成・担当・K01〜K10の依存・受け渡し・完成判定を同期。文書整合と参照先の点検であり、採用・製品実装・実機/実API/外部登録の成功は更新していない。確認結果はWORKFLOWを参照。
+各行を一つの依頼・差分・確認単位にする。一括で「MVPを全部作って」と渡さない。K01/K02の小作業名は本書内の識別用で、製品の機能IDや受入IDを追加しない。
+
+| 小作業 | 入力・編集先 | 完了時に見せるもの／停止条件 |
+|---|---|---|
+| UI検討（UI/UX担当、K02準備） | §4/6/8からU01/U06/U07。検討用データはapps/client/src/data/ | 通常・相違・確認待ち・期限切れの画面案と操作先。未決定の配色/配置は案と明示。実API契約・製品実装の完了とはしない |
+| K01-a 契約対応表（担当確認後） | §9/15→contracts/mvp-v1.schema.jsonの設計 | 必須/null、版、時刻、文字範囲、状態軸、エラーを出典節へ対応付ける。未定義の意味/矛盾は欄を埋めずWORKFLOWへ。設計段階の不完全schemaを有効な契約と称さない |
+| K01-b schemaと人工ケース | 解決済みK01-a→contracts/ | [4fixtureの期待結果](../product/MVP_SPEC.md#initial-fixtures)と期待する拒否を機械検証。共有未成立/音声期限/文字期限を混同しない。未解決の必須項目があればK01完了にしない |
+| K02-a データ境界（UI/UX担当） | K01-b→apps/client/src/data/ | 一覧・会話・出典のfixture取得と表示状態変換。画面から直接JSON本文へ依存しない。型検査とunknown/空/失敗の変換確認。ネットワーク・録音はまだ呼ばない |
+| K02-b 記録から本文（UI/UX担当） | K02-a→src/screens/・src/navigation/（apps/client内） | U01の一覧/空/フィルタ0件→共有会話U06、相違/不明を保持。個人記録の行はU03へ向かう仕様を守り、U06に代用しない。未実装遷移は下記規則へ |
+| K02-c 出典往復（UI/UX担当） | K02-b→同screens/、src/ui/ | 発言→U07の該当原文/版→閉じて元位置。自分の訂正と他者への指摘を区別。期限切れ/時刻不明は再生成功にしない。人工状態の確認で実音声再生は完了しない |
+| K02-d 共通面と操作確認（UI/UX担当） | K02-b/c→src/ui/・navigation、設定変更は取りまとめ役 | [UI共通ルール](../product/MVP_SPEC.md#ui-rules)で通常面/Glass、文字拡大/読み上げ/戻るを確認。依存は実manifestを確認して導入。未導入のGlassを使えたと報告しない |
+
+K02中にU03/U04/U08/U12/U14等の未実装画面へ向かう場合、開発用の遷移確認で宛先IDと引数を検査し、未実装と分かる戻れる仮画面を使える。架空の保存・共有・再生成功を返さない。初回起動先U12・3タブの製品仕様は変えず、U01直起動は開発用入口に限る。K02の完了はAC06/07/15の該当表示部分であり、未実装画面や全43条件の完了を意味しない。
+
+K03以降も、該当Kの中で「状態別UI→人工API/adapterで境界確認→条件成立後に実接続→同じ入力と失敗ケースで確認」の順に依頼を分ける。録音なら保存完了、共有なら双方許可、訂正なら版競合、予定なら結果不明の扱いまでを一つの成功画面から切り離さず確認する。細部は実際に着手するKの正本から展開し、今ここで後段の未知の技術仕様を埋めない。
+
+### 7. 合流時の判定
+
+取りまとめ担当は、受け取った差分の対象版と契約版を照合し、変更ファイルの重複を確認する。K01-bの同じfixtureを双方で検証し、K02-b/cの往復操作と本文遮断を確認してからAPI版へ接続する。片方だけの成功、型チェックだけ、リンク検査だけで合流完了にしない。衝突は一方のファイルを丸ごと優先せず、仕様・各差分の目的・テストを照合して解消する。
+
+実接続前の引継ぎには、操作名、入力と期待結果、契約版、実装済み/仮画面、検証したOS/環境、未実行条件を記録する。受信後に契約を変更する場合は両者の影響箇所とfixtureを同時更新し、旧契約のまま片側だけを完成扱いにしない。
+
+<a id="tasks"></a>
+## Kタスクと着手順
+
+採用状態は仕様書が正本です。現在はK01-aで契約の具体化に着手できる仕様が揃っています。未定義項目は着手判定に従って解消し、K01-bの正式契約を完成させます。以下は依頼されたKを実装する際の定義で、文書を読んだだけで全工程を開始する指示ではありません。
+
+| K | 担当・成果と完了条件 | 依存・受入 |
+|---|---|---|
+| K01 契約 | Go君がcontractsのschemaと4fixtureを取りまとめる案。UI/UX担当が必要な表示・期待結果を渡し、両者でID/版/文字範囲とunknownを確認。技術未確定でもUIラフは先行可 | [§9](../product/MVP_SPEC.md#contracts)。人工入力のみ。JSON検証・TSの受理/拒否テスト。署名・クラウド・音声不要 |
+| K02 表示 | UI/UX担当がU01→U06→U07と主タブ・Glassを共通実装。同じ4fixtureで原文/相違/不明・根拠への移動を確認 | K01。[AC06/07/15の表示部分](../product/MVP_SPEC.md#ac)と[UIルール](../product/MVP_SPEC.md#ui-rules)。録音操作面へのGlass接続はK03。人工デモと明示 |
+| K03 録音・ASR | UI/UX担当がU02/U03の状態と操作を実装。Go君が端末録音adapter・保存/送信・ASR/正規化/Source生成を担当する案 | K01/K02、実機と処理同意の条件。[AC01/02/14/19](../product/MVP_SPEC.md#ac)。実録音の実行範囲は確認済み条件と照合 |
+| K04 持ち寄り・許可 | UI/UX担当がU04/U05/U09。Go君がsnapshot・再確認・相互許可・継続/取消のAPI/認可を担当する案。人工入力をAPIまで接続 | K01、Auth/DB。[AC03/04/09〜12/16/19](../product/MVP_SPEC.md#ac) |
+| K05 統合 | Go君がworker/G1・APIとContextView/根拠group接続を担当する案。UI/UX担当がpending/失敗/出典/結果更新の表示を接続 | K01/K03/K04、実adapter設定。[AC05/06](../product/MVP_SPEC.md#ac)。fixtureを実生成と称さない |
+| K06 出典・訂正 | UI/UX担当がU07/U08。Go君がclip認可・訂正/指摘API・再生成を担当する案。期限切れと取消競合を同じ入力で確認 | K03〜K05。[AC07/08/13/17/18](../product/MVP_SPEC.md#ac) |
+| K09 今日・保存・ToDo | UI/UX担当がU12〜U15の本人操作・保存/メモ/確認。Go君が対応API/永続化を担当する案。人工G2/G4出力を接続 | K01/K04、UIはK02から並行可。[§15とA条件](../product/MVP_SPEC.md#agents-ac) |
+| K10 役割・日次 | Go君がG2/G3/G5生成・G4決定的処理とrunner/APIを担当する案。UI/UX担当が日次・失効・失敗/再試行の表示を接続 | K05/K09、目的別生成許可。[A01〜A15](../product/MVP_SPEC.md#agents-ac) |
+| K08 カレンダー | UI/UX担当がU10/U11・OS編集への導線。Go君がGoogle executor/APIと端末カレンダーadapterを担当する案。iPhoneの操作はUI/UX担当が確認 | K05/K10のG3実生成。人工UIはK09と並行可。[C01〜C09](../product/MVP_SPEC.md#calendar-ac) |
+| K07 完成・提出 | UI/UX担当が通しUX/iPhone/署名、Go君がAndroid/API/workerを担当する案。統合→相違→ToDo→保存/メモ→予定→日次→根拠を両者で確認 | 他Kの接続後。[AC01〜19](../product/MVP_SPEC.md#ac)、[C01〜09](../product/MVP_SPEC.md#calendar-ac)、[A01〜15](../product/MVP_SPEC.md#agents-ac)。計43条件の証拠 |
+
+K01の成果物は `contracts/mvp-v1.schema.json`、`contracts/fixtures/{duplicate,conflict,pending,expired}.json` と各期待結果。JSON検証・TS受理/拒否テストを含みます。既存音声由来の文言は使いません。unknownを0/空の成功へ置換せず、共有未回答・期限切れの結果を成功にしません。各Kのテストは仕様の関連節を読み、API/worker/画面の境界を跨ぐ必要がある条件を単体表示だけで代替しません。
+
+<a id="runtime-prerequisites"></a>
+## 後段で確認する前提
+
+| 必要になる時点 | 担当と確認事項 |
+|---|---|
+| K02 iOSのGlass確認 | UI/UX担当が対応OS・文字拡大・透明度低減・通常面への代替を確認。実機が未準備でも共通UIの人工実装は進めるがiOS確認済みにしない |
+| K03/K04 実機とAPI | Go君がAuth・HTTPS・DB・権限・upload ticket、UI/UX担当がiPhone録音と保存/中断/バックアップ除外を確認。依存はExpo互換版で導入 |
+| K03以降の音声処理 | [VALIDATIONの利用条件](VALIDATION.md#音声の利用処理条件)と対象データの了承を照合。保存設定・宛先・同意を実経路で確認 |
+| K05/K10 実生成 | Go君がadapter/model版・timeout・token/費用上限とjob接続を確認する案。未設定なら実呼出を停止し人工実装は進める |
+| K08 外部登録 | Go君がGoogle OAuth・送信先・本人許可・費用設定を確認。UI/UX担当がOSカレンダー編集を確認。OS画面を開くだけでGoogle登録成功としない |
+| K07 配布・大会条件 | UI/UX担当がiOS署名/端末登録、Go君がAndroid/Webを確認。提出日時・実際の大会条件・配布方式を確認し、完了日時を創作しない |
+
+音声方式の現在地は§9に記録し、Go君の選定結果を受領してから更新します。保持・共有・外部送信の条件は従来の採用仕様を維持します。実モデルのアカウント可用性、秘密情報、予算、配布先は仕様採用だけで設定・実行されたことにはしません。クラウド移行やグループ実画面は初回の前提ではありません。
+
+## 確認・受け渡し・提出
+
+起動・型チェック・バンドル手順は[APP_DEVELOPMENT](APP_DEVELOPMENT.md)。実装時はTS契約テスト、API/workerのpytest、RNの状態/表示テストを関連Kへ追加します。OS操作は実機またはMaestro等で対象条件を確認し、未導入のテスト基盤を存在すると記載しません。
+
+混在確認はRN Android↔RN iPhone。録音・中断・保存、共有・失効、カレンダーを各OSで確かめます。単一iPhone上の確認を2台の独立録音の代替にしません。明色が初回の完成対象で、暗色は後続です。
+
+各Kの受け渡しは担当/K/仕様版、M/U/受入ID、対象版と未コミット差分、schema/fixture/manifest版、入力ID・端末/OS/ビルド・条件、成功/失敗/未実行、証拠、相手への確認事項を[WORKFLOW](WORKFLOW.md)へ短く記録します。API変更は共通画面とworkerへの影響を同じ作業で確認します。
+
+提出候補はRN Android＋RN iPhoneで受入条件を満たした版です。独立Swift版との比較・切替はありません。Webは保険ですが、権限・API・生成の未達をWebで隠しません。スマホ未達の場合のWeb提出範囲は大会条件と実際の完成度を確認して判断します。失敗・模擬・未検証を明示し、機能の縮小は変更判断を記録します。

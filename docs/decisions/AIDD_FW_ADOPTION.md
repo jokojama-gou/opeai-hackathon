@@ -14,12 +14,14 @@
 
 | 内容 | 正本 |
 |---|---|
-| 製品方針・未決定事項 | [PRODUCT_CORE.md](../product/PRODUCT_CORE.md)のD/S/O |
+| 製品方針・残る判断 | [PRODUCT_CORE.md](../product/PRODUCT_CORE.md)のD/S/O |
+| 機能・UI・API・受入条件 | [MVP_SPEC](../product/MVP_SPEC.md)のM/U/AC/C/A |
+| 担当・実装順 | [ロードマップ](../development/MULTIPLATFORM_DELIVERY_PLAN.md#tasks)のK |
 | 現在地・作業結果 | [WORKFLOW.md](../development/WORKFLOW.md) |
-| 作業手順・判断境界 | [DEVELOPMENT_PLAYBOOK.md](../development/DEVELOPMENT_PLAYBOOK.md) |
+| 作業手順・判断境界 | [作業規則](../../AGENTS.md) |
 | 検証ケース・音声条件・証拠の様式 | [VALIDATION.md](../development/VALIDATION.md)のV体系 |
 
-[AI_DECISION_BOUNDARIES.md](AI_DECISION_BOUNDARIES.md)は引き続き未採用案。本書によって案全体を採用したり、AIの権限を広げたりしない。
+[AI_DECISION_BOUNDARIES.md](../history/process/AI_DECISION_BOUNDARIES.md)は引き続き未採用案。本書によって案全体を採用したり、AIの権限を広げたりしない。
 
 参照対象はAIDD-FW **3.1.1**、コミット`59d7e9985eaf99674b51a90ac06482b9ed88c49a`に固定する。
 

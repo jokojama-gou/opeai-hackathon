@@ -1,14 +1,18 @@
+<!-- archive: historical evidence; not current implementation instructions -->
+
+> 履歴資料。2026-09-13に現行入口から分離。本文は当時の判断・状態であり、現在の実装指示ではありません。現行入口は[AGENTS](../../../AGENTS.md)。
+
 # 複数の記録から、一つの会話を振り返るMVP案
 
-最新の判断用仕様は[MVP_SPEC](MVP_SPEC.md)。本書は前段の比較・準備案として保持する。下記Q1〜Q3の未回答を採用にせず、新仕様のA/B/Cで具体的な機能・UI・処理・完成条件を提案する。
+最新の判断用仕様は[MVP_SPEC](MVP_SPEC_2_0.md)。本書は前段の比較・準備案として保持する。下記Q1〜Q3の未回答を採用にせず、新仕様のA/B/Cで具体的な機能・UI・処理・完成条件を提案する。
 
-2026-09-12 / v0.1。状態: **採用待ちの設計案・開発準備**。以下の機能・数値・方式を採用済みと扱わない。正本は[PRODUCT_CORE](PRODUCT_CORE.md)、開発担当と技術候補は[MULTIPLATFORM_DELIVERY_PLAN](../development/MULTIPLATFORM_DELIVERY_PLAN.md)。今回の準備契約は[MVP_IMPLEMENTATION_PREP](../development/MVP_IMPLEMENTATION_PREP.md)。
+2026-09-12 / v0.1。状態: **採用待ちの設計案・開発準備**。以下の機能・数値・方式を採用済みと扱わない。正本は[PRODUCT_CORE](PRODUCT_CORE_20260912.md)、開発担当と技術候補は[MULTIPLATFORM_DELIVERY_PLAN](../process/MULTIPLATFORM_DELIVERY_PLAN_20260912.md)。今回の準備契約は[MVP_IMPLEMENTATION_PREP](MVP_IMPLEMENTATION_PREP.md)。
 
 ## 1. 今回の決定と既存の証拠
 
 ユーザーは既存2ケースの探索を終了し、MVP具体化と開発準備へ進むことを明示した。追加録音、全文逐語採点、既存録音の再評価、音声認識環境の再構築を今回の前提にしない。未確認は該当機能の確認事項へ引き継ぐ。D14の段階移行であり、全機能の採用ではない。
 
-根拠: リポジトリ外の `C:/Users/yos57/home/myApp/audio-validation-local/results/AUDIO-VALIDATION-FINAL-REPORT.md`（2026-09-12）。同ファイルの過去の「次の判断」は今回の作業指示にしない。内容入り成果物を共有Gitへ複製しない。
+根拠: リポジトリ外の `<共有対象外の音声検証領域>/results/AUDIO-VALIDATION-FINAL-REPORT.md`（2026-09-12）。同ファイルの過去の「次の判断」は今回の作業指示にしない。内容入り成果物を共有Gitへ複製しない。
 
 - 複数文字起こしの部分的補完を確認したが、完全な内容正答数は最良単独を超えなかった。
 - 不明には認識文の崩れ、AIの慎重さ、話者情報不足、採点条件が関係する。単一原因や誤認率へ換算しない。

@@ -39,7 +39,7 @@ function render(message = '') {
     } else {
       content = `<h2>${other}さんと、この会話を共有しますか？</h2><p class="muted">一緒に話したと確認できた部分だけを共有します。前後の会話や、他の履歴は共有されません。</p><label class="check"><input id="always${i}" type="checkbox" ${drafts[i] ? 'checked' : ''}><span>今後も${other}さんとの会話を自動共有する<br><span class="muted">双方が選ぶと、次回から確認を省けます。録音は毎回、自分で開始します。後から解除できます。</span></span></label><button class="primary full" data-action="allow" data-person="${i}">この範囲の共有を許可</button><button class="full" data-action="decline" data-person="${i}">今回は共有しない</button><button class="plain full" data-action="later" data-person="${i}">あとで</button>`;
     }
-    return `<section class="phone" aria-label="${name}さんの画面"><div class="top"><strong>${name}さんの画面</strong><span class="badge">会話 ${state.round}</span></div><div class="inside"><span class="eyebrow">YOUR CONVERSATION</span><div class="card"><strong>今日の会話</strong><div class="muted">共有対象：14:10〜14:32<br>あなたの記録から確認した範囲</div></div>${content}</div></section>`;
+    return `<section class="phone" aria-label="${name}さんの画面"><div class="top"><strong>${name}さんの画面</strong><span class="badge">会話 ${state.round}</span></div><div class="inside"><span class="eyebrow">YOUR CONVERSATION</span><div class="card"><strong>今日の会話</strong><div class="muted">共有対象：14:10〜14:14<br>あなたの記録から確認した範囲</div></div>${content}</div></section>`;
   }).join('');
   document.querySelector('#history').textContent = state.history.length ? state.history.map(item => `会話 ${item.round}：${item.shared ? '共有済み' : '未共有'}`).join(' ／ ') : 'まだありません。';
   document.querySelector('#announcement').textContent = message;

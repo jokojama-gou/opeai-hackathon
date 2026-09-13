@@ -1,8 +1,12 @@
+<!-- archive: historical evidence; not current implementation instructions -->
+
+> 履歴資料。2026-09-13に現行入口から分離。本文は当時の判断・状態であり、現在の実装指示ではありません。現行入口は[AGENTS](../../../AGENTS.md)。
+
 # AIと進める開発手順
 
 > 共有版（2026-09-11）。旧企画資料から参照先を整理して移管しました。今後の正本はこのリポジトリです。元のローカル資料は移管前の記録として保持し、並行更新しません。
 
-2026-09-11。入口は[AGENTS.md](../../AGENTS.md)。本書は依頼された作業を進めるための手順であり、製品実装や未決定仕様への包括承認ではない。各依頼の許可範囲を優先する。今回の文書基盤整備を将来の全作業へ自動継承しない。
+2026-09-11。入口は[AGENTS.md](../../../AGENTS.md)。本書は依頼された作業を進めるための手順であり、製品実装や未決定仕様への包括承認ではない。各依頼の許可範囲を優先する。今回の文書基盤整備を将来の全作業へ自動継承しない。
 
 ## 使い始める
 
@@ -19,15 +23,15 @@
 
 | 必要な情報 | 参照先 | 位置付け |
 |---|---|---|
-| AIの進め方・現在依頼の境界 | [AGENTS.md](../../AGENTS.md) | 有効な作業規則。全資料の毎回読解を要求しない |
-| プロダクトの意味・方針・理由 | [PRODUCT_CORE.md](../product/PRODUCT_CORE.md) | 製品正本。製品判断ではD01〜D17と関連S/Oを読む |
-| MVPの機能・画面・API・受入条件 | [MVP_SPEC 2.0](../product/MVP_SPEC.md) | 最新の採用提案。採否と実装済みを区別し、§11のK01〜K10で作業を選ぶ |
-| 二人の担当・着手順 | [ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)、[開発開始ガイド](aidd-lite/DEVELOPMENT_START.md) | Go君のWindows/RN・共通APIと、依頼者のMac/SwiftUI・workerの受け渡し |
-| 今回までの作業と証拠 | [WORKFLOW.md](WORKFLOW.md)、[基盤の引き継ぎ](../history/FOUNDATION_HANDOFF.md) | 過去の「次の作業」は新しい実行許可ではない |
-| 必要なユーザー判断 | [HANDOFF_AUDIT.md](../history/HANDOFF_AUDIT.md) | U1回答済み、U2以降は正本・最新決定と照合 |
-| 裁量を広げる案 | [AI_DECISION_BOUNDARIES.md](../decisions/AI_DECISION_BOUNDARIES.md) | 未採用案。参考にできるが承認根拠にはしない |
-| 価値検証の場面／技術ケース | [SCENARIOS_AND_SUCCESS.md](../product/SCENARIOS_AND_SUCCESS.md)、[VALIDATION.md](VALIDATION.md) | 確定方針と未採用の画面・手法・合格値を分ける |
-| 道具・モデル・レビューの選び方 | [CODEX_OPERATING_GUIDE.md](CODEX_OPERATING_GUIDE.md) | 根拠・適用条件付きの運用ガイド |
+| AIの進め方・現在依頼の境界 | [AGENTS.md](../../../AGENTS.md) | 有効な作業規則。全資料の毎回読解を要求しない |
+| プロダクトの意味・方針・理由 | [PRODUCT_CORE.md](../design/PRODUCT_CORE_20260912.md) | 製品正本。製品判断ではD01〜D17と関連S/Oを読む |
+| MVPの機能・画面・API・受入条件 | [MVP_SPEC 2.0](../design/MVP_SPEC_2_0.md) | 最新の採用提案。採否と実装済みを区別し、§11のK01〜K10で作業を選ぶ |
+| 二人の担当・着手順 | [ロードマップ](MULTIPLATFORM_DELIVERY_PLAN_20260912.md)、[開発開始ガイド](DEVELOPMENT_START.md) | Go君のWindows/RN・共通APIと、依頼者のMac/SwiftUI・workerの受け渡し |
+| 今回までの作業と証拠 | [WORKFLOW.md](../WORKFLOW_20260912.md)、[基盤の引き継ぎ](../FOUNDATION_HANDOFF.md) | 過去の「次の作業」は新しい実行許可ではない |
+| 必要なユーザー判断 | [HANDOFF_AUDIT.md](../HANDOFF_AUDIT.md) | U1回答済み、U2以降は正本・最新決定と照合 |
+| 裁量を広げる案 | [AI_DECISION_BOUNDARIES.md](AI_DECISION_BOUNDARIES.md) | 未採用案。参考にできるが承認根拠にはしない |
+| 価値検証の場面／技術ケース | [SCENARIOS_AND_SUCCESS.md](../../product/SCENARIOS_AND_SUCCESS.md)、[VALIDATION.md](../audio/VALIDATION_20260912.md) | 確定方針と未採用の画面・手法・合格値を分ける |
+| 道具・モデル・レビューの選び方 | [CODEX_OPERATING_GUIDE.md](../../development/CODEX_OPERATING_GUIDE.md) | 根拠・適用条件付きの運用ガイド |
 | 社員の実践と一次出典 | 調査資料（共有対象外：`../codex-research/README.md`） | 独立した知識資料。公式仕様・採用方針とは別 |
 
 ## 進行とスコープ管理
@@ -56,11 +60,11 @@ AGENTS.mdから移した有効な手順です。開始・範囲変更・調査�
 完了条件／確認方法／作業を返す条件:
 ```
 
-結果は[WORKFLOWの結果報告様式](WORKFLOW.md)を使う。記録ID・対象版・実行条件・人間の判断・観測・証拠・推測・未検証・次の判断を区別し、実音声や派生情報を記録へ混ぜない。
+結果は[WORKFLOWの結果報告様式](../WORKFLOW_20260912.md)を使う。記録ID・対象版・実行条件・人間の判断・観測・証拠・推測・未検証・次の判断を区別し、実音声や派生情報を記録へ混ぜない。
 
 ## 作業別の手順
 
-各節に使用場面、入力、参照元、道具の選定、手順、判断境界、検証、完了条件、記録先をまとめる。道具の利用可否は[機能確認表](CODEX_OPERATING_GUIDE.md)で確認する。
+各節に使用場面、入力、参照元、道具の選定、手順、判断境界、検証、完了条件、記録先をまとめる。道具の利用可否は[機能確認表](../../development/CODEX_OPERATING_GUIDE.md)で確認する。
 
 ### 1. 相談・調査
 
@@ -136,7 +140,7 @@ AGENTS.mdから移した有効な手順です。開始・範囲変更・調査�
 - **道具・手順**：重複しない短い記録を保存→参照の存在と現在の状態を確認→成果・限界・次の判断を返す。圧縮前にも保存する。
 - **判断境界**：人間の決定のない箇所は案のまま。次の作業案を実行許可としない。コンテクスト圧縮は利用可能な操作がある場合だけ。
 - **検証・完了**：次のAIが目的、正本、許可範囲、未決定、次の判断へ辿れる。新しい会話で試していなければ、引き継ぎ成功の実証とはしない。
-- **記録先**：WORKFLOWの短い作業記録と、[FOUNDATION_HANDOFF.md](../history/FOUNDATION_HANDOFF.md)の入口・現在地。
+- **記録先**：WORKFLOWの短い作業記録と、[FOUNDATION_HANDOFF.md](../FOUNDATION_HANDOFF.md)の入口・現在地。
 
 ## MVP 2.0を二人で進めるとき
 

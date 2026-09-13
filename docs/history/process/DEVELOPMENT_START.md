@@ -1,10 +1,16 @@
+<!-- archive: historical evidence; not current implementation instructions -->
+
+> 履歴資料。2026-09-13に現行入口から分離。本文は当時の判断・状態であり、現在の実装指示ではありません。現行入口は[AGENTS](../../../AGENTS.md)。
+
 # MVP 2.0を二人と各AIで開発する
 
-更新日: 2026-09-12。最新の[MVP仕様書 2.0](../../product/MVP_SPEC.md)に合わせた開発手順。A/B/Cは採用提案の状態を維持し、製品実装・環境導入は未実施。
+2026-09-12・実装先の補足: 取得済みmain（0432468）にはapps/clientのRN/Expoスターターとnpm workspaceがある。この文書ブランチには未取込のため、着手時に既存基盤と統合先のAPP_DEVELOPMENT.mdを確認する。旧apps/mobile案はapps/clientへ対応付け、別アプリやlockfileを作らない。詳しい対象版・統合待ちはロードマップ冒頭を参照。
+
+更新日: 2026-09-12。最新の[MVP仕様書 2.0](../design/MVP_SPEC_2_0.md)に合わせた開発手順。A/B/Cは採用提案の状態を維持し、製品実装・環境導入は未実施。
 
 ## 1. 開始時に揃えるもの
 
-[AGENTS](../../../AGENTS.md)と[WORKFLOW](../WORKFLOW.md)で今回の依頼と現在地を確認する。製品方針は[PRODUCT_CORE](../../product/PRODUCT_CORE.md)、機能・画面・API・受入条件はMVP_SPEC、担当と接続順は[ロードマップ§7](../MULTIPLATFORM_DELIVERY_PLAN.md#7-macwindowsの開発ロードマップ)、日々の進め方は[開発手順](../DEVELOPMENT_PLAYBOOK.md)を参照する。
+[AGENTS](../../../AGENTS.md)と[WORKFLOW](../WORKFLOW_20260912.md)で今回の依頼と現在地を確認する。製品方針は[PRODUCT_CORE](../design/PRODUCT_CORE_20260912.md)、機能・画面・API・受入条件はMVP_SPEC、担当と接続順は[ロードマップ§7](MULTIPLATFORM_DELIVERY_PLAN_20260912.md#7-macwindowsの開発ロードマップ)、日々の進め方は[開発手順](DEVELOPMENT_PLAYBOOK.md)を参照する。
 
 関連D01〜D17/S01〜S05、O01/O03/O04/O05/O07/O09/O10。O02の担当・提出方針は決定済み。旧Q1〜Q3やT01〜T09を最新仕様の代わりに使わない。既存の音声探索は一区切りであり、追加録音・全文採点・既存録音再評価・認識環境再構築へ戻らない。未検証は仕様書§12と対応するKへ引き継ぐ。
 
@@ -46,7 +52,7 @@ K08の人工画面はK09と並行できるが、実登録はK05/K10のG3実生�
 5. 原要求と差分を自己レビューし、相手は同じfixture/ビルドで結果を返す。独立AIレビューは依頼された場合に使う。
 6. WORKFLOWに結果・証拠・未達・次の受け渡しを残す。仕様変更はMVP_SPECの該当箇所へ戻り、両アプリへ反映する。
 
-必要なときだけ[GUIDE](GUIDE.md)からdesign/implement/review/handoffを選び、根拠不明の問いはresearchへ戻す。小さな修正に全skillを強制しない。
+必要なときだけ[GUIDE](../../development/aidd-lite/GUIDE.md)からdesign/implement/review/handoffを選び、根拠不明の問いはresearchへ戻す。小さな修正に全skillを強制しない。
 
 引き継ぎには「担当/K/仕様版と採用範囲」「M/U/受入ID」「対象コミットまたはファイル版と未コミット差分」「API/schema/fixture/manifest版」「端末/OS/ビルドと成功・失敗・未実行」「証拠」「相手への確認事項・残件」を残す。模擬・実生成・実音声・外部登録の結果を分け、受け手の証拠が揃うまで相手PCで確認済みとしない。
 

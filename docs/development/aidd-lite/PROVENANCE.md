@@ -10,7 +10,7 @@
 | review | 上流から改変：[aidd-review](https://github.com/spikestudio/aidd-fw/blob/59d7e9985eaf99674b51a90ac06482b9ed88c49a/skills/aidd-review/SKILL.md) | 根拠を伴う指摘を残し、一律の多人数起動・点数・自動修正を除く |
 | handoff | 上流から改変：[aidd-doc-drift](https://github.com/spikestudio/aidd-fw/blob/59d7e9985eaf99674b51a90ac06482b9ed88c49a/skills/aidd-doc-drift/SKILL.md) | 文書との差を検出し、既存WORKFLOWへ接続する |
 | researcher / reviewer | 上流を参考に新規構成：[researcher](https://github.com/spikestudio/aidd-fw/blob/59d7e9985eaf99674b51a90ac06482b9ed88c49a/aidd-framework/agents/researcher.md)、[qa-engineer](https://github.com/spikestudio/aidd-fw/blob/59d7e9985eaf99674b51a90ac06482b9ed88c49a/aidd-framework/agents/qa-engineer.md) | モデルやFW階層を固定せず、読み取り専用の委任用役割に限定 |
-| GUIDEの判断境界・記録・変更反映 | 既存規則の手順化：[開発手順](../DEVELOPMENT_PLAYBOOK.md)、[採用方針](../../decisions/AIDD_FW_ADOPTION.md) | 正本を重複せずskillから使う |
+| GUIDEの判断境界・記録・変更反映 | 既存規則の手順化：[作業規則](../../../AGENTS.md)、[採用方針](../../decisions/AIDD_FW_ADOPTION.md) | 正本を重複せずskillから使う |
 | PROJECT_CHECKS | 既存規則の手順化：[製品正本](../../product/PRODUCT_CORE.md)、[VALIDATION](../VALIDATION.md) | 製品固有の見落としを防ぐ索引 |
 | Codex UI・利用試験・静的検査 | 今回新規提案 | 呼び出し可能性と判断の実際を分けて確認する |
 | デモと2人の受け渡しへの接続 | 既存方針を今回の手順に具体化 | 大会条件や権限を創作せず、成果と証拠を共有する |

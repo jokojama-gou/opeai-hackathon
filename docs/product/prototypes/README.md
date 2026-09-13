@@ -1,6 +1,6 @@
-# 共有確認の画面試作
+# 共有確認の操作検討用試作
 
-架空の2人による、今回の共有・双方の継続承認・解除を操作する試作。音声取得、本人認証、外部送信、永続保存は行わない。製品の共有権限制御の実装ではない。
+架空の2人による、今回の共有・双方の継続承認・解除を操作する試作。音声取得、本人認証、外部送信、永続保存は行わない。製品の共有権限制御の実装ではない。旧画面案の操作検討用で、MVP 2.0の全機能・受入条件への適合を示すものではない。現在の15画面配置は[mvp-spec-wireframes.html](mvp-spec-wireframes.html)、契約は[MVP_SPEC](../MVP_SPEC.md)を参照する。
 
 Node.js 22以降を用意し、リポジトリのルートで実行する。追加パッケージは不要。
 
@@ -22,4 +22,4 @@ node docs/product/prototypes/serve.mjs
 node --test docs/product/prototypes/sharing-state.test.mjs
 ```
 
-仕様は[FEATURE_SPEC_DRAFT §8](../FEATURE_SPEC_DRAFT.md#8-共有確認継続承認解除の画面案)、製品正本は[PRODUCT_CORE](../PRODUCT_CORE.md)を参照。
+仕様は[FEATURE_SPEC_DRAFT §8](../../history/design/FEATURE_SPEC_DRAFT.md#8-共有確認継続承認解除の画面案)、製品正本は[PRODUCT_CORE](../PRODUCT_CORE.md)を参照。

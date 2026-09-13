@@ -1,0 +1,37 @@
+{
+  "name": "opeai-hackathon",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/client"
+  ],
+  "engines": {
+    "node": ">=22.20.0 <23"
+  },
+  "packageManager": "npm@10.9.0",
+  "volta": {
+    "node": "22.20.0",
+    "npm": "10.9.0"
+  },
+  "scripts": {
+    "start": "npm run start --workspace @hackathon/client --",
+    "web": "npm run web --workspace @hackathon/client --",
+    "android": "npm run android --workspace @hackathon/client --",
+    "ios": "npm run ios --workspace @hackathon/client --",
+    "typecheck": "npm run typecheck --workspace @hackathon/client",
+    "build:web": "npm run build:web --workspace @hackathon/client",
+    "build:bundles": "npm run build:bundles --workspace @hackathon/client",
+    "doctor": "npm run doctor --workspace @hackathon/client",
+    "eas:login": "npm run eas:login --workspace @hackathon/client --",
+    "eas:init": "npm run eas:init --workspace @hackathon/client --",
+    "eas:device": "npm run eas:device --workspace @hackathon/client --",
+    "build:android:apk": "npm run build:android:apk --workspace @hackathon/client --",
+    "build:android:store": "npm run build:android:store --workspace @hackathon/client --",
+    "build:ios:preview": "npm run build:ios:preview --workspace @hackathon/client --",
+    "build:ios:store": "npm run build:ios:store --workspace @hackathon/client --",
+    "build:ios:simulator": "npm run build:ios:simulator --workspace @hackathon/client --"
+  },
+  "devDependencies": {
+    "eas-cli": "24.3.0"
+  }
+}
