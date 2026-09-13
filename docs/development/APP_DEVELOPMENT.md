@@ -88,6 +88,10 @@ Expoと組み合わせるライブラリは、`apps/client`から`npx expo insta
 - 製品の権限やネイティブ設定を確認する際はexpo-dev-clientとEAS development profileを追加する。現在のpreviewは配布用でdevelopment clientではない。
 - 初回はlight固定。主タブ/録音操作面のGlassと非対応環境の代替表示はMVP_SPECのUIルールに従う。
 
+音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。K03では開発PCのFastAPI/Python workerから外部ASRへ接続し、workerに必要な音声変換・分割の依存を用意する。スマホや開発PCへのASRモデル/GPU環境導入は製品の前提にしない。Supabaseは認証/非公開保存/ジョブ管理を担う。バックエンドの起動コマンド、依存manifest、ASR adapterは未実装で、上記のExpo起動だけでは書き起こせない。
+
+プロバイダの認証情報の準備は[credentialsの手順](../../credentials/README.md)を参照する。実接続時はworker側で読み込み、クライアント公開変数やアプリ配布物へ入れない。キー取得と認証確認、許可済み音声による書き起こし成功は別々に記録する。接続先/モデル・分割設定・保持条件・呼出/費用上限の確認項目は[ロードマップのK03前提](MULTIPLATFORM_DELIVERY_PLAN.md#runtime-prerequisites)から辿る。
+
 ## 決定範囲
 
 ユーザー指定のReact NativeとWeb共通開発を具体化するため、Expoのblank TypeScriptテンプレートを採用した。画面遷移が不要な段階なのでRouterは未導入。

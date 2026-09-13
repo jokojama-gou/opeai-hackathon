@@ -4,7 +4,7 @@
 
 ## 現在地
 
-RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います。MVP仕様2.0のA/B/Cを今回の決定に基づき2.1として採用し、独立レビューを完了しました。初回UIは明色＋Liquid Glass。仕様・採用状態は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。
+RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います。現行仕様は2.2で、外部APIによる音声書き起こしを採用しています。各スマホから共通バックエンドへ音声を送り、workerが必要な分割と外部ASR呼出・結果結合を担当します。Supabaseは認証・非公開保存・ジョブ管理を担います。初回UIは明色＋Liquid Glass。仕様・採用状態は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。2.1の独立レビューは完了しましたが、今回の2.2差分の独立レビューは未実施です。
 
 既存のExpoスターターを同じ作業ツリーへ取り込みました。製品機能は未実装です。コード生成・バンドル出力と、実機・音声・APIの成立は区別します。
 
