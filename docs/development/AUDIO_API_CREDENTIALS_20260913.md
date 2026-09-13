@@ -1,10 +1,16 @@
 # 音声比較用の認証準備
 
-2026-09-13。対象は[音声モデル比較](AUDIO_MODEL_SELECTION_20260913.md)の全候補。ユーザーから、本人のブラウザで各サービスのAPIキーを取得する依頼を受けた。**CodexのWindows実行エラーを修復し、5社の専用キーを新規発行・ローカル保存済み**。残る認証準備は下表のとおり。キー保存とモデル実行の成功は区別する。
+更新日2026-09-14。対象は[音声モデル比較](AUDIO_MODEL_SELECTION_20260913.md)の全候補。**APIキー7社、Hugging Faceの読取トークン、Google Cloudの認証JSONの計9項目を保存済み**。キー保存とモデル実行の成功は区別する。
 
 ## 最新の取得状態
 
-キー名は5社とも `hackathon-audio-eval-20260913`。キー値・認証コードは本資料に保存しない。全社とも実認証API、対象モデルの実行、音声送信は未検証。
+2026-09-14の最終取得：ElevenLabs/Geminiの本人発行キーを受領・保存し、HFの公開モデル読取トークンを新規発行した。本人作成のHFトークンは値を取得できなかったため保持し、用途を限定した別名のトークンを使用する。Google Cloudの2ロールとJSON鍵の発行・保存も成功。先行5社の平文共有は宛先の明示承認後、privateの `jokojama-gou/opeai-hackathon` / mainへ `555d950` でpush成功。追加取得分も同じ共有先へ反映する準備を完了した。
+
+対象版 `e887e14`。別担当が編集中の製品仕様・関連文書の差分を保持し、この作業の編集は認証ファイル・共有手順・本記録・復号表示に限定。自己確認は保存値の一致、JSONの対象project/サービスアカウント、更新した暗号化環境ファイルの復号一致が成功。実認証API、音声送信、モデルの精度評価、課金契約、独立レビューは未実行。次はモデルごとの利用枠・権限、Cloudリージョン、HFモデルの利用条件を実行前に確認する。
+
+推奨構成の再確認（2026-09-14）：1日で完成させる基準はScribe v2、独立ASRとしてGPT-Transcribeを加え、本人の声で別録音を対応付ける場合にPrecision-2 Voiceprintを追加する。不一致箇所だけ原音を再認識し、文字だけの多数決を根拠に確定しない。これは実測前の推奨で、採用や日本語精度の首位を示すものではない。公式で[単語時刻・話者分離・speaker library](https://elevenlabs.io/docs/api-reference/speech-to-text/convert)、[GPT-Transcribe](https://developers.openai.com/api/docs/models/gpt-transcribe)、[声紋による本人識別](https://docs.pyannote.ai/tutorials/identification-with-voiceprints)を再確認。Gemini 3.5 Transcribeは比較候補に残すが、[辞書と話者分離/時刻の併用制約](https://ai.google.dev/gemini-api/docs/models/gemini-3.5-transcribe)を分けて測る。
+
+先行5社のキー名は `hackathon-audio-eval-20260913`。ElevenLabs・Geminiは本人が発行した `openai-hackathon`、HFは `hackathon-audio-eval-20260914`。キー値・認証コードは本資料に保存しない。全社とも実認証API、対象モデルの実行、音声送信は未検証。
 
 | サービス | 発行・保存 | 設定または残件 |
 |---|---|---|
@@ -13,10 +19,10 @@
 | Speechmatics | 成功 | Default project、EU1。専用キー1件。画面上は100 credits。作成画面に期限・権限の選択欄なし |
 | Deepgram | 成功 | 本人のproject。デフォルト音声API実行権限、30日。project管理・追加キー作成の権限なし。画面上は$200無料credit |
 | AssemblyAI | 成功 | Default project。登録時のDefault API Keyとは別に専用キーを発行・保存。Free plan、画面上は$50 credit。作成画面に期限・権限の選択欄なし |
-| Gemini | 未取得 | 初回はサイトがsuspicious requestで拒否。復旧後、同じGemini Projectで1回再試行。発行成功・同名キーの追加を確認できず、保存なし。他projectの既存キーは流用していない |
-| ElevenLabs | 未取得 | Googleログイン小窓のアカウント選択で操作がタイムアウト。本人によるログイン完了待ち |
-| Hugging Face | 未取得 | ログイン画面を保持。本人ログイン後に読取トークンを発行する。モデル利用条件への同意は別途確認 |
-| Google Cloud Chirp 3 | 設定途中 | Gemini ProjectでSpeech API有効化・`hackathon-audio-eval` サービスアカウント作成を確認。Cloud Speech Client / Service Usage Consumerの権限付与完了、JSON鍵、region設定は未確認・未取得 |
+| Gemini | 成功 | 本人発行キーを受領し保存。Gemini Projectの専用名・作成日・キー末尾を画面と照合。Tier 1 / Prepay。モデル別の利用可否は未検証 |
+| ElevenLabs | 成功 | 本人ログイン後の新規キー表示から保存。専用名、Enabled、期限Neverを確認。キー内の個別権限・Scribe利用枠は未検証 |
+| Hugging Face | 成功 | Fine-grained / 公開gated repoの読取のみ。私有repo・書込・推論課金・管理の権限は付けていない。本人作成の別トークンは保持。モデル利用条件の同意・実ダウンロードは未実施 |
+| Google Cloud Chirp 3 | 認証保存成功 | Gemini ProjectでSpeech API有効化、音声用アカウントのCloud Speech Client / Service Usage Consumerの2ロール反映、JSON鍵の発行・保存を確認。リージョン・実認証・モデル利用は未検証 |
 
 ## 対象と発行先
 
@@ -38,8 +44,8 @@ Qwen3-ASR、VibeVoice、ReazonSpeech、Whisper、NVIDIAのローカル候補、R
 
 ## 保存と再開
 
-- ルートの `.env.audio-models.local` に5社のキーを保存した。既存 `.gitignore` の `.env.*` で除外される。読み込むランナーは未接続。クライアントの公開環境変数には使用しない。
-- キー名は `hackathon-audio-eval-20260913`。既存キーの削除・ローテーションは今回行っていない。キー値を文書・チャット・Excel・クライアントバンドルに含めない。
+- ルートの `.env.audio-models.local` に7社のキーとHFトークンを保存した。Cloud JSONは `.env.audio-google-service-account.local.json`。本人指定によりprivateリポジトリで共有する。読み込むランナーは未接続。クライアントの公開環境変数には使用しない。
+- 既存キーの削除・ローテーションは行っていない。キー値を説明文書・回答・Excel・クライアントバンドルに含めない。
 - 再開時に本人のアカウントと対象project/workspaceを画面で確認し、発行したキーを保存する。ユーザー入力が必要なログイン・2段階認証等は、その画面まで到達した時点で引き継ぐ。
 - 発行、ローカル保存、認証確認、対象モデルの利用可否、音声実行はそれぞれ別の状態として記録する。今回の依頼によりキー取得は依頼済み。実音声の送信・利用条件は既存の検証方針と照合する。
 

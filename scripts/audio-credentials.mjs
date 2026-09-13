@@ -83,7 +83,7 @@ async function run(command) {
       plaintext = decryptCredentials(JSON.parse(await readFile(bundlePath, 'utf8')), key);
       if (command === 'open') {
         await writeNewCredentialFile(sourcePath, plaintext);
-        console.log('Credentials restored to the local Git-ignored environment file.');
+        console.log('Credentials restored to the local environment file.');
       } else {
         const source = await readFile(sourcePath);
         try {
