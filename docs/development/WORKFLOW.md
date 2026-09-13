@@ -1,8 +1,11 @@
 # 現在地と引き継ぎ
 
-2026-09-13。方針は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、採用仕様は[MVP_SPEC](../product/MVP_SPEC.md)、担当・依存・K定義は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md#tasks)。
+2026-09-14。方針は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、採用仕様は[MVP_SPEC](../product/MVP_SPEC.md)、担当・依存・K定義は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md#tasks)。
 
 ## 現在の状態
+
+- 外部API書き起こしの構成要件反映（2026-09-14、作業中）：ユーザーが外部APIのモデル利用を明示採用し、ドキュメント更新を依頼。開始版 `555d950` / main、既存差分は `.env.audio-models.local` のみで保持。主担当がMVP_SPECと関連する方針・ロードマップ・開発手順・利用条件・調査の状態・画面見本・README・本記録を更新する。対象はK01/K03/K05/K06/K07、M01/M03/M04/M06/M08・U02/U03/U06/U07・AC02/05/07/13/14/19。完了条件は、外部ASR・分割主体・認証/保持/送信条件・受入条件の整合と文書検査。製品コードと実APIの実行は対象外。
+  - 決定範囲は外部API書き起こしとバックエンド経由の構成。プロバイダ/モデル、チャンク設定、予算、対象音声の実送信条件は未確定で、Go君の選定と企画者の判断・対象データの利用確認を実接続前に行う。人工契約/UIの先行を妨げない。旧仕様の根拠はGit `555d950` のMVP_SPEC §9と下記の過去記録に保持する。
 
 - 音声APIキーファイルのGit除外解除（2026-09-14）：開始版 `8f40f70` / main、開始時差分なし。ユーザーがハッカソン当日用キーのプライベートリポジトリ共有を指定したため、ルートの `.env.audio-models.local` だけを `.gitignore` の例外に追加し、[共有手順](../../credentials/README.md)を更新。以下の暗号化共有時点の「平文はGit除外」を今回変更した。K03/K05/K07の認証準備で、製品M/U/受入条件の変更は対象外。
   - 自己確認成功：`git check-ignore -v --no-index` と `git status --short` で対象ファイルが追加可能、復号鍵・他のenv・クライアント側envは除外継続と確認。`node scripts/check-docs.mjs` は49文書402ローカル参照/使用アンカーが成功、`git diff --check` も成功。キー値は表示していない。commit/push・実API・独立レビューは未実行。次は必要なファイルを追加してcommit/pushする。
