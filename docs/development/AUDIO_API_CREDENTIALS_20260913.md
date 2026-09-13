@@ -16,7 +16,7 @@
 | Gemini | 未取得 | 初回はサイトがsuspicious requestで拒否。復旧後、同じGemini Projectで1回再試行。発行成功・同名キーの追加を確認できず、保存なし。他projectの既存キーは流用していない |
 | ElevenLabs | 未取得 | Googleログイン小窓のアカウント選択で操作がタイムアウト。本人によるログイン完了待ち |
 | Hugging Face | 未取得 | ログイン画面を保持。本人ログイン後に読取トークンを発行する。モデル利用条件への同意は別途確認 |
-| Google Cloud Chirp 3 | 未設定 | ADC・project・region・Speech API設定は未実施。今回の7社のAPIキー発行とは異なる認証設定が必要 |
+| Google Cloud Chirp 3 | 設定途中 | Gemini ProjectでSpeech API有効化・`hackathon-audio-eval` サービスアカウント作成を確認。Cloud Speech Client / Service Usage Consumerの権限付与完了、JSON鍵、region設定は未確認・未取得 |
 
 ## 対象と発行先
 
@@ -74,3 +74,11 @@ Qwen3-ASR、VibeVoice、ReazonSpeech、Whisper、NVIDIAのローカル候補、R
 - Gemini再試行：復旧後、同じGemini Projectで専用名を入力して作成を1回実行。作成パネルは閉じたが、一覧再読込後も専用名なし（ヘッダーを含む15行）。今回の失敗理由は画面で確定できず、初回のsuspicious拒否と区別して未確認と記録する。異なるprojectや非UI経路による回避は行っていない。
 - 未実行：保存済みキーによる実認証API、音声・声紋モデルの試験、Hugging Faceのモデル取得、Cloud STTのADC設定、製品への接続、独立レビュー、commit/push。次は本人ログインの完了確認とGeminiの発行状況の確認。キー発行許可を課金契約や音声送信許可に広げない。
 - 文書・保存の自己確認成功：`node scripts/check-docs.mjs`（49ファイル399ローカル参照）、`git diff --check`、`.env.audio-models.local` のGit除外、保存済み5変数、変更した公開文書3本に実キー値が含まれないことを確認。
+
+## 追加の認証準備とGit共有（2026-09-14）
+
+- 追加承認：ユーザーが既存Gemini ProjectでのCloud Speech API有効化・規約同意、音声用サービスアカウントへのCloud Speech Client / Service Usage Consumer付与、JSON鍵のGit除外保存を明示承認。ElevenLabsへ本人の指定Googleアカウントで名前・画像・メールを共有するログイン連携も承認した。今回も音声実行・課金契約・購入は対象にしていない。
+- Cloudで確認できた結果：Speech APIの管理画面にDisable APIが表示され、有効化成功。`hackathon-audio-eval@gen-lang-client-0236493235.iam.gserviceaccount.com` の作成成功通知と権限選択画面を確認。ロールを検索する途中でブラウザ操作の自動レビュー待ち・実行タイムアウトが起き、権限付与完了とJSON鍵発行には至っていない。CLIと標準保存先のユーザーADCは見つからなかった。今後のJSON鍵はADC用の資格情報ファイルとして扱う。
+- ElevenLabsはGoogle認証の小窓でクリックがタイムアウト。本人アカウントの連携承認後、同じ認証ページを通常タブで開きアカウント選択操作は通ったが、次の画面確認がタイムアウトしてセッションがresetされた。ログイン成功・キー取得とは扱わない。HFとGeminiも新たな取得なし。
+- Git共有の依頼を受領。privateの `jokojama-gou/opeai-hackathon` を送信先として確認。取得済み5社の環境ファイル全体を `credentials/audio-models.env.enc.json` に暗号化した。復号鍵は `.env.audio-models.encryption-key.local` に保存し、Git除外を確認。平文キー・復号鍵はpush対象外。別PCでの復号にはGitとは別の経路で鍵を渡す必要がある。
+- [共有・復号手順](../../credentials/README.md)とNode.jsスクリプトを追加。AES-256-GCMの認証付き暗号化を使用。人工データで復号一致・IVの更新・異なる鍵/改ざん拒否・既存ファイル保護を確認し、実データでも暗号化後の原本一致を確認。キー値は検証ログに出力していない。

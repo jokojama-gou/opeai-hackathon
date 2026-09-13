@@ -9,6 +9,9 @@ npm-debug.*
 !.env.example
 .DS_Store
 credentials.json
+credentials/*
+!credentials/README.md
+!credentials/*.enc.json
 *.keystore
 *.jks
 *.p8
