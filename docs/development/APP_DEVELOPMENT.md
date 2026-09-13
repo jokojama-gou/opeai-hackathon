@@ -81,6 +81,8 @@ Expoと組み合わせるライブラリは、`apps/client`から`npx expo insta
 
 ## 製品実装へ進むとき
 
+大会の参照先は[リンク集](HACKATHON_LINKS.md)。必要時のクラウド管理は[Supabase操作手順](SUPABASE_ACCESS.md)を参照する。管理APIの過去の認証成功は、製品API・ローカルSupabaseの構築や現在のPCでの成功を意味しない。
+
 - K01/K02の人工データ・共通画面から着手する。独立Swiftアプリは作らない。
 - Glass部品・録音・カレンダー・SecureStore・navigation等は未導入。該当Kで既存Expo SDKに互換の依存を追加し、root lockfileを更新する。
 - 製品の権限やネイティブ設定を確認する際はexpo-dev-clientとEAS development profileを追加する。現在のpreviewは配布用でdevelopment clientではない。
