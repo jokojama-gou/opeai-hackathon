@@ -1,0 +1,4 @@
+interface:
+  display_name: "ハッカソン発表コーチ"
+  short_description: "今回の製品から、対話でスライド・ピッチ・デモを一緒に仕上げる"
+  default_prompt: "$hackathon-pitch-coach を使って今回の発表準備を始めて。大会の未定項目はそのままで、製品を根拠に発表の切り口から一緒に考えたい。"

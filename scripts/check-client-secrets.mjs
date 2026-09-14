@@ -3,11 +3,14 @@ import { join, resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const env = join(root, ".env.audio-models.local");
 const dist = join(root, "apps/client/dist");
-if (!existsSync(env) || !existsSync(dist))
+if (!existsSync(dist))
   throw new Error(
-    "Build bundles and provide the local credential file before scanning.",
+    "Build bundles before scanning, then run this check through the credential vault.",
   );
-const secrets = readFileSync(env, "utf8")
+const source = existsSync(env) ? readFileSync(env, "utf8") :
+  ['OPENAI_API_KEY','ELEVENLABS_API_KEY','PYANNOTE_API_KEY','GEMINI_API_KEY','SPEECHMATICS_API_KEY','DEEPGRAM_API_KEY','ASSEMBLYAI_API_KEY','HF_TOKEN']
+    .map(name => `${name}=${process.env[name] ?? ''}`).join('\n');
+const secrets = source
   .split(/\r?\n/)
   .flatMap((line) => {
     const match = line.match(/^\s*(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
@@ -17,6 +20,15 @@ const secrets = readFileSync(env, "utf8")
       ? [Buffer.from(value)]
       : [];
   });
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+  let account;
+  try { account = JSON.parse(readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8')); }
+  catch { throw new Error('Google credential could not be inspected; no secret values were printed.'); }
+  if (typeof account.private_key === 'string') {
+    secrets.push(Buffer.from(account.private_key));
+    secrets.push(Buffer.from(JSON.stringify(account.private_key).slice(1,-1)));
+  }
+}
 if (!secrets.length)
   throw new Error(
     "No populated credential values found; scan was not performed.",

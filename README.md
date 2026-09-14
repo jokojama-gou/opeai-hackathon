@@ -8,6 +8,11 @@ RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います�
 
 2026-09-14〜15に共通画面、人工契約、端末録音adapter、FastAPI/worker、2人の接続・共有確認、個人の訂正・保存に加え、個人Context/生成処理・ToDo/日次APIとLive画面を追加しました。開発起動は人工データの操作デモです。実ASR・2入力統合・スマホ実機の通し動作はまだ完成していません。実装範囲と残件は[現在地](docs/development/WORKFLOW.md#現在の状態)を参照してください。
 
+## 発表準備・資料の確認
+
+[発表準備](hackathon-pitch/README.md)に大会情報・発表コーチ・原稿テンプレートを保持しています。現行仕様は `docs/` を参照し、文書の確認には `npm run verify:docs` を使います。
+音声検証環境 `../audio-validation-local/` は既存の保管条件に従ってリポジトリ外に保持します。
+
 ## 開発を始める
 
 Node.js 22.20.0 / npm 10.9.3で、リポジトリルートから実行します。
@@ -19,14 +24,17 @@ npm run web
 
 共通画面は `apps/client/App.tsx` です。スマホ・型チェック・EASの前提は[開発環境](docs/development/APP_DEVELOPMENT.md)を参照してください。
 
+変更後は[検証入口](docs/development/APP_DEVELOPMENT.md#verification)を使います。UIは `npm run verify:ui`、UIと文書の両方は `npm run verify -- ui docs`、登録済みの全ローカル確認は `npm run verify` です。AIは依頼された成果まで実装・検証・修正・再確認を続け、新しい仕様判断や担当範囲の変更が必要な部分だけ確認します。
+
 AIは[AGENTS](AGENTS.md)→[現在地](docs/development/WORKFLOW.md)→[担当と実装順](docs/development/MULTIPLATFORM_DELIVERY_PLAN.md)から、該当する仕様・受入条件だけを読みます。バックエンドは[起動・検証手順](services/backend/README.md)を参照してください。人工画面の成功を実機・実処理の成功として引き継がないでください。
 
 ### 初回プロンプト
 
 ~~~text
 AGENTSとWORKFLOWを読み、ロードマップから次のKの担当・変更先・依存を確認してください。
-MVP_SPECの該当機能・画面・受入条件を参照し、現在の依頼の範囲で進めてください。
-未実装・実装済み・実機確認済みを分け、履歴の旧指示を実行しないでください。
+MVP_SPECの該当機能・画面・受入条件を参照し、依頼された成果まで必要な作業を分割して進めてください。
+同じ依頼の明示済み判断と範囲を引き継ぎ、小作業ごとの再依頼を求めず、必要な検証・修正・再確認まで行ってください。
+未実装・実装済み・実機確認済みを分け、終了した別作業の旧指示を実行しないでください。
 ~~~
 
 ## 必要な資料
@@ -44,3 +52,7 @@ MVP_SPECの該当機能・画面・受入条件を参照し、現在の依頼の
 `docs/history/` は旧案・過去結果です。実装の通常入口ではなく、当時の理由や証拠が必要な場合に参照します。旧共有操作試作の位置付けは[試作README](docs/product/prototypes/README.md)に記載しています。
 
 共有リポジトリが資料の正本です。個人PCの移管前資料を並行更新しません。音声・文字起こし・内容入り評価、認証情報、個人環境設定は共有対象に含めません。詳細な音声条件はVALIDATIONを参照してください。
+
+## 復元した資料と統合状態
+
+[Setlog構成案](docs/product/SETLOG_UI_STRUCTURE.md)・[一覧整理](docs/product/SETLOG_RECORDS_LIST.md)・[画面画像v2と書体見本](docs/product/prototypes/setlog-ui/README.md)、[発表準備](hackathon-pitch/README.md)、[復元一覧と実装の残件](docs/development/RESTORE_INTEGRATION_20260915.md)を参照できます。

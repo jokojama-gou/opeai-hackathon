@@ -1,0 +1,47 @@
+{
+  "recordedAt": "2026-09-15",
+  "status": "pending-user-decision",
+  "decisionOwner": "user",
+  "selectedCandidate": null,
+  "instruction": "添付されたFolday F4とVoicemark V1のみを候補として記録し、後でユーザーが決める。",
+  "candidates": [
+    {
+      "id": "folday-f4",
+      "name": "Folday",
+      "variant": "F4 / Folded F, rounded revision",
+      "image": "assets/folday-f4.png",
+      "source": "User attachment in this message; copied without changes",
+      "sha256": "670D65520FA5D5C102F4696BB4AE607BAD3FB243F73327CC42CE880A8C8FBC85",
+      "size": {
+        "width": 1254,
+        "height": 1254
+      },
+      "previewViewport": {
+        "x": 250,
+        "y": 137,
+        "width": 755,
+        "height": 755
+      }
+    },
+    {
+      "id": "voicemark-v1",
+      "name": "Voicemark",
+      "variant": "V1 / Voice bookmark",
+      "image": "assets/voicemark-source-board.png",
+      "source": "Previously generated comparison board, left icon V1 only",
+      "sha256": "D05349BDC21CFAF0968C90AC0DD1E91ED64CB0E71BA8A3EDDB019A4DA2946B7D",
+      "size": {
+        "width": 1536,
+        "height": 1024
+      },
+      "previewViewport": {
+        "x": 175,
+        "y": 165,
+        "width": 525,
+        "height": 525
+      }
+    }
+  ],
+  "selectionScope": "Only the two candidates above. Other historical proposals are not current candidates.",
+  "preservation": "Original image bytes preserved. The HTML viewer clips the original images for display; no regeneration or pixel edits."
+}
