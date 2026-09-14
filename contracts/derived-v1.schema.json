@@ -1,0 +1,945 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "context": {
+      "$ref": "#/definitions/PersonalContext"
+    },
+    "candidate": {
+      "$ref": "#/definitions/CandidateView"
+    },
+    "todo": {
+      "$ref": "#/definitions/TodoView"
+    },
+    "run": {
+      "$ref": "#/definitions/RunView"
+    },
+    "daily": {
+      "$ref": "#/definitions/DailyView"
+    },
+    "today": {
+      "$ref": "#/definitions/TodayView"
+    },
+    "preferences": {
+      "$ref": "#/definitions/ReviewPreferences"
+    }
+  },
+  "required": [
+    "context",
+    "candidate",
+    "todo",
+    "run",
+    "daily",
+    "today",
+    "preferences"
+  ],
+  "title": "DerivedContracts",
+  "type": "object",
+  "definitions": {
+    "CandidateIds": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Candidate Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "candidate_ids"
+      ],
+      "title": "CandidateIds",
+      "type": "object"
+    },
+    "CandidateView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "intent_key": {
+          "title": "Intent Key",
+          "type": "string"
+        },
+        "evidence_group_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Group Ids",
+          "type": "array"
+        },
+        "manifest_id": {
+          "title": "Manifest Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "title": "Expires At",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        },
+        "due": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Due"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assignee": {
+          "enum": [
+            "unknown",
+            "other"
+          ],
+          "title": "Assignee",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/definitions/ContextEvidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "origins": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Origins",
+          "type": "object"
+        },
+        "candidate_status": {
+          "enum": [
+            "proposed",
+            "needs_confirmation",
+            "accepted"
+          ],
+          "title": "Candidate Status",
+          "type": "string"
+        },
+        "source_state": {
+          "const": "available",
+          "title": "Source State",
+          "type": "string"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "duplicate_unresolved": {
+          "title": "Duplicate Unresolved",
+          "type": "boolean"
+        },
+        "previously_dismissed": {
+          "default": false,
+          "title": "Previously Dismissed",
+          "type": "boolean"
+        },
+        "todo_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Todo Id"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "intent_key",
+        "evidence_group_ids",
+        "manifest_id",
+        "expires_at",
+        "action",
+        "due",
+        "assignee",
+        "evidence",
+        "origins",
+        "candidate_status",
+        "source_state",
+        "run_id",
+        "duplicate_unresolved"
+      ],
+      "title": "CandidateView",
+      "type": "object"
+    },
+    "CitedText": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 400,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/definitions/ContextEvidence"
+          },
+          "maxItems": 20,
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "evidence"
+      ],
+      "title": "CitedText",
+      "type": "object"
+    },
+    "ContextEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "context_id": {
+          "title": "Context Id",
+          "type": "string"
+        },
+        "context_revision": {
+          "minimum": 1,
+          "title": "Context Revision",
+          "type": "integer"
+        },
+        "source_id": {
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_version": {
+          "minimum": 1,
+          "title": "Source Version",
+          "type": "integer"
+        },
+        "char_start": {
+          "minimum": 0,
+          "title": "Char Start",
+          "type": "integer"
+        },
+        "char_end": {
+          "exclusiveMinimum": 0,
+          "title": "Char End",
+          "type": "integer"
+        },
+        "target_kind": {
+          "const": "source",
+          "title": "Target Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "context_id",
+        "context_revision",
+        "source_id",
+        "source_version",
+        "char_start",
+        "char_end",
+        "target_kind"
+      ],
+      "title": "ContextEvidence",
+      "type": "object"
+    },
+    "ContextSource": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "recording_id": {
+          "title": "Recording Id",
+          "type": "string"
+        },
+        "original_text": {
+          "title": "Original Text",
+          "type": "string"
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Ms"
+        },
+        "end_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Ms"
+        },
+        "timing_quality": {
+          "enum": [
+            "unknown",
+            "estimated"
+          ],
+          "title": "Timing Quality",
+          "type": "string"
+        },
+        "speaker_label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Speaker Label"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "recording_id",
+        "original_text",
+        "start_ms",
+        "end_ms",
+        "timing_quality",
+        "speaker_label",
+        "version"
+      ],
+      "title": "ContextSource",
+      "type": "object"
+    },
+    "DailyResult": {
+      "additionalProperties": false,
+      "properties": {
+        "topics": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Topics",
+          "type": "array"
+        },
+        "ideas": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Ideas",
+          "type": "array"
+        },
+        "promises": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Promises",
+          "type": "array"
+        },
+        "questions": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "topics",
+        "ideas",
+        "promises",
+        "questions"
+      ],
+      "title": "DailyResult",
+      "type": "object"
+    },
+    "DailyView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "run_id": {
+          "title": "Run Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "ready",
+            "needs_confirmation",
+            "failed",
+            "stale"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Code"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "sections": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DailyResult"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "run_id",
+        "status",
+        "error_code",
+        "retryable"
+      ],
+      "title": "DailyView",
+      "type": "object"
+    },
+    "Due": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "date",
+            "datetime"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "string"
+        },
+        "time_zone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Time Zone"
+        }
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "title": "Due",
+      "type": "object"
+    },
+    "PersonalContext": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "personal",
+          "title": "Kind",
+          "type": "string"
+        },
+        "context_revision": {
+          "title": "Context Revision",
+          "type": "integer"
+        },
+        "recording_id": {
+          "title": "Recording Id",
+          "type": "string"
+        },
+        "canonical_start_at": {
+          "title": "Canonical Start At",
+          "type": "string"
+        },
+        "expires_at": {
+          "title": "Expires At",
+          "type": "string"
+        },
+        "manifest_hash": {
+          "title": "Manifest Hash",
+          "type": "string"
+        },
+        "generation_allowed": {
+          "title": "Generation Allowed",
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "needs_confirmation"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "preparation_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Preparation Reason"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/definitions/ContextSource"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "latest_runs": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Latest Runs",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "context_revision",
+        "recording_id",
+        "canonical_start_at",
+        "expires_at",
+        "manifest_hash",
+        "generation_allowed",
+        "status",
+        "preparation_reason",
+        "sources"
+      ],
+      "title": "PersonalContext",
+      "type": "object"
+    },
+    "ReviewPreferences": {
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "review_time_zone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Review Time Zone"
+        }
+      },
+      "required": [
+        "version",
+        "review_time_zone"
+      ],
+      "title": "ReviewPreferences",
+      "type": "object"
+    },
+    "RunView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "G1",
+            "G2",
+            "G5"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "queued",
+            "running",
+            "ready",
+            "needs_confirmation",
+            "failed",
+            "stale"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Code"
+        },
+        "retryable": {
+          "title": "Retryable",
+          "type": "boolean"
+        },
+        "attempts": {
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "retry_round": {
+          "title": "Retry Round",
+          "type": "integer"
+        },
+        "result": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/SummaryResult"
+            },
+            {
+              "$ref": "#/definitions/DailyResult"
+            },
+            {
+              "$ref": "#/definitions/CandidateIds"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Result"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "status",
+        "version",
+        "error_code",
+        "retryable",
+        "attempts",
+        "retry_round"
+      ],
+      "title": "RunView",
+      "type": "object"
+    },
+    "SummaryResult": {
+      "additionalProperties": false,
+      "properties": {
+        "contents": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Contents",
+          "type": "array"
+        },
+        "reasons": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "decisions": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Decisions",
+          "type": "array"
+        },
+        "unresolved": {
+          "items": {
+            "$ref": "#/definitions/CitedText"
+          },
+          "maxItems": 3,
+          "title": "Unresolved",
+          "type": "array"
+        }
+      },
+      "required": [
+        "contents",
+        "reasons",
+        "decisions",
+        "unresolved"
+      ],
+      "title": "SummaryResult",
+      "type": "object"
+    },
+    "TodayView": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "title": "Date",
+          "type": "string"
+        },
+        "review_time_zone": {
+          "title": "Review Time Zone",
+          "type": "string"
+        },
+        "selection_hash": {
+          "title": "Selection Hash",
+          "type": "string"
+        },
+        "contexts": {
+          "items": {
+            "$ref": "#/definitions/PersonalContext"
+          },
+          "title": "Contexts",
+          "type": "array"
+        },
+        "unprepared": {
+          "items": {
+            "$ref": "#/definitions/UnpreparedRecord"
+          },
+          "title": "Unprepared",
+          "type": "array"
+        },
+        "default_selected_context_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Default Selected Context Ids",
+          "type": "array"
+        },
+        "selection_required": {
+          "title": "Selection Required",
+          "type": "boolean"
+        },
+        "daily_reviews": {
+          "items": {
+            "$ref": "#/definitions/DailyView"
+          },
+          "title": "Daily Reviews",
+          "type": "array"
+        },
+        "todos": {
+          "items": {
+            "$ref": "#/definitions/TodoView"
+          },
+          "maxItems": 3,
+          "title": "Todos",
+          "type": "array"
+        },
+        "generation_configured": {
+          "title": "Generation Configured",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "date",
+        "review_time_zone",
+        "selection_hash",
+        "contexts",
+        "unprepared",
+        "default_selected_context_ids",
+        "selection_required",
+        "daily_reviews",
+        "todos",
+        "generation_configured"
+      ],
+      "title": "TodayView",
+      "type": "object"
+    },
+    "TodoView": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "source_state": {
+          "enum": [
+            "available",
+            "needs_review",
+            "unavailable"
+          ],
+          "title": "Source State",
+          "type": "string"
+        },
+        "todo_status": {
+          "enum": [
+            "open",
+            "done"
+          ],
+          "title": "Todo Status",
+          "type": "string"
+        },
+        "candidate_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate Id"
+        },
+        "action": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Action"
+        },
+        "due": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Due"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/definitions/ContextEvidence"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "source_state",
+        "todo_status"
+      ],
+      "title": "TodoView",
+      "type": "object"
+    },
+    "UnpreparedRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "recording_id": {
+          "title": "Recording Id",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "recording_id",
+        "version",
+        "status"
+      ],
+      "title": "UnpreparedRecord",
+      "type": "object"
+    }
+  },
+  "$id": "https://hackathon.invalid/derived-v1.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

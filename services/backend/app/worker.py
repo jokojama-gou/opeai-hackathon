@@ -198,5 +198,7 @@ if __name__ == "__main__":
         raise SystemExit("Configure backend environment before starting worker.")
     while True:
         service.cleanup()
-        if not run_once(service):
+        from .generation import run_generation_once
+
+        if not run_once(service) and not run_generation_once(service):
             time.sleep(2)

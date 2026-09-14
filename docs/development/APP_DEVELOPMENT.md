@@ -94,7 +94,7 @@ Expoと組み合わせるライブラリは、`apps/client`から`npx expo insta
 - development profileとexpo-dev-clientを追加済み。録音保存先のバックアップ除外はconfig pluginで設定し、iOSでは起動時の設定成功を確認できない場合に録音を開始しない。OS上の実効性は実機で検証する。
 - 初回はlight固定。主タブ/録音操作面は対応iOSでGlass、非対応環境と透明度低減設定では通常面を使う。実機の文字拡大・読み上げ・OSの戻るは未検証。
 
-音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。FastAPI・非公開Storage/PostgreSQL adapter・単一入力のASR worker境界を追加した。外部ASRの具体adapter、正規化/チャンク分割、統合/生成runnerは未接続。Expoの起動だけでは書き起こせない。バックエンドの依存・起動・人工テストは[backend README](../../services/backend/README.md)を参照する。
+音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。FastAPI・非公開Storage/PostgreSQL adapter・単一入力のASR worker境界と、個人Context/G1/G2/G5生成・ToDo/日次APIを追加した。外部ASRの具体adapter、正規化/チャンク分割、2入力統合・共有Context、G3/G4は残る。Expoの起動だけでは書き起こせない。生成adapterも接続/保持/予算の明示設定まで無効。バックエンドの依存・起動・人工テストは[backend README](../../services/backend/README.md)を参照する。
 
 実機接続は `apps/client/.env.example` を参考に `EXPO_PUBLIC_API_URL` を設定し、設定画面でAPIモードへ切り替える。スマホは証明書を検証できる明示的なHTTPS接続先が必要。開発PC自身のWeb検証に限りloopback HTTPを許す。Supabase用の秘密鍵やASRキーをクライアントのenvへ入れない。ログインにはチームが用意したアカウントを使い、画面から新規アカウントを作る機能はない。
 

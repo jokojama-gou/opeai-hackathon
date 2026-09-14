@@ -4,6 +4,8 @@
 
 `schema.mjs`から`mvp-v1.schema.json`を生成し、同じJSONから`packages/api-ts/src/schema.ts`を生成する。`npm run contracts:generate`で再生成、`npm run test:contracts`で構造と意味を検証する。入力は全て人工で、判定時刻と閲覧者を固定している。
 
+個人Context/ToDo/日次/AgentRunの応答は `services/backend/app/derived_contracts.py` を正本に `./scripts/backend.ps1 schema` で `derived-v1.schema.json` とOpenAPIを生成する。その後 `npm run contracts:generate` で `packages/api-ts/src/derived-schema.ts` を更新する。端末の `derived.ts` は構造に加えてstale/unavailable応答への本文混入を拒否する。共有Contextの被覆/対応表とG3/G4の契約はまだ含まない。
+
 | 仕様 | コードへの対応 |
 |---|---|
 | §6 録音/送信/統合の独立状態 | Recording.capture_status/upload_status、Conversation.status。成功へ相互変換しない |

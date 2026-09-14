@@ -18,7 +18,27 @@ from .models import (
     UploadTicket,
 )
 from .service import Service, identifier
-from .personal import PersonalService
+from .reviews import ReviewService
+from .openai_generation import OpenAIGeneration
+from .derived_models import GenerationConsent
+from .derived_contracts import (
+    PersonalContext,
+    CandidateView,
+    TodoView,
+    RunView,
+    DailyView,
+    TodayView,
+    ReviewPreferences,
+)
+from .derived_models import (
+    RunCreate,
+    TimeZoneEdit,
+    DailyCreate,
+    CandidateEdit,
+    Adopt,
+    TodoEdit,
+    Reconfirm,
+)
 from .models import ConnectionCreate, ConnectionAccept, MatchConfirmation, ShareResponse
 from .models import SavedCreate, SavedEdit, SavedDelete
 from .store import PostgresStore
@@ -28,7 +48,7 @@ def build_service(settings=None):
     settings = settings or Settings.from_env()
     if not settings.configured:
         return None
-    return PersonalService(
+    return ReviewService(
         PostgresStore(settings.database_url),
         SupabaseBlobs(
             settings.supabase_url,
@@ -37,6 +57,7 @@ def build_service(settings=None):
         ),
         settings,
         MediaProbe(),
+        generation=OpenAIGeneration.from_options(settings.generation_options),
     )
 
 
@@ -275,6 +296,104 @@ def create_app(service=None, auth=None, settings=None):
     @api.delete("/v1/saved-items/{sid}")
     def delete_saved(sid: str, payload: SavedDelete, user: Actor):
         return service.delete_saved(user, sid, payload.model_dump())
+
+    @api.get("/v1/preferences", response_model=ReviewPreferences)
+    def preferences(user: Actor):
+        return service.preferences(user)
+
+    @api.patch("/v1/preferences/review-time-zone")
+    def edit_zone(payload: TimeZoneEdit, user: Actor):
+        return service.edit_zone(user, payload.model_dump())
+
+    @api.get(
+        "/v1/contexts",
+        response_model=list[PersonalContext],
+        response_model_exclude_unset=True,
+    )
+    def contexts(user: Actor):
+        return service.contexts(user)
+
+    @api.get(
+        "/v1/contexts/{cid}",
+        response_model=PersonalContext,
+        response_model_exclude_unset=True,
+    )
+    def context(cid: str, user: Actor):
+        return service.context(user, cid)
+
+    @api.get("/v1/contexts/{cid}/evidence")
+    def context_evidence(cid: str, source_id: str, version: int, user: Actor):
+        return service.context_evidence(user, cid, source_id, version)
+
+    @api.post("/v1/contexts/{cid}/agent-runs", status_code=202)
+    def create_run(cid: str, payload: RunCreate, user: Actor):
+        return service.create_run(user, cid, payload.model_dump())
+
+    @api.post("/v1/contexts/{cid}/generation-consents", status_code=201)
+    def generation_consent(cid: str, payload: GenerationConsent, user: Actor):
+        return service.generation_consent(user, cid, payload.model_dump())
+
+    @api.get(
+        "/v1/agent-runs/{run_id}",
+        response_model=RunView,
+        response_model_exclude_unset=True,
+    )
+    def agent_run(run_id: str, user: Actor):
+        return service.agent_run(user, run_id)
+
+    @api.post("/v1/agent-runs/{run_id}/retry", status_code=202)
+    def retry_run(run_id: str, payload: Mutation, user: Actor):
+        return service.retry_run(user, run_id, payload.model_dump())
+
+    @api.get(
+        "/v1/action-candidates",
+        response_model=list[CandidateView],
+        response_model_exclude_unset=True,
+    )
+    def candidates(user: Actor):
+        return service.candidates(user)
+
+    @api.patch("/v1/action-candidates/{cid}")
+    def dismiss_candidate(cid: str, payload: CandidateEdit, user: Actor):
+        return service.dismiss_candidate(user, cid, payload.model_dump())
+
+    @api.post("/v1/action-candidates/{cid}/adopt", status_code=201)
+    def adopt(cid: str, payload: Adopt, user: Actor):
+        return service.adopt(user, cid, payload.model_dump())
+
+    @api.get(
+        "/v1/todos", response_model=list[TodoView], response_model_exclude_unset=True
+    )
+    def todos(user: Actor):
+        return service.todos(user)
+
+    @api.patch("/v1/todos/{tid}")
+    def edit_todo(tid: str, payload: TodoEdit, user: Actor):
+        return service.edit_todo(user, tid, payload.model_dump())
+
+    @api.delete("/v1/todos/{tid}")
+    def delete_todo(tid: str, payload: Mutation, user: Actor):
+        return service.edit_todo(user, tid, payload.model_dump(), deleting=True)
+
+    @api.post("/v1/todos/{tid}/reconfirm")
+    def reconfirm_todo(tid: str, payload: Reconfirm, user: Actor):
+        return service.reconfirm_todo(user, tid, payload.model_dump())
+
+    @api.get("/v1/today", response_model=TodayView, response_model_exclude_unset=True)
+    def today(date: str, zone: str, user: Actor):
+        return service.today(user, date, zone)
+
+    @api.post("/v1/daily-reviews", status_code=202)
+    def create_daily(payload: DailyCreate, user: Actor):
+        return service.create_daily(user, payload.model_dump())
+
+    @api.get(
+        "/v1/daily-reviews/{did}",
+        response_model=DailyView,
+        response_model_exclude_unset=True,
+    )
+    def daily(did: str, user: Actor):
+        return service.daily(user, did)
 
     return api
 

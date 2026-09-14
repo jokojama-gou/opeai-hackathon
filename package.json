@@ -16,8 +16,8 @@
   },
   "scripts": {
     "contracts:generate": "node contracts/schema.mjs && node contracts/generate-fixtures.mjs && node scripts/generate-contract-types.mjs",
-    "test:contracts": "tsx --test contracts/contracts.test.ts packages/api-ts/src/client.test.ts",
-    "test": "tsx --test contracts/contracts.test.ts packages/api-ts/src/client.test.ts apps/client/src/data/*.test.ts",
+    "test:contracts": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts",
+    "test": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts apps/client/src/data/*.test.ts",
     "start": "npm run start --workspace @hackathon/client --",
     "web": "npm run web --workspace @hackathon/client --",
     "android": "npm run android --workspace @hackathon/client --",

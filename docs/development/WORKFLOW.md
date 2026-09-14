@@ -1,8 +1,21 @@
 # 現在地と引き継ぎ
 
-2026-09-14。方針は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、採用仕様は[MVP_SPEC](../product/MVP_SPEC.md)、担当・依存・K定義は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md#tasks)。
+2026-09-15。方針は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、採用仕様は[MVP_SPEC](../product/MVP_SPEC.md)、担当・依存・K定義は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md#tasks)。
 
 ## 現在の状態
+
+- 個人の生成・ToDo・日次を追加（2026-09-14〜15）：ユーザーの「このほか実装すべきところを実装して」に対し、主担当がK09/K10・M10/M11（M12のメモ非送信）・U03/U12/U13・§15/A02/03/05/06/08/10/11/13/14/15の個人入力部分を実装・人工検証。開始版 `a8ab85d` / main、開始時差分なし。変更は未コミット。採用仕様の変更、Go君の作業受領、実APIの利用許可取得ではない。
+  - 実装：個人ContextViewと全生成入力のmanifest、G1/G2/G5 runner、ToDoの本人採用/編集/完了/戻す/削除/再確認、タイムゾーンと日次の選択/生成/失効API。引用していない背景Sourceも依存に含む。ToDoの再確認でIDと完了状態を保持。11候補は全件非公開、日次11件以上は自動選択しない。個人メモを生成へ渡さない。
+  - 実装：LiveAppの「今日」「ToDo」、個人記録の整理/候補、根拠の現在版確認、生成同意の追加/取消、失敗/上限/再試行表示。文字が有効なら原音の7日期限後にも生成同意を変更できる。画面は通信断/背景化で消去し、復帰時・表示中15秒ごと・期限時に再検査。別端末変更のpush通知は未実装。
+  - 実装：採用済みResponses API用の `openai_generation.py`。modelは設定差替え可、例は `gpt-5-mini`。構造化出力・toolなし・store false・切詰めなし・timeout/応答量制限。backend専用の明示設定が全部揃うまで無効。全worker同時2件、本人queued最大10、全員共通の予約予算台帳、各round最大2呼出・手動retry1round、結果不明は再送なし。保持/予算値・実キーは今回設定していない。予約額と実請求額の照合は未実装で、実費保証ではない。
+  - 共通契約：追加response modelから `contracts/derived-v1.schema.json` とOpenAPIを出力し、共通TS型を生成。端末でも失効応答への本文混入を拒否する。再生成手順は[backend README](../../services/backend/README.md)と[contracts README](../../contracts/README.md)。全MVP契約の完成とはしない。
+  - 自己確認成功：Python API/worker/HTTP代替 **57件**、TS契約/クライアント **28件**、型チェック、OpenAPI/schema/TS型再生成。ToDo本文遮断/同ID再確認、同意取消中の遅着結果拒否、期限後の本文なし状態、同時2件・4呼出上限、HTTP500/timeout/拒否/不正根拠の非公開、日またぎ・zone変更・対象変更・11件選択を含む。独立レビューではない。Python依存由来のdeprecation warning 2件あり。
+  - バンドル成功：Web（737KB）、iOS/Android Hermes（各約2MB）。配信用6ファイルの既知キー値混入検査成功。APK/IPA・ネイティブコンパイル・実機・実ASR/実生成の品質確認ではない。
+  - 文書・差分の確認成功：49文書416ローカル参照/使用アンカー、`git diff --check`。最終修正後もPython 57件を再確認して成功。
+  - 失敗と修正：sandboxの `npm test` はNodeの `uv_os_get_passwd / ENOMEM` で起動失敗。通常環境で同じ28テスト成功。Pythonの初回失敗1件はTestClientのDELETE呼出方法を修正し成功。同意と最新retryはDB列挙順に依存しないよう版で固定した。
+  - ブラウザ確認は未完：人工専用loopback API＋別Web（8001/8082）を起動し、390×844でAPIログイン画面まで確認。HTTPのhealth/CORS preflight/人工ログインは成功したが、in-app browserのログインは結果不明。診断toolが約48分応答せず通信の証拠を取得できなかった。LiveのToDo/日次操作成功とはしない。検証プロセス2本とタブを終了し、viewportを戻した。再開手順はbackend README。既存8081の人工デモと混同しない。
+  - 残る実装：K03の具体ASR/チャンク、K05の時間対応/統合・共有Context被覆/同一化、認可clip・指摘API、G3/G4とカレンダー、G1/G2の確定/訂正イベントからの自動起動、当日保存/確認点を含むToday全体、3人/グループ境界、画面の戻り位置・実機受入。現在のContextは個人だけで、対応Matchのある記録は二重生成を避けて保留する。**今回の追加をMVP全体やスマホの完成とはしない。**
+  - 実行待ち：Supabase/2アカウント/HTTPS/ffprobe、ASR選定・入力/保持/予算、生成の実保持/予算設定、Expo署名・実端末。外部モデル呼出・実音声・公開・課金・commit/push・独立レビューは未実行。次はローカルAPIとLive画面の実接続を確認し、K03/K05へ接続する。
 
 - 共通画面・API基盤の開発（2026-09-14）：ユーザーの「君が開発すすめられるのはすべてすすめて」を受け、主担当が契約・UI・端末adapter・API/workerを実装。基準版 `0591ef0` / main、開始時差分なし。今回の差分は未コミット。他者の選定結果・別PCの実装を受領済みとはしない。**実装は進んだが、スマホ＋実ASRの通し動作とMVP全体は未完成。**
   - K01/K02：`contracts/` に4人工fixture・7状態、JSON schema、受理/拒否テスト、`packages/api-ts/` に生成TS型・HTTPS/APIクライアントを追加。`apps/client/src/` で今日/記録/会話/出典/訂正/保存/ToDo/確認の人工画面、明色・Glass代替、戻る導線を実装。原文相違、時刻不明、片側記録、未許可・期限切れを分けた。日次は原文抜粋で、AI生成ではない。AC06/07/15の表示部分、A条件の操作部分。全43条件の合格とはしない。

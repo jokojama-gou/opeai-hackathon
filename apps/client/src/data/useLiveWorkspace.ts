@@ -38,7 +38,26 @@ const messages: Record<string, string> = {
   expired: "この記録の保存期限が過ぎました。",
   not_found: "この記録を利用できません。",
   version_conflict: "内容が更新されています。読み直してください。",
+  generation_not_configured: "生成サービスの接続と予算が未設定です。",
+  generation_consent_required: "この記録の文字生成への同意を確認してください。",
+  context_not_ready: "文字起こしを準備しています。",
+  manifest_changed: "元の記録が更新されました。対象を読み直してください。",
+  selection_changed: "対象の記録が変わりました。選択し直してください。",
+  too_many_candidates:
+    "候補が多いため抽出できませんでした。元の記録を確認してください。",
+  generation_budget_exhausted: "生成の予算上限に達しました。",
+  generation_queue_full: "処理待ちが多いため、しばらくしてから試してください。",
+  duplicate_resolution_required:
+    "同じ内容を二重に採用しないため、記録の対応確認が必要です。",
+  source_reconfirmation_required: "現在の根拠から確認し直してください。",
+  invalid_time_zone: "タイムゾーンを確認してください（例 Asia/Tokyo）。",
+  invalid_date: "日付をYYYY-MM-DDで入力してください。",
+  invalid_request:
+    "入力内容を確認してください。日時には時差とタイムゾーンが必要です。",
 };
+export const errorCodeText = (code: string) =>
+  messages[code] ??
+  "処理を完了できませんでした。元の記録と処理状態を確認してください。";
 export const errorText = (error: unknown) =>
   error instanceof ApiError
     ? (messages[error.code] ??
@@ -70,7 +89,13 @@ export function useLiveWorkspace() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [screen, setScreen] = useState<
-    "records" | "recording" | "personal" | "settings" | "saved"
+    | "records"
+    | "recording"
+    | "personal"
+    | "settings"
+    | "saved"
+    | "today"
+    | "todos"
   >("records");
   const [active, setActive] = useState(AppState.currentState === "active");
   const network = useNetworkState();

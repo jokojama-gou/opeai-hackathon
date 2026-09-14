@@ -17,6 +17,7 @@ import { GlassSurface } from "../ui/GlassSurface";
 import { LiveSharing } from "./LiveSharing";
 import { LiveSourceCard } from "./LiveSourceCard";
 import { LiveSaved } from "./LiveSaved";
+import { LiveToday, LiveTodos, LiveContextTools } from "./LiveInsights";
 const captureLabels = {
   recording: "録音中",
   stopping: "端末へ保存中",
@@ -178,6 +179,19 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
         body="保存した内容は、現在の権限を確認してから表示します。"
       />
     );
+  else if (w.screen === "today" || w.screen === "todos")
+    body = w.connected ? (
+      w.screen === "today" ? (
+        <LiveToday api={w.api} onSource={(id) => run(() => w.openRemote(id))} />
+      ) : (
+        <LiveTodos api={w.api} onSource={(id) => run(() => w.openRemote(id))} />
+      )
+    ) : (
+      <Empty
+        title="再接続してください"
+        body="現在の権限を確認してから内容を表示します。"
+      />
+    );
   else if (w.screen === "personal")
     body = (
       <>
@@ -305,6 +319,14 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
             onPress={() => run(w.reloadSources)}
           />
         )}
+        {w.remoteId && w.sources.length > 0 && w.api && w.connected && (
+          <LiveContextTools
+            key={w.remoteId}
+            api={w.api}
+            recordingId={w.remoteId}
+            onSource={(id) => run(() => w.openRemote(id))}
+          />
+        )}
         {w.remoteId && w.api && w.session && w.connected && (
           <LiveSharing
             key={w.remoteId}
@@ -405,7 +427,7 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
   return (
     <View style={styles.page}>
       <View style={{ padding: 16, gap: 10 }}>
-        <View style={styles.row}>
+        <View style={[styles.row, { flexWrap: "wrap" }]}>
           <Heading>
             {w.screen === "personal"
               ? "自分の記録"
@@ -415,15 +437,31 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
                   ? "設定"
                   : w.screen === "saved"
                     ? "保存"
-                    : "記録"}
+                    : w.screen === "today"
+                      ? "今日"
+                      : w.screen === "todos"
+                        ? "ToDo"
+                        : "記録"}
           </Heading>
           <View style={{ flex: 1 }} />
           {w.session && (
-            <Button
-              label="保存"
-              secondary
-              onPress={() => w.setScreen("saved")}
-            />
+            <View style={[styles.row, { flexWrap: "wrap" }]}>
+              <Button
+                label="今日"
+                secondary
+                onPress={() => w.setScreen("today")}
+              />
+              <Button
+                label="ToDo"
+                secondary
+                onPress={() => w.setScreen("todos")}
+              />
+              <Button
+                label="保存"
+                secondary
+                onPress={() => w.setScreen("saved")}
+              />
+            </View>
           )}
           <Button
             label="設定"

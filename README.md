@@ -6,7 +6,7 @@
 
 RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います。現行仕様は2.2で、外部APIによる音声書き起こしを採用しています。各スマホから共通バックエンドへ音声を送り、workerが必要な分割と外部ASR呼出・結果結合を担当します。Supabaseは認証・非公開保存・ジョブ管理を担います。初回UIは明色＋Liquid Glass。仕様・採用状態は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。2.1の独立レビューは完了しましたが、今回の2.2差分の独立レビューは未実施です。
 
-2026-09-14に共通画面、人工契約、端末録音adapter、FastAPI/worker、2人の接続・共有確認、個人の訂正・保存APIを追加しました。開発起動は人工データの操作デモです。実機モードと実ASR・統合生成の接続は完成していません。実装範囲と残件は[現在地](docs/development/WORKFLOW.md#現在の状態)を参照してください。
+2026-09-14〜15に共通画面、人工契約、端末録音adapter、FastAPI/worker、2人の接続・共有確認、個人の訂正・保存に加え、個人Context/生成処理・ToDo/日次APIとLive画面を追加しました。開発起動は人工データの操作デモです。実ASR・2入力統合・スマホ実機の通し動作はまだ完成していません。実装範囲と残件は[現在地](docs/development/WORKFLOW.md#現在の状態)を参照してください。
 
 ## 開発を始める
 

@@ -236,6 +236,15 @@ class Service:
                 raise DomainError("processor_not_configured", 503)
             value = {
                 "id": identifier(),
+                "version": 1
+                + max(
+                    (
+                        c.get("version", 0)
+                        for c in state.table("consents").values()
+                        if c["recording_id"] == rid and c["actor_id"] == actor
+                    ),
+                    default=0,
+                ),
                 "recording_id": rid,
                 "actor_id": actor,
                 "checksum": record["checksum"],
@@ -245,7 +254,12 @@ class Service:
                 "external_audio_transcription": payload["external_audio_transcription"],
                 "external_text_generation": payload["external_text_generation"],
                 "allowed_purposes": (
-                    ["transcription"] if payload["external_audio_transcription"] else []
+                    (
+                        ["transcription"]
+                        if payload["external_audio_transcription"]
+                        else []
+                    )
+                    + (["generation"] if payload["external_text_generation"] else [])
                 ),
                 "confirmed_at": iso(self.clock()),
                 "revoked_at": None,

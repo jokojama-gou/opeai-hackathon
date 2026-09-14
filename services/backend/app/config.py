@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import os
 from pathlib import Path
 from urllib.parse import urlparse
@@ -21,6 +21,7 @@ class Settings:
         "送信先と保持条件が未設定です。文字は外部へ送信できません。"
     )
     cors_origins: tuple[str, ...] = ()
+    generation_options: dict[str, str] = field(default_factory=dict, repr=False)
 
     @property
     def configured(self):
@@ -45,6 +46,25 @@ class Settings:
             "PC_DESTINATION_ID",
             "CORS_ORIGINS",
         }
+        generation_keys = {
+            "GENERATION_" + suffix
+            for suffix in (
+                "ENABLED",
+                "API_KEY",
+                "MODEL",
+                "DESTINATION_ID",
+                "RETENTION_VERIFIED",
+                "RETENTION_DESCRIPTION",
+                "MAX_INPUT_CHARS",
+                "MAX_OUTPUT_CHARS",
+                "MAX_OUTPUT_TOKENS",
+                "TIMEOUT_SECONDS",
+                "BUDGET_ID",
+                "BUDGET_MICRO_USD",
+                "RESERVATION_MICRO_USD",
+            )
+        }
+        allowed |= generation_keys
         if local_env.exists():
             for line in local_env.read_text(encoding="utf-8-sig").splitlines():
                 if not line.strip() or line.lstrip().startswith("#") or "=" not in line:
@@ -59,6 +79,12 @@ class Settings:
             supabase_service_key=os.getenv("SUPABASE_SERVICE_ROLE_KEY", ""),
             ticket_secret=os.getenv("UPLOAD_TICKET_SECRET", ""),
             pc_destination=os.getenv("PC_DESTINATION_ID", ""),
+            generation_destination=os.getenv("GENERATION_DESTINATION_ID") or None,
+            generation_retention=os.getenv("GENERATION_RETENTION_DESCRIPTION")
+            or cls.generation_retention,
+            generation_options={
+                key: os.environ[key] for key in generation_keys if key in os.environ
+            },
             cors_origins=tuple(filter(None, os.getenv("CORS_ORIGINS", "").split(","))),
         )
         if settings.supabase_url:
