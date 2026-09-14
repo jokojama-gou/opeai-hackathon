@@ -15,6 +15,10 @@
     "npm": "10.9.3"
   },
   "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "verify:docs": "node scripts/verify.mjs docs",
+    "verify:ui": "node scripts/verify.mjs ui",
+    "verify:tooling": "node scripts/verify.mjs tooling",
     "contracts:generate": "node contracts/schema.mjs && node contracts/generate-fixtures.mjs && node scripts/generate-contract-types.mjs",
     "test:contracts": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts",
     "test": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts apps/client/src/data/*.test.ts",
@@ -33,7 +37,10 @@
     "build:android:store": "npm run build:android:store --workspace @hackathon/client --",
     "build:ios:preview": "npm run build:ios:preview --workspace @hackathon/client --",
     "build:ios:store": "npm run build:ios:store --workspace @hackathon/client --",
-    "build:ios:simulator": "npm run build:ios:simulator --workspace @hackathon/client --"
+    "build:ios:simulator": "npm run build:ios:simulator --workspace @hackathon/client --",
+    "verify:security": "node scripts/verify.mjs security",
+    "security:scan": "node scripts/check-repository-secrets.mjs",
+    "security:hooks": "git config --local core.hooksPath .githooks"
   },
   "devDependencies": {
     "eas-cli": "24.3.0",

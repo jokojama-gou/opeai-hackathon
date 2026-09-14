@@ -1,38 +1,38 @@
-# 音声APIキーの共有
+# 音声認証情報の保管
 
-取得済みAPIキーはルートの `.env.audio-models.local` に保存しています。2026-09-14のユーザー指定により、ハッカソン当日用のキーをプライベートリポジトリで共有するため、このファイルをGit除外から外しました。
+2026-09-15。APIキー7社・Hugging Faceトークン・Google Cloud秘密鍵の値を維持し、平文のGit共有を終了する。発行履歴は[取得記録](../docs/development/AUDIO_API_CREDENTIALS_20260913.md)。
 
-`audio-models.env.enc.json` は既存の暗号化ファイルです。AES-256-GCMとランダムな256ビット鍵を使います。復号鍵 `.env.audio-models.encryption-key.local` は引き続きGit除外です。
+## このWindows PCでの保管
 
-2026-09-14時点でOpenAI・ElevenLabs・pyannote・Gemini・Speechmatics・Deepgram・AssemblyAIの7社とHugging Faceのモデル読取トークンを保存済みです。Google Cloud Speech用の認証JSONは `.env.audio-google-service-account.local.json` に保存しています。ユーザー指定のprivateリポジトリへ、これらの認証ファイルを共有します。実認証・モデルの利用可否は未検証です。[取得状態](../docs/development/AUDIO_API_CREDENTIALS_20260913.md)を参照してください。
+正本はリポジトリ外の `%LOCALAPPDATA%\OpeaiHackathon\Secrets\audio-credentials.dpapi`。Windows DPAPIのCurrentUserで2ファイル全体を暗号化する。復号用の鍵ファイルはリポジトリへ作らない。保管フォルダは継承権限を外し、実行した本人とSYSTEMだけを許可する。
 
-## 別のPCで使う
+このファイルは保管したWindowsユーザーのプロファイルに依存する。単に別PCへコピーしても復号できない。別PCへの引き渡しやPC移行は、別途承認した秘密情報管理サービス等の安全な経路で行う。Windowsアカウント/プロファイルを失うと復旧できない可能性がある。旧AES-256-GCMファイルは過去の暗号化コピーとして保持するが、Google Cloud JSONを含まず、このPCに復号鍵はない。
 
-1. `.env.audio-models.local` を含むコミットをpushした後、別PCでリポジトリを取得・更新します。
-2. ルートの `.env.audio-models.local` を評価用バックエンドから読み込みます。キー値をクライアント用の公開環境変数には入れないでください。読み込みランナーは未接続です。
-3. Google Cloud用の `GOOGLE_APPLICATION_CREDENTIALS` はリポジトリ直下のJSONを指します。別の作業ディレクトリから起動する場合はそのPCの絶対パスに解決します。`GOOGLE_CLOUD_LOCATION` はモデル・言語に対応したリージョンを実行前に設定します。
+PowerShell 7で暗号化ファイルの復号・内部ハッシュを確認する。実キーを表示せず、外部APIも呼ばない。
 
-### 暗号化ファイルから復元する場合
-
-平文ファイルが手元にない場合は、既存の復号手順も利用できます。
-
-1. リポジトリを取得します。
-2. 元のPCの `.env.audio-models.encryption-key.local` を、Gitとは別の安全な経路で受け取り、リポジトリ直下の同じ名前で保存します。このファイルを持つ人はAPIキーを復号できます。
-3. Node.jsで次を実行します。既存の `.env.audio-models.local` がある場合は上書きせず停止します。
-
-```sh
-node scripts/audio-credentials.mjs open
+```powershell
+./scripts/audio-vault.ps1 -Action verify
 ```
 
-復号先は `.env.audio-models.local` です。
+## バックエンドで必要なときだけ使う
 
-## キーを追加・更新した後
-
-```sh
-node scripts/audio-credentials.mjs seal
-node scripts/audio-credentials.mjs verify
+```powershell
+./scripts/audio-vault.ps1 -Action run -Executable node -CommandArguments @('path/to/approved-backend-runner.mjs')
 ```
 
-`seal` はローカルの環境ファイル全体を暗号化し、既存の暗号化ファイルを更新します。元のキーは残します。復号鍵がない初回だけ鍵を生成します。`verify` はファイルの改ざん検出と元データとの一致を確認し、キー値は表示しません。
+これは呼出形式の例。指定したプログラムには実キーを渡すため、検証済みのバックエンドだけを実行する。音声APIキー8変数とCloudのproject/locationを読み込み、Google Cloud JSONは本人専用の一時フォルダへ復号する。終了時に一時JSONを削除し、プロセス環境を元に戻す。OSの強制終了/電源断では一時ファイルが残り得るので、保管フォルダ内のrun-*を確認する。通常起動やExpoへの自動注入はしない。GENERATION_API_KEYへの転用、ASR接続、Cloudリージョン、予算等は別の設定で、今回有効化しない。
 
-Gitへ追加するのは `.env.audio-models.local`、`.env.audio-google-service-account.local.json` と、更新した暗号化ファイルです。暗号化ファイルには環境ファイルの内容だけが入り、Google CloudのJSON本体は入りません。復号鍵を失うと、この暗号化ファイルからキーを復元できません。
+## Gitと再混入防止
+
+平文env・Cloud JSON・復号鍵を追跡しない。平文を許可していた.gitignoreの例外を撤去する。旧node scripts/audio-credentials.mjsの平文復元CLIは無効化し、既存暗号化データの検証用関数だけを維持する。
+
+```sh
+npm run security:hooks
+npm run verify:security
+```
+
+pre-commitは作業ファイルではなくステージ済みの内容を検査する。pre-pushは現在ファイルと全ローカル履歴を検査し、過去の平文が残る間は停止する。ファイル名・既知のキー形式・秘密鍵形式を検査する方式で、未知の全秘密を検出できる保証はない。保管庫から検査を起動すれば実キー値との一致も検査する。hookはクローンごとの設定なので、他の開発者も設定する必要がある。
+
+## GitHub履歴の更新と別クローン
+
+2026-09-15に、認証情報を含むmainの6コミットを除去後の履歴へ更新した。認証情報以外の各コミットの内容と、既存の編集・stashを保持したことは[保管修正と履歴除去の結果](../docs/development/CREDENTIAL_STORAGE_20260915.md)を参照する。旧mainを持つ別クローンでは未公開の編集を退避し、更新後の履歴を再取得・再統合する。旧履歴をそのまま再pushしない。GitHubのキャッシュや他のコピーまで完全に消去済みとは扱わない。

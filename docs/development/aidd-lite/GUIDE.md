@@ -16,4 +16,4 @@
 
 [採用原則](../../decisions/AIDD_FW_ADOPTION.md)、[由来](PROVENANCE.md)、[過去の利用確認](ACCEPTANCE.md)は必要時の参考です。自動発見・相手PCでの利用・製品動作は別々に確認します。
 
-静的確認はルートで `pwsh -NoProfile -File scripts/check-aidd-lite.ps1 -RepoRoot .` と `node scripts/check-docs.mjs` を実行します。前者はskill metadata、後者はローカル参照・使用アンカーを検査します。意味の正しさやAIの参照行動を保証するものではありません。
+文書・Skillの変更後はルートで `npm run verify:docs` を実行します。skill metadataとローカル参照・使用アンカーをまとめて検査し、失敗・起動不能を成功扱いにしません。UI等も変更した場合は[検証入口](../APP_DEVELOPMENT.md#verification)から該当対象を併用します。意味の正しさやAIの参照行動を保証するものではありません。
