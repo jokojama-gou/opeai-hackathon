@@ -1,0 +1,163 @@
+{
+  "contract_version": "mvp-2.2-k01-v1",
+  "case_id": "conflict",
+  "viewer_id": "person-a",
+  "now": "2026-09-14T03:00:00.000Z",
+  "scenarios": [
+    {
+      "id": "conflict",
+      "label": "展示の日程と会場",
+      "kind": "shared",
+      "response_status": 200,
+      "recordings": [
+        {
+          "id": "recording-a",
+          "owner_id": "person-a",
+          "installation_id": "device-person-a",
+          "mode": "normal",
+          "duration_ms": 60000,
+          "stopped_at": "2026-09-14T02:00:00.000Z",
+          "capture_status": "saved",
+          "upload_status": "ready",
+          "audio_expires_at": "2026-09-21T02:00:00.000Z",
+          "text_expires_at": "2026-10-14T02:00:00.000Z",
+          "version": 1
+        },
+        {
+          "id": "recording-b",
+          "owner_id": "person-b",
+          "installation_id": "device-person-b",
+          "mode": "normal",
+          "duration_ms": 60000,
+          "stopped_at": "2026-09-14T02:00:00.000Z",
+          "capture_status": "saved",
+          "upload_status": "ready",
+          "audio_expires_at": "2026-09-21T02:00:00.000Z",
+          "text_expires_at": "2026-10-14T02:00:00.000Z",
+          "version": 1
+        }
+      ],
+      "sources": [
+        {
+          "id": "c1",
+          "recording_id": "recording-a",
+          "original_text": "展示は土曜にしよう。",
+          "start_ms": 18000,
+          "end_ms": 22000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "c2",
+          "recording_id": "recording-b",
+          "original_text": "展示は日曜にしよう。",
+          "start_ms": 19000,
+          "end_ms": 23000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "c3",
+          "recording_id": "recording-a",
+          "original_text": "会場はまだ決めていない。",
+          "start_ms": 25000,
+          "end_ms": 29000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "c4",
+          "recording_id": "recording-b",
+          "original_text": "入口に写真を置く案もある。",
+          "start_ms": null,
+          "end_ms": null,
+          "timing_quality": "unknown",
+          "speaker_label": null,
+          "version": 1
+        }
+      ],
+      "conversation": {
+        "id": "conversation-conflict",
+        "mode": "normal",
+        "revision": 1,
+        "access_revision": 1,
+        "status": "ready",
+        "script": [
+          {
+            "id": "conflict-1",
+            "kind": "conflict",
+            "evidence_refs": [
+              {
+                "source_id": "c1",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 10,
+                "start_ms": 18000,
+                "end_ms": 22000
+              },
+              {
+                "source_id": "c2",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 10,
+                "start_ms": 19000,
+                "end_ms": 23000
+              }
+            ],
+            "uncertainty": [
+              "原文に相違があります"
+            ],
+            "order_status": "aligned",
+            "speaker_label": null
+          },
+          {
+            "id": "conflict-2",
+            "kind": "single",
+            "evidence_refs": [
+              {
+                "source_id": "c3",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 12,
+                "start_ms": 25000,
+                "end_ms": 29000
+              }
+            ],
+            "uncertainty": [],
+            "order_status": "aligned",
+            "speaker_label": null
+          },
+          {
+            "id": "conflict-3",
+            "kind": "single",
+            "evidence_refs": [
+              {
+                "source_id": "c4",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 13,
+                "start_ms": null,
+                "end_ms": null
+              }
+            ],
+            "uncertainty": [],
+            "order_status": "unknown",
+            "speaker_label": null
+          }
+        ],
+        "highlights": [],
+        "confirmation_reason": null
+      },
+      "connection": null,
+      "expected": {
+        "script_count": 3,
+        "source_count": 4,
+        "audio_available": true,
+        "next_screen": "U06"
+      }
+    }
+  ]
+}

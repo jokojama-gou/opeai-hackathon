@@ -23,3 +23,6 @@ credentials/*
 *.ipa
 *.apk
 *.aab
+__pycache__/
+.pytest_cache/
+.venv/

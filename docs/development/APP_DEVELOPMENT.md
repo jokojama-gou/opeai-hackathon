@@ -4,7 +4,7 @@
 
 ## セットアップと起動
 
-Node.js 22.20.0、npm 10.9.0を使用する。Volta利用時はルートの設定で切り替わる。nvm利用時は`.nvmrc`を参照する。
+Node.js 22.20.0、npm 10.9.3を使用する。Volta利用時はルートの設定で切り替わる。nvm利用時は`.nvmrc`を参照する。
 
 リポジトリルートで実行する。
 
@@ -13,7 +13,7 @@ npm ci
 npm run web
 ```
 
-表示されるlocalhostのURLを開く。画面の「動作確認 +1」で回数が増えることを確認する。`apps/client/App.tsx`を保存すると開発サーバーが変更を反映する。
+表示されるlocalhostのURLを開く。開発ビルドは「今日」から始まる人工データの操作デモ。記録→会話→元の記録、保存/メモ、ToDo採用、期限切れの表示を操作できる。デモの変更はメモリ内だけで、再読込すると戻る。実音声・実AIは呼ばない。Windowsでは `./scripts/dev.ps1 web` でも起動でき、このPCに用意したGit除外済みNodeキャッシュがあれば利用する。
 
 スマホで確認する場合:
 
@@ -21,7 +21,7 @@ npm run web
 npm start
 ```
 
-ターミナルのQRコードを、このExpo SDKに対応するExpo Goで開く。PCとスマホは同一ネットワークを使用し、必要に応じてOSのファイアウォールで開発サーバーの通信を許可する。Expo Goの対応版は[公式案内](https://expo.dev/go)を確認する。
+ターミナルのQRコードを、このExpo SDKに対応するExpo Goで開くと人工画面を確認できる。録音はバックグラウンド設定・バックアップ除外を含む専用development buildが必要で、Expo Goでは開始しない。PCとスマホは同一ネットワークを使用する。Expo Goの対応版は[公式案内](https://expo.dev/go)を確認する。
 
 | コマンド | 用途 |
 |---|---|
@@ -30,6 +30,8 @@ npm start
 | `npm run android` | 起動済みAndroidエミュレーター等で開く |
 | `npm run ios` | macOSのiOS Simulatorで開く |
 | `npm run typecheck` | TypeScriptの型チェック |
+| `npm test` | 人工契約・APIクライアント・画面用データ処理のテスト |
+| `npm run contracts:generate` | JSON schema/4 fixture/共通TypeScript型の再生成 |
 | `npm run doctor` | Expo設定・依存の整合性チェック |
 | `npm run build:web` | Webを`apps/client/dist`に出力 |
 | `npm run build:bundles` | Android・iOS・Webの配信用バンドルを出力 |
@@ -68,7 +70,12 @@ EAS BuildはソースをExpoへ送信してビルド枠を使用する。料金�
 
 ## ファイルと依存関係
 
-- `apps/client/App.tsx`: 共通画面。現状は環境確認用のカウンター。
+- `apps/client/App.tsx`: 人工デモ/APIモードの入口。製品ビルドはAPIモードから始まる。
+- `apps/client/src/screens/`: 共通画面。Demo系とLive系を明示的に分ける。
+- `apps/client/src/platform/audio/`: iOS/Androidの録音・保存。Webは録音を開始しない。
+- `apps/client/src/data/`: fixture repository、認証、API処理状態。通信失敗をfixture成功へ切り替えない。
+- `contracts/` / `packages/api-ts/`: schema、人工データ、生成型、APIクライアント。
+- `services/backend/` / `supabase/`: FastAPI/worker、非公開保存のDB migration。
 - `apps/client/index.ts`: Expoのエントリーポイント。
 - `apps/client/app.json`: アプリ名・プラットフォーム設定。
 - `apps/client/assets/`: 公式テンプレートのアイコン。
@@ -83,21 +90,22 @@ Expoと組み合わせるライブラリは、`apps/client`から`npx expo insta
 
 大会の参照先は[リンク集](HACKATHON_LINKS.md)。必要時のクラウド管理は[Supabase操作手順](SUPABASE_ACCESS.md)を参照する。管理APIの過去の認証成功は、製品API・ローカルSupabaseの構築や現在のPCでの成功を意味しない。
 
-- K01/K02の人工データ・共通画面から着手する。独立Swiftアプリは作らない。
-- Glass部品・録音・カレンダー・SecureStore・navigation等は未導入。該当Kで既存Expo SDKに互換の依存を追加し、root lockfileを更新する。
-- 製品の権限やネイティブ設定を確認する際はexpo-dev-clientとEAS development profileを追加する。現在のpreviewは配布用でdevelopment clientではない。
-- 初回はlight固定。主タブ/録音操作面のGlassと非対応環境の代替表示はMVP_SPECのUIルールに従う。
+- Glass、expo-audio、FileSystem、SecureStore、Network、SafeArea、expo-system-uiを導入済み。カレンダーadapterは未実装。
+- development profileとexpo-dev-clientを追加済み。録音保存先のバックアップ除外はconfig pluginで設定し、iOSでは起動時の設定成功を確認できない場合に録音を開始しない。OS上の実効性は実機で検証する。
+- 初回はlight固定。主タブ/録音操作面は対応iOSでGlass、非対応環境と透明度低減設定では通常面を使う。実機の文字拡大・読み上げ・OSの戻るは未検証。
 
-音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。K03では開発PCのFastAPI/Python workerから外部ASRへ接続し、workerに必要な音声変換・分割の依存を用意する。スマホや開発PCへのASRモデル/GPU環境導入は製品の前提にしない。Supabaseは認証/非公開保存/ジョブ管理を担う。バックエンドの起動コマンド、依存manifest、ASR adapterは未実装で、上記のExpo起動だけでは書き起こせない。
+音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。FastAPI・非公開Storage/PostgreSQL adapter・単一入力のASR worker境界を追加した。外部ASRの具体adapter、正規化/チャンク分割、統合/生成runnerは未接続。Expoの起動だけでは書き起こせない。バックエンドの依存・起動・人工テストは[backend README](../../services/backend/README.md)を参照する。
+
+実機接続は `apps/client/.env.example` を参考に `EXPO_PUBLIC_API_URL` を設定し、設定画面でAPIモードへ切り替える。スマホは証明書を検証できる明示的なHTTPS接続先が必要。開発PC自身のWeb検証に限りloopback HTTPを許す。Supabase用の秘密鍵やASRキーをクライアントのenvへ入れない。ログインにはチームが用意したアカウントを使い、画面から新規アカウントを作る機能はない。
 
 プロバイダの認証情報の準備は[credentialsの手順](../../credentials/README.md)を参照する。実接続時はworker側で読み込み、クライアント公開変数やアプリ配布物へ入れない。キー取得と認証確認、許可済み音声による書き起こし成功は別々に記録する。接続先/モデル・分割設定・保持条件・呼出/費用上限の確認項目は[ロードマップのK03前提](MULTIPLATFORM_DELIVERY_PLAN.md#runtime-prerequisites)から辿る。
 
 ## 決定範囲
 
-ユーザー指定のReact NativeとWeb共通開発を具体化するため、Expoのblank TypeScriptテンプレートを採用した。画面遷移が不要な段階なのでRouterは未導入。
+ユーザー指定のReact NativeとWeb共通開発を具体化するため、Expoのblank TypeScriptテンプレートを採用した。今回の画面遷移はReact stateとModalで実装し、Routerは未導入。実機のOS戻る・画面復帰の受入は残る。
 
 2026-09-12の追加指定により、React Nativeを共通基盤としてiOS・Android・Webを作る。Webは、ハッカソン当日にiOS・Android版の開発が終わらなかった場合の保険として用意する。提出条件は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)で実際の大会条件と照合する。
 
-仕様と採用状態は[MVP_SPEC](../product/MVP_SPEC.md)、残る判断は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、担当・実装順は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)。MVP A/B/CとRN＋Expoは採用済み。現在の画面は製品UIではなく、録音・統合・共有・APIは未実装。確認結果は[WORKFLOW](WORKFLOW.md)を参照する。
+仕様と採用状態は[MVP_SPEC](../product/MVP_SPEC.md)、残る判断は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、担当・実装順は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md)。MVP A/B/CとRN＋Expoは採用済み。現状は操作デモと実機接続用の実装途中のアプリ。全43条件の合格・スマホ実動作は未確認。確認結果と残実装は[WORKFLOW](WORKFLOW.md)を参照する。
 
 公式資料: [create-expo-app](https://docs.expo.dev/more/create-expo/)、[Web開発](https://docs.expo.dev/workflow/web/)。

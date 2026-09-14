@@ -6,11 +6,11 @@
 
 RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います。現行仕様は2.2で、外部APIによる音声書き起こしを採用しています。各スマホから共通バックエンドへ音声を送り、workerが必要な分割と外部ASR呼出・結果結合を担当します。Supabaseは認証・非公開保存・ジョブ管理を担います。初回UIは明色＋Liquid Glass。仕様・採用状態は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。2.1の独立レビューは完了しましたが、今回の2.2差分の独立レビューは未実施です。
 
-既存のExpoスターターを同じ作業ツリーへ取り込みました。製品機能は未実装です。コード生成・バンドル出力と、実機・音声・APIの成立は区別します。
+2026-09-14に共通画面、人工契約、端末録音adapter、FastAPI/worker、2人の接続・共有確認、個人の訂正・保存APIを追加しました。開発起動は人工データの操作デモです。実機モードと実ASR・統合生成の接続は完成していません。実装範囲と残件は[現在地](docs/development/WORKFLOW.md#現在の状態)を参照してください。
 
 ## 開発を始める
 
-Node.js 22.20.0 / npm 10.9.0で、リポジトリルートから実行します。
+Node.js 22.20.0 / npm 10.9.3で、リポジトリルートから実行します。
 
 ~~~sh
 npm ci
@@ -19,7 +19,7 @@ npm run web
 
 共通画面は `apps/client/App.tsx` です。スマホ・型チェック・EASの前提は[開発環境](docs/development/APP_DEVELOPMENT.md)を参照してください。
 
-AIは[AGENTS](AGENTS.md)→[現在地](docs/development/WORKFLOW.md)→[担当と実装順](docs/development/MULTIPLATFORM_DELIVERY_PLAN.md)から、該当する仕様・受入条件だけを読みます。次の実装入口はK01の人工契約、続いてK02の画面です。資料の存在自体は実装依頼ではありません。
+AIは[AGENTS](AGENTS.md)→[現在地](docs/development/WORKFLOW.md)→[担当と実装順](docs/development/MULTIPLATFORM_DELIVERY_PLAN.md)から、該当する仕様・受入条件だけを読みます。バックエンドは[起動・検証手順](services/backend/README.md)を参照してください。人工画面の成功を実機・実処理の成功として引き継がないでください。
 
 ### 初回プロンプト
 

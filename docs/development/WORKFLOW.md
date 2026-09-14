@@ -4,6 +4,21 @@
 
 ## 現在の状態
 
+- 共通画面・API基盤の開発（2026-09-14）：ユーザーの「君が開発すすめられるのはすべてすすめて」を受け、主担当が契約・UI・端末adapter・API/workerを実装。基準版 `0591ef0` / main、開始時差分なし。今回の差分は未コミット。他者の選定結果・別PCの実装を受領済みとはしない。**実装は進んだが、スマホ＋実ASRの通し動作とMVP全体は未完成。**
+  - K01/K02：`contracts/` に4人工fixture・7状態、JSON schema、受理/拒否テスト、`packages/api-ts/` に生成TS型・HTTPS/APIクライアントを追加。`apps/client/src/` で今日/記録/会話/出典/訂正/保存/ToDo/確認の人工画面、明色・Glass代替、戻る導線を実装。原文相違、時刻不明、片側記録、未許可・期限切れを分けた。日次は原文抜粋で、AI生成ではない。AC06/07/15の表示部分、A条件の操作部分。全43条件の合格とはしない。
+  - K03：端末録音・5分停止・保存状態・checksum・原音再生、SecureStore、再接続時の本文再取得、目的別同意からupload/job取得までを実装。Expo Go/Webの実録音は開始不可。FastAPI、PostgreSQL/Storage adapter、非公開DB migration、単一入力ASR worker境界を追加。AC01/02/07/14/19の人工境界と設定。具体ASR/分割・実機確認は残る。
+  - K04/K06：コード接続、双方の帰属/参加確認、今回許可、継続許可/解除、範囲の新版確認、取消をAPIとLive画面へ追加。古い継続回答で解除済み許可を復活させず、取消後は新しい双方許可を要求。自分の原文訂正・旧版遮断・入力削除を実装。AC03/04/08/09/10/13/16/18/19の該当境界。共有本文の生成・clip・指摘受信の実経路は残る。
+  - K09：本人のSourceを「あとで見る」へ保存し、私用メモ/タグ編集、再確認・解除するAPIとLive画面を実装。訂正・期限・削除後に古い引用/メモを出さない。保存の重複抑止と本文なし状態の7日後削除を確認。ToDoは人工デモで採用/完了/戻すを操作できるが、実G2と永続化は未接続。A03/04/05/06/13/14の関連部分を人工確認。
+  - 自己確認成功：`npm run typecheck`、`npm test` **26件**、`./scripts/backend.ps1 test` **32件**、`npm run contracts:generate`、OpenAPI再生成。Node 22.20.0/npm 10.9.3、Python 3.12の独立venvで実行。Pythonの依存由来deprecation warning 2件あり。FastAPI認証・Storageはテスト用代替で、実Supabaseの証拠ではない。
+  - バンドル成功：`npm run build:bundles` でAndroid/iOSのHermesとWebを出力。`npm run doctor` **21/21**。`node scripts/check-client-secrets.mjs` で配信用6ファイルにローカル既知キー値の一致なし（値を出力せず検査）。APK/IPA・署名・実機確認ではない。
+  - Web操作確認成功：390×844のブラウザ幅で、相違→出典→訂正の破棄→元位置、保存/メモ一覧、ToDo本人採用→完了→未完了、API未設定の表示を確認。開発用Webは `http://localhost:8081/`。iPhone/AndroidのOS動作・文字拡大・読み上げの確認ではない。
+  - 失敗を修正して同条件で成功：WebのBackHandler/透明度設定の非対応呼出、録音状態再読込の誤った中断表示、同時uploadの正常音声削除、保存の失効表示がcleanupで延長される問題など。型・APIテスト・ブラウザで該当範囲を再確認。
+  - ネイティブ生成は一部のみ確認：作業用コピーのExpo prebuildはテンプレート転送時にWindowsのEIO/Access deniedで停止。展開済みテンプレートへExpoのconfig生成関数を適用し、Androidのマイク/foreground service/backup除外XMLとiOS AppDelegateのbackup除外挿入を確認した。検証用コピーのXcode target/Info.plist警告は残り、通常prebuild・Swift/Gradleコンパイル成功とはしない。Androidテーマの依存不足はexpo-system-ui追加で修正。バックアップ除外は[Android公式仕様](https://developer.android.com/identity/data/autobackup?hl=ja)の端末間転送も考慮したが、実機での実効性は未確認。
+  - 実行に必要な残設定：PATH上でDocker/ffprobe/adb/javaを検出できず、Supabaseのローカル起動・2アカウント・HTTPS入口は未構築。ASR provider/model/入力上限/チャンク設定/保持/予算と対象音声、生成予算、Expo project/識別子/署名/端末が未確定。実音声・外部モデル・課金・公開・commit/push・独立レビューは未実行。
+  - **残る実装（選定だけで済む部分とは区別）**：ASR adapterと正規化/チャンク再開、2入力の時間対応/統合とG1、認可済みclip・指摘API、ContextView/全文脈manifest・G2〜G5 runner、ToDo/日次の永続化、Google/端末カレンダー、3人/グループの人工認可境界、初回体験と両OS受入。主要response以外の共通schema/OpenAPIも未完。現在の共有許可成立後は統合未設定のfailedを返す。
+  - 再開先：[APP_DEVELOPMENT](APP_DEVELOPMENT.md)、[backend README](../../services/backend/README.md)、[contracts README](../../contracts/README.md)。次はK03の具体ASR adapter/チャンクとローカルSupabase/HTTPSの接続を固定し、1端末の保存→個人文字起こしを実条件で検証。そのSourceをK05/K10へ接続する。既存の人工成果を実生成に見せ替えない。デザイン値は今回の実装案で、最終デザイン承認を取得済みとはしない。
+  - 文書・差分確認成功：`node scripts/check-docs.mjs` は49文書414ローカル参照/使用アンカー、`git diff --check` 成功。成果物の検査範囲は上記に限定し、独立レビュー・実機の成功を加えていない。
+
 - 外部API書き起こしの構成要件反映（2026-09-14、文書更新完了）：ユーザーが外部APIのモデル利用を明示採用し、ドキュメント更新を依頼。開始版 `555d950` / main、開始時の既存差分は `.env.audio-models.local` のみで保持。主担当が[MVP_SPEC 2.2 §9](../product/MVP_SPEC.md#contracts)と方針・ロードマップ・開発手順・利用条件・調査の採用状態・U03画面見本・README・本記録の計9文書を更新。対象はK01/K03/K05/K06/K07、M01/M03/M04/M06/M08・U02/U03/U06/U07・AC01/02/05/07/13/14/19。スマホ/worker/Supabaseの責務、外部ASR adapter、チャンク/時刻/再送/費用管理、用途別同意と外部保持を反映した。
   - 自己確認成功：`node scripts/check-docs.mjs` は49文書407ローカル参照/使用アンカー、対象9文書の `git diff --check` は成功。現行仕様・契約・画面見本・K03の相互照合も実施。これは静的な文書確認で、製品の受入テスト・実認証/音声送信・実機・独立レビューは未実行。コード/依存・音声評価・モデルの再調査は今回の文書更新の対象外。
   - 残件：外部API利用の判断は完了。具体プロバイダ/モデル、チャンク設定、予算、対象音声の実送信条件はGo君の選定と企画者の判断・対象データの利用確認を実接続前に行う。人工契約/UIは先行できる。旧仕様の証拠はGit `555d950:docs/product/MVP_SPEC.md` に保持し、下記のPC処理/外部ASR未採用という過去記録は2.2で更新した。今回のモデル選定資料の変更は採用状態と残件だけで、調査日当時の比較内容とExcelは保持。

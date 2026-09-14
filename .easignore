@@ -37,3 +37,6 @@ expo-env.d.ts
 /.agents/
 /.codex/
 /AGENTS.md
+/credentials/
+/services/
+/supabase/

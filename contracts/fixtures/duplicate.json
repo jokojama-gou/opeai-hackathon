@@ -1,0 +1,198 @@
+{
+  "contract_version": "mvp-2.2-k01-v1",
+  "case_id": "duplicate",
+  "viewer_id": "person-a",
+  "now": "2026-09-14T03:00:00.000Z",
+  "scenarios": [
+    {
+      "id": "duplicate",
+      "label": "展示のアイデア",
+      "kind": "shared",
+      "response_status": 200,
+      "recordings": [
+        {
+          "id": "recording-a",
+          "owner_id": "person-a",
+          "installation_id": "device-person-a",
+          "mode": "normal",
+          "duration_ms": 60000,
+          "stopped_at": "2026-09-14T02:00:00.000Z",
+          "capture_status": "saved",
+          "upload_status": "ready",
+          "audio_expires_at": "2026-09-21T02:00:00.000Z",
+          "text_expires_at": "2026-10-14T02:00:00.000Z",
+          "version": 1
+        },
+        {
+          "id": "recording-b",
+          "owner_id": "person-b",
+          "installation_id": "device-person-b",
+          "mode": "normal",
+          "duration_ms": 60000,
+          "stopped_at": "2026-09-14T02:00:00.000Z",
+          "capture_status": "saved",
+          "upload_status": "ready",
+          "audio_expires_at": "2026-09-21T02:00:00.000Z",
+          "text_expires_at": "2026-10-14T02:00:00.000Z",
+          "version": 1
+        }
+      ],
+      "sources": [
+        {
+          "id": "a1",
+          "recording_id": "recording-a",
+          "original_text": "展示のアイデアを話そう🌱",
+          "start_ms": 1000,
+          "end_ms": 5000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "b1",
+          "recording_id": "recording-b",
+          "original_text": "展示のアイデアを話そう🌱",
+          "start_ms": 2000,
+          "end_ms": 6000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "a2",
+          "recording_id": "recording-a",
+          "original_text": "写真を並べるのはどうかな。",
+          "start_ms": 8000,
+          "end_ms": 12000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "a3",
+          "recording_id": "recording-a",
+          "original_text": "いいね。",
+          "start_ms": 18000,
+          "end_ms": 20000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        },
+        {
+          "id": "a4",
+          "recording_id": "recording-a",
+          "original_text": "いいね。",
+          "start_ms": 28000,
+          "end_ms": 30000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        }
+      ],
+      "conversation": {
+        "id": "conversation-duplicate",
+        "mode": "normal",
+        "revision": 1,
+        "access_revision": 1,
+        "status": "ready",
+        "script": [
+          {
+            "id": "utterance-1",
+            "kind": "duplicate",
+            "evidence_refs": [
+              {
+                "source_id": "a1",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 12,
+                "start_ms": 1000,
+                "end_ms": 5000
+              },
+              {
+                "source_id": "b1",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 12,
+                "start_ms": 2000,
+                "end_ms": 6000
+              }
+            ],
+            "uncertainty": [],
+            "order_status": "aligned",
+            "speaker_label": null
+          },
+          {
+            "id": "utterance-2",
+            "kind": "single",
+            "evidence_refs": [
+              {
+                "source_id": "a2",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 13,
+                "start_ms": 8000,
+                "end_ms": 12000
+              }
+            ],
+            "uncertainty": [],
+            "order_status": "aligned",
+            "speaker_label": null
+          },
+          {
+            "id": "utterance-3",
+            "kind": "single",
+            "evidence_refs": [
+              {
+                "source_id": "a3",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 4,
+                "start_ms": 18000,
+                "end_ms": 20000
+              }
+            ],
+            "uncertainty": [],
+            "order_status": "aligned",
+            "speaker_label": null
+          },
+          {
+            "id": "utterance-4",
+            "kind": "single",
+            "evidence_refs": [
+              {
+                "source_id": "a4",
+                "source_version": 1,
+                "char_start": 0,
+                "char_end": 4,
+                "start_ms": 28000,
+                "end_ms": 30000
+              }
+            ],
+            "uncertainty": [],
+            "order_status": "aligned",
+            "speaker_label": null
+          }
+        ],
+        "highlights": [
+          {
+            "id": "highlight-1",
+            "section": "content",
+            "text": "写真を並べる案が出ました。",
+            "interpretation": false,
+            "utterance_ids": [
+              "utterance-2"
+            ]
+          }
+        ],
+        "confirmation_reason": null
+      },
+      "connection": null,
+      "expected": {
+        "script_count": 4,
+        "source_count": 5,
+        "audio_available": true,
+        "next_screen": "U06"
+      }
+    }
+  ]
+}
