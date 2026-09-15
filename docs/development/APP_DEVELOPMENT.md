@@ -1,6 +1,6 @@
 # React Native / Web 開発環境
 
-2026-09-13、確認済みMVP作業ツリー f461ab7 から既存スターターを選択統合。Expo、React Native、React Native Web、TypeScriptを使い、`apps/client/App.tsx`をAndroid・iOS・Webで共有する。npm workspacesでルートから操作する。
+2026-09-15、Expo SDK57、React Native、React Native Web、TypeScriptを使用。起動先は `expo-router/entry`、ルートは `apps/client/app`、画面部品は `apps/client/src/screens`。Android・iOS・Webで共有し、npm workspacesでルートから操作する。以前の `App.tsx` は旧人工デモの入口を保持したファイルで、現行起動先ではない。
 
 ## デモの到達点（2026-09-12ユーザー決定）
 
@@ -22,9 +22,9 @@
 
 ## セットアップと起動
 
-2026-09-15の[スマホ接続環境と再起動方法](LOCAL_CONNECTION_PREP.md)、[iPhone/Androidへのインストール手順](DEVICE_INSTALLATION.md)を追加。接続用のAuth/DB/Storageは人工音声で確認済み。アプリのSetlog対応・実ASR・実機確認は残る。
+2026-09-15の[スマホ接続環境と再起動方法](LOCAL_CONNECTION_PREP.md)、[iPhone/Androidへのインストール手順](DEVICE_INSTALLATION.md)を追加。Hinataの[Setlog UIを使った実接続モック](SETLOG_CONNECTED_MOCK.md)とクラウドAuth/DB/Storage接続を実装。実ASR・実機確認は残る。
 
-OS別UIの実装準備は[MVP_SPEC §18](../product/MVP_SPEC.md#platform-design)と[ロードマップの12工程](MULTIPLATFORM_DELIVERY_PLAN.md#platform-design-tasks)を使う。現在のSDKは57。計画はNativeTabs/StackとOS別操作部品へ移行するもので、Router/Expo UIやカセット素材が導入済みという意味ではない。標準部品と独自Glassを分け、代表実装見本の画像/動画を確認してから全画面へ展開する。
+OS別UIは[MVP_SPEC §18](../product/MVP_SPEC.md#platform-design)と[ロードマップの12工程](MULTIPLATFORM_DELIVERY_PLAN.md#platform-design-tasks)を使う。NativeTabs/Stack、Expo UIのAndroid録音CTA、カセット素材と実フォントを導入済み。他の既存詳細部品はRN共通実装を継続し、全画面のOS別部品化と実機受入は残る。
 
 Node.js 22.20.0、npm 10.9.3を使用する。Volta利用時はルートの設定で切り替わる。nvm利用時は`.nvmrc`を参照する。
 
@@ -35,12 +35,12 @@ npm ci
 npm run web
 ```
 
-表示されるlocalhostのURLを開く。接続先未設定の開発ビルドは「今日」から始まる人工データの操作デモ。`EXPO_PUBLIC_API_URL`を設定すると、開発ビルドもAPIのログイン画面から始まり、ログイン後は録音の待機画面へ進む。APIモードの主タブは「録音」「ルーム」。ルームから自分の記録・保存・日付の振り返りへ進める。相手のルームとAI会話は未実装。人工デモは旧3タブを保持し、記録→会話→元の記録、保存/メモ、ToDo採用、期限切れを操作できる。変更はメモリ内だけで再読込すると戻る。Windowsでは `./scripts/dev.ps1 web` でも起動できる。現在のクラウドDB・HTTPS・APKは[Expo実接続](EXPO_CLOUD_CONNECTION.md)を参照する。
+表示されるlocalhostのURLを開く。`EXPO_PUBLIC_API_URL` 設定時はログイン→録音待機。未設定時は接続設定の案内から明示的に人工デモを開ける。主タブは録音/ルーム、ルームから自分の記録・保存・日付の振り返りへ進む。相手ルーム/AI会話は準備中。旧3タブの人工デモは `/demo` または設定から開く。Windowsで実APIに接続する場合は `./scripts/phone-app.ps1 -Mode web`、Expo Go用は `./scripts/phone-app.ps1`。同スクリプトはAPKと同じHTTPS API設定を読む。[現在のクラウドDB・HTTPS・APK](EXPO_CLOUD_CONNECTION.md)。
 
 <a id="ui-study"></a>
 ### U01/U06/U07のUI検討モック（K02準備）
 
-開発時の人工デモ上部で「UI検討モックを開く（K02準備）」を選ぶ。`__DEV__`だけの入口で、閉じると人工デモへ戻る。人工デモには旧「今日」U12の配置が残り、APIモードは録音の待機画面U02から始まる。Setlogの相手ルーム・AI会話・OS別デザインの完成を示すものではない。表示はRN＋Expoの共通部品、状態とデータはすべて人工の検討用。保存・共有・取消・訂正・指摘・録音・再生・APIの成功は返さない。
+この節は以前の `App.tsx` 版で使う検討画面の操作を保持する。現行Routerの配布アプリにはこの比較用入口を接続していない。ソースは `src/screens/UiStudy.tsx` に保持。状態とデータはすべて人工の検討用で、保存・共有・取消・訂正・指摘・録音・再生・APIの成功は返さない。現在のSetlog実接続画面の確認とは分ける。
 
 1. 左のパネルで18状態を切替。狭い画面では「状態・配色を比較する」を開き、状態を選ぶと画面案へ戻る。
 2. U01の個人行はU03の宛先確認、共有行はU06へ。「会話の整理」の根拠から対象発言を開き、「元の記録」でU07へ。シートを閉じると本文の位置を保つ。

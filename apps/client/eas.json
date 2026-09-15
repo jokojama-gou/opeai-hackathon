@@ -13,6 +13,7 @@
       "node": "22.20.0"
     },
     "preview": {
+      "autoIncrement": true,
       "extends": "base",
       "distribution": "internal",
       "environment": "preview",

@@ -36,6 +36,6 @@ Expoの `EXPO_PUBLIC_` 値はアプリへ埋め込まれる。EAS用環境変数
 ## 確認済み範囲と残件
 
 - クラウドDB：人工行のinsert/read/rollback、専用ロールの権限、匿名・認証済みクライアントの直接DB参照拒否を確認。Storage：人工バイト列のwrite/read/delete成功。再現は[backend手順](../../services/backend/README.md)。
-- HTTPS：health成功、未認証 `/v1/recordings` は401。実ユーザーは0人（2026-09-15 10時台JST）。2開発アカウント作成は自動承認レビューが明示了承を要求し、回答待ち。製品APIに新規登録機能はない。
+- HTTPS：health成功、未認証 `/v1/recordings` は401。ユーザー了承後に2開発アカウントを作成済み（メール送信なし）。両方の実ログイン/DB一覧取得、人工1秒AACの音声保存/取得/一致、他人404、削除後本人410を確認。ログイン情報はGit除外の `credentials/development-accounts.local.json`。製品APIに新規登録機能はない。
 - アプリの人工API接続とクラウド認証は別の検証。実機録音・実ASR・2端末統合・相手ルーム/AI会話は未完。iPhone導入は[Mac/XcodeのPersonal Team手順](DEVICE_INSTALLATION.md)が必要。
 - EAS送信物は `.easignore` で認証ファイルとGit履歴を除外。`.git/` だけではEASのshallow clone削除判定に一致しないため、`.git` と指定する。送信前の展開物と配布bundleを `scripts/check-client-secrets.mjs` で検査する。
