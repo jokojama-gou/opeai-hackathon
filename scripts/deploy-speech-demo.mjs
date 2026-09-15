@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import fetch from 'node-fetch';
 
-const VERCEL_TOKEN = 'vcp_1gDxYxOquk5n9nFlcLZOZsiCLzGwW5m7XpwzuCWrC83qZLthJ33ABFKc';
+const VERCEL_TOKEN = process.env.VERCEL_TOKEN || '';
 const htmlPath = path.resolve('outputs/speech-demo/index.html');
 const htmlContent = fs.readFileSync(htmlPath, 'utf-8');
 
