@@ -2,6 +2,8 @@
 
 2026-09-15。採用仕様は [MVP_SPEC §9.0](../product/MVP_SPEC.md#contracts)。各端末の録音を設定済み全社へ送り、原文を残して別LLMで比較する。Windowsバックエンドの起動は不要。現在は本人の端末内で完結する画面で、2端末の共有・統合やM15のAI会話には未接続。
 
+モデルを1つに絞る推奨案と、実際に検証したScribe v2の説明は[仲間向けモデル資料](ASR_MODEL.md)を参照してください。以下は現在の複数社版の操作であり、単独運用への切替はまだ行っていません。
+
 ## 起動と操作
 
 1. リポジトリルートで `node scripts/configure-direct-asr.mjs` を実行する。既存OpenAI/pyannote設定、追加4社を保存した `.env.audio-models.local`、環境変数から、クライアントの `.env.local` へASR設定をまとめる。値は出力しない。既存のAPI URLは保持する。
