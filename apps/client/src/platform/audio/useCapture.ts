@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import {
   AudioModule,
@@ -29,6 +29,7 @@ export function useCapture(onSaved: (recording: LocalRecording) => void) {
   >("idle");
   const [error, setError] = useState<string | null>(null);
   const current = useRef<LocalRecording | null>(null);
+  const alive = useRef(true);
   const finishing = useRef(false);
   const starting = useRef(false);
   const stopRequested = useRef(false);
@@ -99,6 +100,10 @@ export function useCapture(onSaved: (recording: LocalRecording) => void) {
     }
   }
   finishRef.current = finish;
+  useEffect(() => {
+    alive.current = true;
+    return () => { alive.current = false; void finishRef.current(true); };
+  }, []);
   async function start(ownerId: string) {
     if (Platform.OS === "web") {
       setError(
@@ -124,6 +129,7 @@ export function useCapture(onSaved: (recording: LocalRecording) => void) {
     setPhase("preparing");
     try {
       const permission = await AudioModule.requestRecordingPermissionsAsync();
+      if (!alive.current) return;
       if (!permission.granted) {
         setPhase("idle");
         setError(
@@ -138,6 +144,11 @@ export function useCapture(onSaved: (recording: LocalRecording) => void) {
         interruptionMode: "doNotMix",
       });
       await recorder.prepareToRecordAsync();
+      if (!alive.current) {
+        await recorder.stop();
+        await setAudioModeAsync({ allowsRecording: false, allowsBackgroundRecording: false });
+        return;
+      }
       const id = Crypto.randomUUID();
       const started_at = new Date().toISOString();
       current.current = {

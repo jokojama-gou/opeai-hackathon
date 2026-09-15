@@ -1,3 +1,4 @@
+import { isVoiceSample, voiceExpiresAt, voiceOwner, requireVoiceOwner, prepareVoiceSample, requireConversationAudio } from "../../data/voice-enrollment";
 import { useEffect, useRef, useState } from "react";
 import type { LocalRecording } from "./storage";
 import { AsrError, restoreRun, type AudioInput, type EnsembleRun } from "../../data/direct-asr";
@@ -23,16 +24,16 @@ async function tx<T>(mode: IDBTransactionMode, action: (store: IDBObjectStore, f
   });
 }
 const expiry = (r: LocalRecording) => Date.parse(r.stopped_at ?? r.started_at) + 30 * 86400000;
-export async function loadRecordings(): Promise<LocalRecording[]> {
+export async function loadRecordings(ownerId = "direct-device"): Promise<LocalRecording[]> {
   return tx("readwrite", (store, finish) => {
     const request = store.getAll();
     request.onsuccess = () => {
       const values: Entry[] = request.result;
       for (const entry of values) {
-        if (expiry(entry.recording) <= Date.now()) store.delete(entry.recording.id);
+        if ((isVoiceSample(entry.recording) ? voiceExpiresAt(entry.recording) : expiry(entry.recording)) <= Date.now()) store.delete(entry.recording.id);
         else if (entry.blob && Date.parse(entry.recording.audio_expires_at) <= Date.now()) store.put({ ...entry, blob: null });
       }
-      finish(values.filter(e => expiry(e.recording) > Date.now()).map(e => e.recording).sort((a, b) => b.started_at.localeCompare(a.started_at)));
+      finish(values.filter(e => e.recording.owner_id === ownerId && (isVoiceSample(e.recording) ? voiceExpiresAt(e.recording) : expiry(e.recording)) > Date.now()).map(e => e.recording).sort((a, b) => b.started_at.localeCompare(a.started_at)));
     };
   });
 }
@@ -45,6 +46,7 @@ export async function saveRun(run: EnsembleRun): Promise<void> {
     request.onsuccess = () => {
       const entry: Entry | undefined = request.result;
       if (!entry || expiry(entry.recording) <= Date.now()) { finish(false); return; }
+      if (isVoiceSample(entry.recording)) { finish(false); return; }
       store.put({ ...entry, run }); finish(true);
     };
   });
@@ -56,6 +58,7 @@ export async function removeRecording(recording: LocalRecording): Promise<void> 
 export async function getAudio(recording: LocalRecording): Promise<AudioInput> {
   const entry = await tx<Entry | undefined>("readonly", (store, finish) => { const req = store.get(recording.id); req.onsuccess = () => finish(req.result); });
   if (!entry?.blob) throw new AsrError("audio_expired");
+  requireConversationAudio(entry.recording);
   const type = entry.blob.type.split(";")[0];
   return { recordingId: recording.id, checksum: recording.checksum!, durationMs: recording.duration_ms,
     stoppedAt: recording.stopped_at!, audioExpiresAt: recording.audio_expires_at, textExpiresAt: new Date(expiry(recording)).toISOString(),
@@ -82,7 +85,7 @@ export function useDirectCapture(onSaved: (recording: LocalRecording) => void) {
       if (alive.current) { setPhase(entry.recording.capture_status); saved.current(entry.recording); }
     } catch { if (alive.current) { setPhase("save_failed"); setError("録音を保存できませんでした。保存を再試行してください。"); } }
   }
-  async function start(_ownerId: string) {
+  async function start(ownerId: string) {
     if (starting.current || recorder.current || pending.current) return;
     starting.current = true; setError(null); setPhase("preparing");
     let stream: MediaStream | null = null;
@@ -111,7 +114,7 @@ export function useDirectCapture(onSaved: (recording: LocalRecording) => void) {
         try {
           const checksum = Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", await blob.arrayBuffer())), n => n.toString(16).padStart(2, "0")).join("");
           const stopped = Date.now(); const id = crypto.randomUUID();
-          const recording: LocalRecording = { id, owner_id: "direct-device", uri: `indexeddb:${id}`, started_at: new Date(started).toISOString(),
+          const recording: LocalRecording = { id, owner_id: ownerId, uri: `indexeddb:${id}`, started_at: new Date(started).toISOString(),
             stopped_at: new Date(stopped).toISOString(), duration_ms: Math.max(1, Math.min(stopped - started, 300000)),
             capture_status: interrupted ? "interrupted" : "saved", audio_expires_at: new Date(stopped + 7 * 86400000).toISOString(),
             size: blob.size, checksum, remote_id: null, remote_version: null, processing_key: crypto.randomUUID() };
@@ -128,3 +131,40 @@ export function useDirectCapture(onSaved: (recording: LocalRecording) => void) {
   }
   return { phase, error, durationMs, start, stop, retrySave: persist, clearError: () => setError(null) };
 }
+
+export async function saveVoiceSample(recordingId: string, memberId: string, displayName: string): Promise<LocalRecording> {
+  const result = await tx<{ value?: LocalRecording; error?: string }>("readwrite", (store, finish) => {
+    const request = store.get(recordingId);
+    request.onsuccess = () => {
+      const entry: Entry | undefined = request.result;
+      try {
+        if (!entry?.blob) throw new Error("登録音声が見つかりません。");
+        const updated = prepareVoiceSample(entry.recording, memberId, displayName);
+        store.put({ ...entry, recording: updated }); finish({ value: updated });
+      } catch (error) { finish({ error: error instanceof Error ? error.message : "保存できませんでした。" }); }
+    };
+  });
+  if (!result.value) throw new Error(result.error);
+  return result.value;
+}
+export async function deleteVoiceSample(recordingId: string, memberId: string): Promise<void> {
+  const removed = await tx<boolean>("readwrite", (store, finish) => {
+    const request = store.get(recordingId);
+    request.onsuccess = () => {
+      const entry: Entry | undefined = request.result;
+      if (!entry) { finish(true); return; }
+      if (entry.recording.owner_id !== voiceOwner(memberId)) { finish(false); return; }
+      store.delete(recordingId); finish(true);
+    };
+  });
+  if (!removed) throw new Error("この登録音声を削除できません。");
+}
+export async function voiceSampleUri(recordingId: string, memberId: string): Promise<string> {
+  const entry = await tx<Entry | undefined>("readonly", (store, finish) => {
+    const request = store.get(recordingId); request.onsuccess = () => finish(request.result);
+  });
+  if (!entry?.blob || voiceExpiresAt(entry.recording) <= Date.now()) throw new Error("登録音声が見つからないか、期限が切れています。");
+  requireVoiceOwner(entry.recording, memberId);
+  return URL.createObjectURL(entry.blob);
+}
+export function releaseVoiceSampleUri(uri: string) { URL.revokeObjectURL(uri); }

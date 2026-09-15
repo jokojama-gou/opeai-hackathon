@@ -11,7 +11,7 @@ const statusLabels = { queued: "送信待ち", running: "処理中", succeeded: 
   unconfigured: "キー未設定", cancelled: "中止", result_unknown: "結果不明" };
 const time = (ms: number) => `${Math.floor(ms / 60000).toString().padStart(2, "0")}:${Math.floor(ms / 1000 % 60).toString().padStart(2, "0")}`;
 
-export function DirectAsrScreen({ onDemo, onLegacy }: { onDemo: () => void; onLegacy: () => void }) {
+export function DirectAsrScreen({ onDemo, onLegacy, onVoice }: { onDemo: () => void; onLegacy: () => void; onVoice: () => void }) {
   const [keys, setKeys] = useState<Keys>({ ...bundledKeys });
   const [model, setModel] = useState(comparisonModel);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -97,6 +97,7 @@ export function DirectAsrScreen({ onDemo, onLegacy }: { onDemo: () => void; onLe
     });
   };
   return <ScrollView style={styles.page} keyboardShouldPersistTaps="handled"><View style={styles.content}>
+    <Button label="自分の声を登録する（ログイン不要）" secondary disabled={busy || capturing} onPress={onVoice} />
     <Heading>録音を聞き比べる</Heading>
     <Text style={styles.body}>同じ音声を設定済みの各社へ送り、書き起こしを並べて確認します。</Text>
     <Card>

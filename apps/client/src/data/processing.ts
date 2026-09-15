@@ -1,3 +1,4 @@
+import { requireConversationAudio } from "./voice-enrollment";
 import {
   ApiClient,
   ApiError,
@@ -19,6 +20,7 @@ export async function processRecording(
   policy: ProcessingPolicy,
   onStage: (stage: string) => void,
 ): Promise<string | null> {
+  requireConversationAudio(local);
   if (
     !local.checksum ||
     !local.stopped_at ||
