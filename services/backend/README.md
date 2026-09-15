@@ -1,6 +1,6 @@
 # Backend development
 
-FastAPI、Python worker、Supabaseの認証・非公開保存adapter。現行コードにはMVP 2.2の同意前提が残り、採用仕様2.4への移行は未完。実装と残件の正本は[WORKFLOW](../../docs/development/WORKFLOW.md)。実データの扱いは[VALIDATION](../../docs/development/VALIDATION.md#音声の利用処理条件)を参照する。
+FastAPI、Python worker、Supabaseの認証・非公開保存adapter。処理同意の旧API・必須入力・判定を撤去し、AC19の認証・所有者・版・期限・送信先検査を維持する。端末直接ASR結果の共有保存と2入力統合は未接続。実装と残件の正本は[WORKFLOW](../../docs/development/WORKFLOW.md)。実データの扱いは[VALIDATION](../../docs/development/VALIDATION.md#音声の利用処理条件)を参照する。
 
 ## 人工データで確認する
 
@@ -22,7 +22,7 @@ macOS等では、このディレクトリで仮想環境を作り、`pip install
 
 1. 開発用Supabaseを用意する。2026-09-15に既存クラウドプロジェクトへ下記の手順でDB/Storageを接続した。隔離したローカル構成を使う場合はDockerとSupabase CLI、[config.toml](../../supabase/config.toml)を使う。初期DDLは[migration](../../supabase/migrations/202609140001_mvp_storage.sql)。既存DBへ適用する前に状態を照合する。
 2. Supabase側で開発用の2アカウントを用意する。製品APIは新規登録・管理者操作を提供しない。
-3. [.env.example](.env.example)を参考に、このディレクトリのGit除外された `.env` に接続設定を入れる。プロセスの環境変数が優先。`UPLOAD_TICKET_SECRET` は32文字以上のランダム値。PC転送の同意に表示する `PC_DESTINATION_ID` も実際の送信先を指定する。音声APIキーの暗号化保管庫は自動では読み込まない。
+3. [.env.example](.env.example)を参考に、このディレクトリのGit除外された `.env` に接続設定を入れる。プロセスの環境変数が優先。`UPLOAD_TICKET_SECRET` は32文字以上のランダム値。音声保存先を示す `PC_DESTINATION_ID` も実際の送信先を指定する。音声APIキーの暗号化保管庫は自動では読み込まない。
 4. 実音声の受入前に、`ffprobe` をPATHへ配置する。現在の形式検査はAAC、48kHz、mono、25MiB以下、5分以下。このPCでは `backend.ps1` がローカルのffprobeを検出する。音声変換・分割・ASR呼出は別のworker処理として接続する。
 5. 次の2プロセスを起動する。
 
@@ -49,7 +49,7 @@ serveは `127.0.0.1:8000` に待受し、アクセスログを抑止する。ス
 
 ## 今回の実装範囲
 
-- 本人の録音metadata、3用途別同意、期限付きupload ticket、checksum/形式検査、非公開保存、所有者の原音/文字取得。
+- 本人の録音metadata、送信先設定を固定した期限付きupload ticket、checksum/形式検査、非公開保存、所有者の原音/文字取得。
 - ASR adapter境界と単一入力worker。ジョブの二重作成を防ぎ、1job最大2呼出・設定したjob当たり費用枠を検査。結果不明・再起動後の処理中jobを自動再送しない。部分結果は公開しない。
 - 接続コード、相互確認、今回許可、継続許可/解除、確認し直し、取消。相手の本文は統合の公開条件が未成立なら取得不可。
 - 自分の原文訂正、旧版の無効化、個人Sourceの保存/メモ/タグ、再確認、保存解除。メモをモデルへ渡す処理はない。
@@ -63,11 +63,11 @@ ASRを接続する際は[adapters.py](app/adapters.py)のAsrAdapterを実装し�
 
 ## 個人の生成・ToDo・日次
 
-実接続モードの自分の記録から、文字生成の送信先/保持条件を確認し、その記録だけの同意を追加・取り消せる。原音の7日期限後も文字が有効なら設定でき、音声転送の許可は増やさない。「内容を整理する」「ToDo候補を確認する」からG1/G2を要求する。現在は本人の操作で起動し、文字起こし確定/訂正イベントからの自動起動は後続。
+実接続モードの自分の記録では、送信先/保持条件と処理設定の状態を表示する。アプリ内で処理同意を取得・保存・取消する導線はない。原音の7日期限後も文字が有効で処理設定が完了していれば生成を要求できる。「内容を整理する」「ToDo候補を確認する」からG1/G2を要求する。現在は本人の操作で起動し、文字起こし確定/訂正イベントからの自動起動は後続。
 
 「ToDo」でaction/本人の作業/期限を確認して採用する。期限未定、日付、日時とIANA zoneを区別する。本人編集・完了を生成結果で上書きしない。「今日」で固定zoneを初回確認し、会話の開始日で対象を選ぶ。11件以上は自動選択せず、最大10件を明示選択する。G5には選択した原文と、存在する有効なG1整理だけを渡し、保存メモやToDo本文を入れない。
 
-生成結果は入力に渡した全Source/Context/Match/権限/同意の版に依存する。引用していない背景の訂正でも旧本文を遮断し、ToDoは同じID・完了状態を維持して現行候補から再確認する。通信断/背景化でLive画面をアンマウントし、復帰時に再取得する。表示中は15秒間隔で再確認し、期限時は消去する。別端末からの変更をpushで即時反映する仕組みは未実装。
+生成結果は入力に渡した全Source/Context/Match/権限と処理設定の版に依存する。引用していない背景の訂正でも旧本文を遮断し、ToDoは同じID・完了状態を維持して現行候補から再確認する。通信断/背景化でLive画面をアンマウントし、復帰時に再取得する。表示中は15秒間隔で再確認し、期限時は消去する。別端末からの変更をpushで即時反映する仕組みは未実装。
 
 [.env.example](.env.example)の `GENERATION_*` を実設定で埋める。`GENERATION_ENABLED=true`、専用キー、モデル版、送信先、確認済み保持説明、入出力/timeout、予算ID・上限・1呼出の予約額のすべてが必要。モデル初期値は採用済みの `gpt-5-mini`。キーはbackendだけに置き、rootのキーは自動で読まない。今回は値を設定せず実APIも呼んでいない。
 
@@ -84,3 +84,11 @@ UI確認用に、`services/backend`から `python tests/serve_artificial.py --ar
 DBのprivate schemaと音声bucketは、匿名/クライアントから直接読めるpoliciesを追加していない。APIの所有者確認を通して提供する。端末へservice-role keyやStorage全体のURLを返さない。認可エラー本文に入力されたprivate text/passwordを含めない。
 
 [OpenAPI](../../contracts/openapi.json)は実装済み経路と入力モデルの生成物。主要型は[共通JSON schema](../../contracts/mvp-v1.schema.json)、個人Context/ToDo/日次/runの応答は[追加schema](../../contracts/derived-v1.schema.json)で検査する。追加responseはFastAPIのPydanticからschemaを出し、共通TS型を生成し、端末でも失効本文の混入を拒否する。`./scripts/backend.ps1 schema` → `npm run contracts:generate` の順で再生成する。OpenAPIの全response model・§15全体の共通schemaはまだ揃っておらず、契約全体の完成とはしない。
+
+## 処理同意を持たない契約への移行（2026-09-15）
+
+- APIとクライアントを一緒に更新する。`processing-consents` / `generation-consents` は削除済み。upload要求は `request_key/expected_version/checksum`、transcription要求は `request_key/expected_version`。旧 `consent_id` 入力は422になる。[OpenAPI](../../contracts/openapi.json)が実装契約。
+- ticketは保存先と設定版、ASR jobは宛先・provider/model/設定版を保持し、実行前と保存前にも一致を検査する。未設定では呼び出さない。既存の所有者・checksum・期限・共有権限は維持する。
+- 既存DBの同意行は履歴として残り、今回のコードは読み書きしない。JSON保存方式なのでDDL変更は不要。古いticketは新規発行が必要。設定snapshotのない旧ASR jobは外部送信せずfailedにする。旧manifestはhashが変わるため、再取得・既存の再確認/再生成操作が必要。旧ジョブの結果不明状態を自動再送しない。
+- クライアントは処理operation keyの世代を更新し、旧端末保存の同意状態を再利用しない。`generation_allowed` は生成adapter・宛先・保持/予算設定の準備状態を表す。相手への共有許可を意味しない。
+- この更新はローカル実装と人工テストのみ。稼働中API/workerの再起動、クラウドDB操作、APK再配布、実機・実音声・実生成は行っていない。[変更と検証](../../docs/history/BACKEND_PROCESSING_MIGRATION_20260915.md)。

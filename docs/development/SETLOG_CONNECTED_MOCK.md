@@ -26,6 +26,7 @@ Expo Go/Webは画面・ログイン・一覧等の確認用。録音には専用
 ## 確認結果
 
 - 自己確認成功：TypeScript型、UI fixture 11件、API/データ契約32件、Android/iOS/Webのバンドル、バンドル66ファイルとEAS送信ソース98ファイルの認証情報検査。
+- 配布成功：EAS build `5ebe13aa-195f-4d01-9878-a84455c0a9cf`、Android versionCode 2、11:53 JST完了。完成APKのZIP整合性、110,913,645バイトのSHA256、展開1,523ファイルの認証情報検査に成功。ダウンロード先とハッシュは[接続記録](EXPO_CLOUD_CONNECTION.md)。
 - 人工APIのブラウザ確認成功：390px/320pxでカセット画面、ログイン→録音→ルーム→日付一覧→個人記録→保存→戻る。折りたたみ状態とタブ内の遷移位置をタブ往復後に保持した。実行時ログはMetro接続断のwarning 1件、アプリerrorなし。実機でのナビゲーション/録音継続確認ではない。
 - 遷移失敗を再現：React Navigationの予約パラメータ `screen` が消費され `/room/undefined` になった。動的セグメントを `view` に変更し、同じ操作で `/room/records` と個人記録・保存への遷移が成功した。
 - 実API成功：承認済みのクラウドAuth2アカウントでHTTPSログイン・DB一覧取得。1秒の人工AACをprivate Storageへ送信・再取得しバイト一致、別アカウントのメタデータ/音声取得404、削除後本人410。実音声・ASR・生成の実行なし。

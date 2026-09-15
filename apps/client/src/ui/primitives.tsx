@@ -188,6 +188,7 @@ export function Check({
     <Pressable
       accessibilityRole="checkbox"
       accessibilityLabel={label}
+      aria-checked={checked}
       accessibilityState={{ checked, disabled }}
       disabled={disabled}
       onPress={() => onChange(!checked)}

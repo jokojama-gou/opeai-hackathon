@@ -84,13 +84,6 @@ class RunCreate(Mutation):
     expected_manifest_hash: str
 
 
-class GenerationConsent(Mutation):
-    policy_version: str
-    expected_manifest_hash: str
-    destination: str | None
-    external_text_generation: bool
-
-
 class TimeZoneEdit(Mutation):
     review_time_zone: str = Field(min_length=1, max_length=80)
 

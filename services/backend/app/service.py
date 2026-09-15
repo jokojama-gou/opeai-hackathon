@@ -208,90 +208,36 @@ class Service:
             "generation_configured": False,
         }
 
-    def consent(self, actor, rid, payload):
-        def action(state):
-            record = self.recording(state, actor, rid, audio=True)
-            require_version(record, payload["expected_version"])
-            policy = self.policy()
-            if (
-                payload.get("policy_version") != policy["policy_version"]
-                or payload.get("destinations") != policy["destinations"]
-                or payload.get("checksum") != record["checksum"]
-                or "local_asr" in payload
-            ):
-                raise DomainError("consent_policy_changed")
-            for field in (
-                "pc_audio_transfer",
-                "external_audio_transcription",
-                "external_text_generation",
-            ):
-                if type(payload.get(field)) is not bool:
-                    raise DomainError("invalid_consent", 422)
-            if (
-                payload["external_audio_transcription"]
-                and not policy["transcription_configured"]
-                or payload["external_text_generation"]
-                and not policy["generation_configured"]
-            ):
-                raise DomainError("processor_not_configured", 503)
-            value = {
-                "id": identifier(),
-                "version": 1
-                + max(
-                    (
-                        c.get("version", 0)
-                        for c in state.table("consents").values()
-                        if c["recording_id"] == rid and c["actor_id"] == actor
-                    ),
-                    default=0,
-                ),
-                "recording_id": rid,
-                "actor_id": actor,
-                "checksum": record["checksum"],
-                "policy_version": policy["policy_version"],
-                "destinations": deepcopy(policy["destinations"]),
-                "pc_audio_transfer": payload["pc_audio_transfer"],
-                "external_audio_transcription": payload["external_audio_transcription"],
-                "external_text_generation": payload["external_text_generation"],
-                "allowed_purposes": (
-                    (
-                        ["transcription"]
-                        if payload["external_audio_transcription"]
-                        else []
-                    )
-                    + (["generation"] if payload["external_text_generation"] else [])
-                ),
-                "confirmed_at": iso(self.clock()),
-                "revoked_at": None,
-            }
-            state.put("consents", value)
-            return {"consent_id": value["id"], "version": record["version"]}
-
-        return self.mutate(actor, "consent:" + rid, payload, action)
-
-    def active_consent(self, state, actor, record, consent_id, purpose):
-        consent = state.get("consents", consent_id)
+    def processing_configuration(self, purpose):
         policy = self.policy()
-        if (
-            not consent
-            or consent["actor_id"] != actor
-            or consent["recording_id"] != record["id"]
-            or consent["checksum"] != record["checksum"]
-            or consent["revoked_at"]
-            or consent["policy_version"] != policy["policy_version"]
-            or consent["destinations"] != policy["destinations"]
-            or not consent.get(purpose)
-        ):
-            raise DomainError("consent_required")
-        return consent
+        destination = policy["destinations"][purpose]
+        configured = bool(destination)
+        if purpose == "external_audio_transcription":
+            configured = configured and policy["transcription_configured"]
+        if not configured:
+            raise DomainError("processor_not_configured", 503)
+        configuration = {
+            "policy_version": policy["policy_version"],
+            "destination": destination,
+        }
+        if purpose == "external_audio_transcription":
+            config = self.asr.settings
+            configuration.update(
+                provider=config.provider_id,
+                model=config.model_version,
+                version=config.config_version,
+            )
+        return configuration
+
+    def check_processing_configuration(self, value, purpose):
+        if value != self.processing_configuration(purpose):
+            raise DomainError("processor_configuration_changed")
 
     def ticket(self, actor, rid, payload):
         def action(state):
             record = self.recording(state, actor, rid, audio=True)
             require_version(record, payload["expected_version"])
-            self.active_consent(
-                state, actor, record, payload["consent_id"], "pc_audio_transfer"
-            )
+            configuration = self.processing_configuration("pc_audio_transfer")
             if payload["checksum"] != record["checksum"]:
                 raise DomainError("checksum_conflict")
             token = secrets.token_urlsafe(32)
@@ -304,7 +250,7 @@ class Service:
                     "id": hashlib.sha256(token.encode()).hexdigest(),
                     "actor_id": actor,
                     "recording_id": rid,
-                    "consent_id": payload["consent_id"],
+                    "processing_configuration": configuration,
                     "checksum": record["checksum"],
                     "version": record["version"],
                     "expires_at": iso(expires),
@@ -330,8 +276,8 @@ class Service:
             or record["checksum"] != checksum
         ):
             raise DomainError("invalid_upload_ticket")
-        self.active_consent(
-            state, actor, record, ticket["consent_id"], "pc_audio_transfer"
+        self.check_processing_configuration(
+            ticket.get("processing_configuration"), "pc_audio_transfer"
         )
         if (
             record["upload_status"] != "uploaded"
@@ -380,12 +326,8 @@ class Service:
         def action(state):
             record = self.recording(state, actor, rid, audio=True)
             require_version(record, payload["expected_version"])
-            self.active_consent(
-                state,
-                actor,
-                record,
-                payload["consent_id"],
-                "external_audio_transcription",
+            configuration = self.processing_configuration(
+                "external_audio_transcription"
             )
             if not self.policy()["transcription_configured"]:
                 raise DomainError("asr_not_configured", 503)
@@ -425,7 +367,7 @@ class Service:
                 "owner_id": actor,
                 "recording_id": rid,
                 "recording_version": record["version"],
-                "consent_id": payload["consent_id"],
+                "processing_configuration": configuration,
                 "base_key": key,
                 "status": "queued",
                 "stage": "transcription",

@@ -15,11 +15,15 @@ export type LocalRecording = {
   remote_id: string | null;
   remote_version: number | null;
   processing_key: string;
+  voice_profile?: {
+    display_name: string;
+    state: "prepared";
+    provider: "elevenlabs";
+    model: "scribe_v2";
+  };
   deletion_version?: number;
   operation?: {
     key: string;
-    consent_id?: string;
-    consent_version?: number;
     transcription_version?: number;
     job_id?: string;
   };

@@ -10,7 +10,7 @@ import {
   type Recording,
   type Source,
 } from "@hackathon/api";
-import { processRecording, type Choices } from "./processing";
+import { processRecording } from "./processing";
 import { readSession, saveSession, type Session } from "./session";
 import {
   deleteLocal,
@@ -36,15 +36,13 @@ const messages: Record<string, string> = {
     "処理結果を確認できません。同じ操作として状態を確認してください。",
   asr_not_configured: "書き起こしサービスが未設定です。",
   processor_not_configured: "処理サービスが未設定です。",
-  consent_policy_changed:
-    "送信先または説明が変わりました。処理条件を確認し直してください。",
   media_probe_not_configured:
     "サーバーの音声形式確認がまだ準備されていません。",
   expired: "この記録の保存期限が過ぎました。",
   not_found: "この記録を利用できません。",
   version_conflict: "内容が更新されています。読み直してください。",
   generation_not_configured: "生成サービスの接続と予算が未設定です。",
-  generation_consent_required: "この記録の文字生成への同意を確認してください。",
+  processor_configuration_changed: "処理設定が変わりました。最新の状態を取得して再試行してください。",
   context_not_ready: "文字起こしを準備しています。",
   manifest_changed: "元の記録が更新されました。対象を読み直してください。",
   selection_changed: "対象の記録が変わりました。選択し直してください。",
@@ -312,7 +310,7 @@ export function useWorkspaceState(navigation: { screen: WorkspaceScreen; go: (sc
     setScreen("records");
     await persist(null);
   }
-  async function process(choices: Choices) {
+  async function process() {
     if (!api || !selected || !policy) return;
     const id = await processRecording(
       api,
@@ -320,7 +318,6 @@ export function useWorkspaceState(navigation: { screen: WorkspaceScreen; go: (sc
       token,
       selected,
       policy,
-      choices,
       setStage,
     );
     setJobId(id);

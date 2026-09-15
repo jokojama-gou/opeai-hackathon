@@ -2,6 +2,8 @@
 
 2026-09-15。対象はWindowsのこのcheckout。別PCの[ローカルSupabase準備](LOCAL_CONNECTION_PREP.md)とは接続先が異なる。
 
+現在のExpo Go/Webは、同時進行のGitマージの影響を避けた[完成版の隔離プレビュー](SETLOG_VERIFIED_PREVIEW.md)で起動中。再起動は `./scripts/phone-app-verified.ps1`。下記APKと確認済みのAPIを組み合わせて使う。
+
 ## 現在の構成
 
 - アプリ：Setlog / `@yokoyamago/hackathon-client`、Android ID `com.yokoyamago.hackathonclient`。previewは単体APK。初回ログイン後は録音待機、録音・ルームの2タブ。
@@ -9,9 +11,12 @@
 - API：このPCの `127.0.0.1:8000`。Supabase接続設定はGit対象外の `services/backend/.env`。実音声ASRと生成モデルは未設定・無効。
 - 形式検査：FFmpeg/ffprobe 9.0.1を `.npm-cache/tools/ffmpeg` へ配置。1秒の人工AAC（48kHz/mono）を実MediaProbeで検査済み。`backend.ps1` がPATHを設定する。[FFmpeg公式が案内する配布元](https://www.gyan.dev/ffmpeg/builds/)のZIPのSHA256は `fec81ae03971d9dd4be3ebe02e263bd2ec1d789483f931bdba5f5715e65da2e9` と照合した。
 - スマホ接続：ユーザー了承済みCloudflare一時HTTPS。現在のURLはGit対象外 `.npm-cache/phone-api-url.txt` と、今回のAPK用 `apps/client/eas.json` のpreview環境変数に記録。
-- Androidビルド：10:41 JSTに成功。[APKを取得](https://expo.dev/artifacts/eas/rw4Ft2pYvrGRSmzg3mLz_LOjkEhoafZVwfdnehA2aHE.apk) / [Expoのビルド画面](https://expo.dev/accounts/yokoyamago/projects/hackathon-client/builds/065bd0de-c822-4db5-83bc-71b2abbcde8d)。端末へのインストールと実機受入は未実施。
+- Androidビルド：**HinataのUIを反映したversionCode 2が11:53 JSTに成功**。[最新APKを取得](https://expo.dev/artifacts/eas/3ZVkCLn6FuLyOcGbky4qCJUblTnS74qBoL4cqPSz0qs.apk) / [Expoのビルド画面](https://expo.dev/accounts/yokoyamago/projects/hackathon-client/builds/5ebe13aa-195f-4d01-9878-a84455c0a9cf)。[実装範囲と確認](SETLOG_CONNECTED_MOCK.md)。端末へのインストールと実機録音は未実施。
+- Expo Go：`./scripts/phone-app.ps1` で起動。現在は `exp://192.168.100.37:8083`、同じWi-Fiで使用。QRは `outputs/setlog/expo-go-qr.png`。実Webモックは `http://localhost:8083`。SDK57マニフェスト取得とWebのAPI preflight成功。
 
-取得したAPKは73,608,313バイト、SHA256 `a4a75137766496577af8e5705037830ae571aebccb6e51db02059c79ef07f577`。ZIP整合性と展開後1,403ファイルのキー混入検査が成功した。
+最新APKは110,913,645バイト、SHA256 `056c7799eaf3f0b08747e1d1bdfa940db2fc2215852f26d3eec31b0ae6cf6130`。ZIP整合性と展開後1,523ファイルの認証情報検査が成功。ローカルコピーは `.npm-cache/Setlog-Hinata-UI-20260915.apk`。基準コミット `b7023ba` に本タスクの未コミット実装を加えたソースから作成した。
+
+旧UIの初回APK（10:41 JST、versionCode 1）は[旧ビルド](https://expo.dev/accounts/yokoyamago/projects/hackathon-client/builds/065bd0de-c822-4db5-83bc-71b2abbcde8d)として保持。73,608,313バイト、SHA256 `a4a75137766496577af8e5705037830ae571aebccb6e51db02059c79ef07f577`。その版のZIP整合性と展開後1,403ファイルのキー混入検査が成功した。
 
 ## 起動と維持
 

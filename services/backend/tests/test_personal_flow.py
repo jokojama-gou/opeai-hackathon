@@ -102,32 +102,12 @@ def create(client, key="create-recording-a"):
     return response.json()["id"], payload
 
 
-def consent(client, rid, external=True, transfer=True):
-    policy = client.get("/v1/processing-policy").json()
-    response = client.post(
-        f"/v1/recordings/{rid}/processing-consents",
-        json={
-            "request_key": "consent-key-" + rid,
-            "expected_version": 1,
-            "checksum": CHECKSUM,
-            "policy_version": policy["policy_version"],
-            "destinations": policy["destinations"],
-            "pc_audio_transfer": transfer,
-            "external_audio_transcription": external,
-            "external_text_generation": False,
-        },
-    )
-    assert response.status_code == 201, response.text
-    return response.json()["consent_id"]
-
-
-def upload(client, rid, cid):
+def upload(client, rid):
     ticket = client.post(
         f"/v1/recordings/{rid}/uploads",
         json={
             "request_key": "ticket-key-" + rid,
             "expected_version": 1,
-            "consent_id": cid,
             "checksum": CHECKSUM,
         },
     )
@@ -142,13 +122,12 @@ def upload(client, rid, cid):
     return headers
 
 
-def enqueue(client, rid, cid):
+def enqueue(client, rid):
     response = client.post(
         f"/v1/recordings/{rid}/transcription-jobs",
         json={
             "request_key": "transcription-" + rid,
             "expected_version": 2,
-            "consent_id": cid,
         },
     )
     assert response.status_code == 202, response.text
@@ -158,11 +137,10 @@ def enqueue(client, rid, cid):
 def ready(system):
     service, client, _, _ = system
     rid, _ = create(client)
-    cid = consent(client, rid)
-    upload(client, rid, cid)
-    job_id = enqueue(client, rid, cid)
+    upload(client, rid)
+    job_id = enqueue(client, rid)
     run_once(service)
-    return rid, cid, job_id
+    return rid, None, job_id
 
 
 def test_upload_transcribe_poll_sources_and_contract(system):
@@ -205,7 +183,7 @@ def test_subject_is_token_and_errors_do_not_echo_private_input(system):
     assert client.get("/v1/recordings/nonexistent/sources").status_code == 404
 
 
-def test_no_ticket_or_transfer_consent_rejects_before_storage(system):
+def test_no_ticket_or_wrong_checksum_rejects_before_storage(system):
     service, client, _, _ = system
     rid, _ = create(client)
     response = client.put(
@@ -216,35 +194,32 @@ def test_no_ticket_or_transfer_consent_rejects_before_storage(system):
     assert response.status_code == 409
     assert not service.blobs.values
     assert service.probe.calls == 0
-    cid = consent(client, rid, transfer=False)
     assert (
         client.post(
             f"/v1/recordings/{rid}/uploads",
             json={
                 "request_key": "upload-denied-key",
                 "expected_version": 1,
-                "consent_id": cid,
-                "checksum": CHECKSUM,
+                "checksum": "0" * 64,
             },
         ).status_code
         == 409
     )
 
 
-def test_pc_only_consent_does_not_enable_asr(system):
+def test_missing_asr_destination_does_not_enable_asr(system):
     service, client, asr, _ = system
     rid, _ = create(client)
-    cid = consent(client, rid, external=False)
-    upload(client, rid, cid)
+    service.settings = replace(service.settings, asr_destination=None)
+    upload(client, rid)
     response = client.post(
         f"/v1/recordings/{rid}/transcription-jobs",
         json={
             "request_key": "should-not-run-asr",
             "expected_version": 2,
-            "consent_id": cid,
         },
     )
-    assert response.status_code == 409
+    assert response.status_code == 503
     assert not run_once(service)
     assert asr.calls == 0
 
@@ -252,13 +227,11 @@ def test_pc_only_consent_does_not_enable_asr(system):
 def test_policy_change_invalidates_existing_ticket(system):
     service, client, _, _ = system
     rid, _ = create(client)
-    cid = consent(client, rid)
     ticket = client.post(
         f"/v1/recordings/{rid}/uploads",
         json={
             "request_key": "ticket-before-change",
             "expected_version": 1,
-            "consent_id": cid,
             "checksum": CHECKSUM,
         },
     ).json()["ticket"]
@@ -327,9 +300,8 @@ def test_invalid_timing_does_not_publish_partial_result(system):
 def test_delete_during_external_call_discards_late_result(system):
     service, client, asr, _ = system
     rid, _ = create(client)
-    cid = consent(client, rid)
-    upload(client, rid, cid)
-    enqueue(client, rid, cid)
+    upload(client, rid)
+    enqueue(client, rid)
     asr.callback = lambda: service.delete_recording(
         "person-a",
         rid,

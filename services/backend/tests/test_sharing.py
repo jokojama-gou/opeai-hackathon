@@ -9,7 +9,6 @@ from test_personal_flow import (
     system,
     ready,
     create,
-    consent,
     upload,
     enqueue,
     TestAuth,
@@ -29,9 +28,8 @@ def pair(system):
     for actor in ("a", "b"):
         client.headers["Authorization"] = "Bearer token-" + actor
         rid, _ = create(client, "recording-person-" + actor)
-        cid = consent(client, rid)
-        upload(client, rid, cid)
-        enqueue(client, rid, cid)
+        upload(client, rid)
+        enqueue(client, rid)
         run_once(service)
         records[actor] = client.get(f"/v1/recordings/{rid}").json()
         records[actor]["source"] = client.get(f"/v1/recordings/{rid}/sources").json()[0]
@@ -243,9 +241,8 @@ def test_next_pair_uses_grant_after_both_confirm_and_cancelled_scope_cannot_revi
     for actor in ("a", "b"):
         client.headers["Authorization"] = "Bearer token-" + actor
         rid, _ = create(client, "next-recording-" + actor)
-        cid = consent(client, rid)
-        upload(client, rid, cid)
-        enqueue(client, rid, cid)
+        upload(client, rid)
+        enqueue(client, rid)
         run_once(service)
         records[actor] = client.get(f"/v1/recordings/{rid}").json()
         records[actor]["source"] = client.get(f"/v1/recordings/{rid}/sources").json()[0]

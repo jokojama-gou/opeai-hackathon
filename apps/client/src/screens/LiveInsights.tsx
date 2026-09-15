@@ -233,12 +233,10 @@ export function LiveContextTools({
   );
   const [runs, setRuns] = useState<Record<string, string>>({});
   const policy = useDerivedSnapshot(() => api.policy(), [api]);
-  const [confirmGeneration, setConfirmGeneration] = useState(false);
   const op = useOperation();
   const context = snapshot.value;
   useEffect(() => {
     setRuns(context?.latest_runs ?? {});
-    setConfirmGeneration(false);
   }, [context?.manifest_hash, JSON.stringify(context?.latest_runs)]);
   return (
     <>
@@ -252,7 +250,7 @@ export function LiveContextTools({
         )}
         {context && !context.generation_allowed && (
           <Text style={styles.muted}>
-            文字の外部生成への同意が必要です。送信先と保持条件を確認してください。
+            文字生成の処理設定が未完了です。
           </Text>
         )}
         {context && policy.value && (
@@ -264,44 +262,6 @@ export function LiveContextTools({
             <Text style={styles.muted}>
               {policy.value.descriptions.external_text_generation}
             </Text>
-            {!context.generation_allowed && (
-              <Check
-                label="この記録の文字を整理・候補・日次の生成に利用する"
-                checked={confirmGeneration}
-                onChange={setConfirmGeneration}
-                disabled={!policy.value.generation_configured}
-              />
-            )}
-            <Button
-              label={
-                context.generation_allowed
-                  ? "この記録の文字生成への同意を取り消す"
-                  : "文字生成への同意を保存"
-              }
-              secondary
-              busy={op.busy}
-              disabled={!context.generation_allowed && !confirmGeneration}
-              onPress={() =>
-                void op.run(async () => {
-                  await derivedMutation(
-                    api,
-                    `/v1/contexts/${endpoint(cid)}/generation-consents`,
-                    "POST",
-                    {
-                      expected_version: context.context_revision,
-                      expected_manifest_hash: context.manifest_hash,
-                      policy_version: policy.value!.policy_version,
-                      destination:
-                        policy.value!.destinations.external_text_generation,
-                      external_text_generation: !context.generation_allowed,
-                    },
-                  );
-                  setRuns({});
-                  snapshot.clear();
-                  await snapshot.refresh();
-                })
-              }
-            />
           </>
         )}
         {(["G1", "G2"] as const).map((role) => (
@@ -876,7 +836,7 @@ function TodayContent({ api, zone, onSource }: Common & { zone: string }) {
             (c) => selected.includes(c.id) && !c.generation_allowed,
           ) && (
             <Text style={styles.muted}>
-              選択した記録の文字生成への同意を、元の記録で確認してください。
+              選択した記録の文字生成サービスが未設定です。
             </Text>
           )}
           {runId && (

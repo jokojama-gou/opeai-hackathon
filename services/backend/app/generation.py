@@ -153,59 +153,6 @@ class GenerationService(ActionService):
             },
         )
 
-    def generation_consent(self, actor, cid, payload):
-        def action(state):
-            context = self._context(state, actor, cid)
-            record = self.recording(state, actor, context["recording_id"])
-            require_version(record, payload["expected_version"])
-            if payload["expected_manifest_hash"] != context["manifest_hash"]:
-                raise DomainError("manifest_changed")
-            policy = self.policy()
-            if (
-                payload["policy_version"] != policy["policy_version"]
-                or payload["destination"]
-                != policy["destinations"]["external_text_generation"]
-            ):
-                raise DomainError("consent_policy_changed")
-            if (
-                payload["external_text_generation"]
-                and not policy["generation_configured"]
-            ):
-                raise DomainError("generation_not_configured", 503)
-            previous = context["_dependencies"]["consent"]
-            # Preserve existing, independently confirmed audio choices. This
-            # action changes only the text-generation purpose and no retention.
-            same_policy = (
-                previous
-                and not previous["revoked_at"]
-                and previous["policy_version"] == policy["policy_version"]
-                and previous["destinations"] == policy["destinations"]
-            )
-            value = (
-                deepcopy(previous)
-                if same_policy
-                else {"pc_audio_transfer": False, "external_audio_transcription": False}
-            )
-            value.update(
-                id=identifier(),
-                version=(previous or {}).get("version", 0) + 1,
-                recording_id=record["id"],
-                actor_id=actor,
-                checksum=record["checksum"],
-                policy_version=policy["policy_version"],
-                destinations=deepcopy(policy["destinations"]),
-                external_text_generation=payload["external_text_generation"],
-                confirmed_at=iso(self.clock()),
-                revoked_at=None,
-            )
-            value["allowed_purposes"] = (
-                ["transcription"] if value["external_audio_transcription"] else []
-            ) + (["generation"] if value["external_text_generation"] else [])
-            state.put("consents", value)
-            return {"consent_id": value["id"], "version": record["version"]}
-
-        return self.mutate(actor, "generation-consent:" + cid, payload, action)
-
     def create_run(self, actor, cid, payload):
         def action(state):
             context = self._context(state, actor, cid)

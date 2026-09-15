@@ -1,3 +1,4 @@
+import { requireConversationAudio } from "./voice-enrollment";
 import {
   ApiClient,
   ApiError,
@@ -11,37 +12,26 @@ import {
   writeLocal,
   type LocalRecording,
 } from "../platform/audio/storage";
-export type Choices = {
-  pc_audio_transfer: boolean;
-  external_audio_transcription: boolean;
-  external_text_generation: boolean;
-};
 export async function processRecording(
   api: ApiClient,
   baseUrl: string,
   token: () => Promise<string | null>,
   local: LocalRecording,
   policy: ProcessingPolicy,
-  choices: Choices,
   onStage: (stage: string) => void,
 ): Promise<string | null> {
+  requireConversationAudio(local);
   if (
     !local.checksum ||
     !local.stopped_at ||
     !["saved", "interrupted"].includes(local.capture_status)
   )
     throw new Error("保存済みの録音を選んでください");
-  if (!choices.pc_audio_transfer)
-    throw new Error("開発PCへの音声送信が許可されていません");
-  if (
-    (choices.external_audio_transcription &&
-      !policy.transcription_configured) ||
-    (choices.external_text_generation && !policy.generation_configured)
-  )
-    throw new Error("選択した処理サービスが設定されていません");
+  if (!policy.destinations.pc_audio_transfer || !policy.transcription_configured)
+    throw new Error("処理サービスが設定されていません");
   const operationKey = await Crypto.digestStringAsync(
     Crypto.CryptoDigestAlgorithm.SHA256,
-    JSON.stringify([local.processing_key, policy, choices]),
+    JSON.stringify(["processing-v2", local.processing_key, policy]),
   );
   if (local.operation?.key !== operationKey) {
     local.operation = { key: operationKey };
@@ -71,25 +61,6 @@ export async function processRecording(
   }
   const rid = encodeURIComponent(local.remote_id);
   let remote = await api.request<Recording>(`/v1/recordings/${rid}`);
-  if (!operation.consent_id) {
-    onStage("処理の同意を確認中");
-    operation.consent_version ??= remote.version;
-    writeLocal(local);
-    const consent = await api.request<{ consent_id: string }>(
-      `/v1/recordings/${rid}/processing-consents`,
-      "POST",
-      {
-        request_key: operationKey + ":consent",
-        expected_version: operation.consent_version,
-        checksum: local.checksum,
-        policy_version: policy.policy_version,
-        destinations: policy.destinations,
-        ...choices,
-      },
-    );
-    operation.consent_id = consent.consent_id;
-    writeLocal(local);
-  }
   if (remote.upload_status === "local") {
     onStage("送信の受付を確認中");
     const ticket = await api.request<{ ticket: string; expires_at: string }>(
@@ -99,7 +70,6 @@ export async function processRecording(
         request_key:
           operationKey + ":upload:" + Math.floor(Date.now() / 540000),
         expected_version: remote.version,
-        consent_id: operation.consent_id,
         checksum: local.checksum,
       },
     );
@@ -138,10 +108,6 @@ export async function processRecording(
     local.remote_version = remote.version;
     writeLocal(local);
   }
-  if (!choices.external_audio_transcription) {
-    onStage("開発PCへの保存が完了しました。書き起こしは実行していません。");
-    return null;
-  }
   if (!operation.job_id) {
     onStage("書き起こしを受け付け中");
     operation.transcription_version ??= remote.version;
@@ -152,7 +118,6 @@ export async function processRecording(
       {
         request_key: operationKey + ":transcription",
         expected_version: operation.transcription_version,
-        consent_id: operation.consent_id,
       },
     );
     operation.job_id = response.job_id;

@@ -93,27 +93,7 @@ def derived(system):
 def prepare(derived):
     service, client, asr, clock, _ = derived
     rid, _, _ = ready((service, client, asr, clock))
-    permit(client, rid)
     return client.get("/v1/contexts").json()[0]
-
-
-def permit(client, rid, allowed=True, key="generation-consent"):
-    policy = client.get("/v1/processing-policy").json()
-    version = client.get(f"/v1/recordings/{rid}").json()["version"]
-    response = client.post(
-        f"/v1/recordings/{rid}/processing-consents",
-        json={
-            "request_key": key,
-            "expected_version": version,
-            "checksum": CHECKSUM,
-            "policy_version": policy["policy_version"],
-            "destinations": policy["destinations"],
-            "pc_audio_transfer": True,
-            "external_audio_transcription": True,
-            "external_text_generation": allowed,
-        },
-    )
-    assert response.status_code == 201, response.text
 
 
 def start(client, context, role="G2", key="generate-candidates"):
@@ -355,12 +335,14 @@ def test_four_call_cap_manual_retry_idempotency_and_unknown_no_retry(derived):
     )
 
 
-def test_revocation_during_generation_never_publishes_late_output(derived):
+def test_configuration_change_during_generation_never_publishes_late_output(derived):
     service, client, _, _, generator = derived
     c = prepare(derived)
-    generator.callback = lambda: permit(
-        client, c["recording_id"], False, "revoke-generation"
-    )
+
+    def disable_generation():
+        service.settings = replace(service.settings, generation_destination=None)
+
+    generator.callback = disable_generation
     run = start(client, c)
     run_generation_once(service)
     assert client.get(f"/v1/agent-runs/{run}").json()["status"] == "stale"
@@ -586,34 +568,26 @@ def test_dismissal_survives_reordering_and_new_extraction_is_marked(derived):
     assert client.get("/v1/action-candidates").json()[0]["previously_dismissed"]
 
 
-def test_generation_only_consent_after_audio_expiry_and_revoke_toggle(derived):
+def test_generation_after_audio_expiry_ignores_historical_consent(derived):
     service, client, _, clock, _ = derived
     c = prepare(derived)
     clock[0] += timedelta(days=8)
-    for n, allowed in enumerate((False, True, False)):
-        current = client.get(f"/v1/contexts/{c['id']}").json()
-        policy = client.get("/v1/processing-policy").json()
-        response = client.post(
-            f"/v1/contexts/{c['id']}/generation-consents",
-            json={
-                "request_key": "toggle-generation-" + str(n),
-                "expected_version": current["context_revision"],
-                "expected_manifest_hash": current["manifest_hash"],
-                "policy_version": policy["policy_version"],
-                "destination": policy["destinations"]["external_text_generation"],
-                "external_text_generation": allowed,
+    with service.store.transaction() as state:
+        state.put(
+            "consents",
+            {
+                "id": "legacy-denial",
+                "actor_id": "person-a",
+                "recording_id": c["recording_id"],
+                "external_text_generation": False,
             },
         )
-        assert response.status_code == 201, response.text
-        # Database row enumeration order must not choose an old permission.
-        with service.store.transaction() as state:
-            state.entities["consents"] = dict(
-                reversed(list(state.table("consents").items()))
-            )
-        assert (
-            client.get(f"/v1/contexts/{c['id']}").json()["generation_allowed"]
-            == allowed
-        )
+    current = client.get(f"/v1/contexts/{c['id']}").json()
+    assert current["generation_allowed"]
+    assert current["manifest_hash"] == c["manifest_hash"]
+    run = start(client, current)
+    assert run_generation_once(service)
+    assert client.get(f"/v1/agent-runs/{run}").json()["status"] == "ready"
 
 
 def test_invalid_evidence_no_partial_publish_and_unknown_failure_stops(derived):

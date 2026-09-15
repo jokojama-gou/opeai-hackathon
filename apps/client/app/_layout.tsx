@@ -1,15 +1,18 @@
-import { Stack } from "expo-router";
+import { Stack, useSegments } from "expo-router";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Platform, Text, View } from "react-native";
 import { WorkspaceProvider } from "../src/data/WorkspaceProvider";
 import { colors } from "../src/ui/primitives";
 
 export default function RootLayout() {
+  const segments = useSegments() as string[];
+  const mockOnly = segments[0] === "mock" || segments[0] === "demo" || (Platform.OS === "web" && segments.length === 0);
   const [loaded, error] = useFonts({
     KosugiMaru: require("../assets/fonts/KosugiMaru-Regular.ttf"),
     NotoSansJP: require("../assets/fonts/NotoSansJP-Variable.ttf"),
   });
   if (!loaded) return <View style={{ flex: 1, backgroundColor: colors.page, justifyContent: "center", alignItems: "center" }}>{error ? <Text>フォントを読み込めませんでした。アプリを開き直してください。</Text> : <ActivityIndicator color={colors.green} />}</View>;
-  return <WorkspaceProvider><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.page } }} /></WorkspaceProvider>;
+  const screens = <><StatusBar style="dark" /><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.page } }} /></>;
+  return mockOnly ? screens : <WorkspaceProvider>{screens}</WorkspaceProvider>;
 }

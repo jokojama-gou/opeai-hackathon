@@ -3,13 +3,11 @@ import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { useLiveWorkspace } from "../data/WorkspaceProvider";
 import { type WorkspaceScreen } from "../data/useLiveWorkspace";
 import { RecordingScreen, RoomScreen, RecordsScreen } from "./SetlogScreens";
-import { type Choices } from "../data/processing";
 import { sourceTime } from "../data/repository";
 import {
   Badge,
   Button,
   Card,
-  Check,
   Empty,
   Field,
   Heading,
@@ -28,17 +26,11 @@ const captureLabels = {
   interrupted: "中断した記録",
   save_failed: "保存の確認が必要",
 };
-const noChoices: Choices = {
-  pc_audio_transfer: false,
-  external_audio_transcription: false,
-  external_text_generation: false,
-};
 export function LiveApp({ onDemo, nativeNavigation = false, routeScreen }: { onDemo: () => void; nativeNavigation?: boolean; routeScreen?: WorkspaceScreen }) {
   const workspace = useLiveWorkspace();
   const w = { ...workspace, screen: routeScreen ?? workspace.screen };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [choices, setChoices] = useState<Choices>(noChoices);
   const [deleting, setDeleting] = useState(false);
   const run = (action: () => Promise<void>) => {
     void w.perform(action);
@@ -193,7 +185,6 @@ export function LiveApp({ onDemo, nativeNavigation = false, routeScreen }: { onD
               onPress={() =>
                 run(async () => {
                   await w.loadPolicy();
-                  setChoices(noChoices);
                 })
               }
             />
@@ -202,45 +193,16 @@ export function LiveApp({ onDemo, nativeNavigation = false, routeScreen }: { onD
         {w.policy && w.selected && (
           <Card>
             <Heading>送信先と処理内容を確認</Heading>
-            {(
-              [
-                "pc_audio_transfer",
-                "external_audio_transcription",
-                "external_text_generation",
-              ] as const
-            ).map((key) => (
-              <View key={key} style={{ gap: 6 }}>
-                <Check
-                  label={
-                    {
-                      pc_audio_transfer: "開発PCへ音声を送る",
-                      external_audio_transcription:
-                        "指定サービスで音声を書き起こす",
-                      external_text_generation: "文字をAIで整理する",
-                    }[key]
-                  }
-                  checked={choices[key]}
-                  disabled={
-                    (key === "external_audio_transcription" &&
-                      !w.policy!.transcription_configured) ||
-                    (key === "external_text_generation" &&
-                      !w.policy!.generation_configured)
-                  }
-                  onChange={(value) =>
-                    setChoices((current) => ({ ...current, [key]: value }))
-                  }
-                />
-                <Text style={styles.muted}>
-                  送信先: {w.policy!.destinations[key] ?? "未設定"}
-                </Text>
-                <Text style={styles.muted}>{w.policy!.descriptions[key]}</Text>
-              </View>
-            ))}
+            <Text style={styles.muted}>
+              書き起こし先: {w.policy.destinations.external_audio_transcription ?? "未設定"}
+            </Text>
+            <Text style={styles.muted}>{w.policy.descriptions.external_audio_transcription}</Text>
+            <Text style={styles.muted}>{w.policy.descriptions.pc_audio_transfer}</Text>
             <Button
-              label="確認した内容で処理する"
+              label="この記録を処理する"
               busy={w.busy}
-              disabled={!choices.pc_audio_transfer || !w.connected}
-              onPress={() => run(() => w.process(choices))}
+              disabled={!w.policy.transcription_configured || !w.policy.destinations.pc_audio_transfer || !w.connected}
+              onPress={() => run(() => w.process())}
             />
           </Card>
         )}
