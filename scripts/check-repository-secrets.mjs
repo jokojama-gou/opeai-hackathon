@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -36,6 +36,36 @@ function git(repo,args,encoding='utf8') {
   catch { throw new Error('Git inspection failed; secret inspection was not completed.'); }
 }
 
+function gitBlobBatch(repo, ids) {
+  if (!ids.length) return new Map();
+  const result = spawnSync('git', ['-c', 'safe.directory=' + resolve(repo).replaceAll('\\','/'),
+    '-C', repo, 'cat-file', '--batch'], {
+    input: ids.join('\n') + '\n', encoding: null, maxBuffer: 128 * 1024 * 1024,
+    windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  if (result.status !== 0 || !Buffer.isBuffer(result.stdout)) {
+    throw new Error('Git inspection failed; secret inspection was not completed.');
+  }
+  const blobs = new Map();
+  let offset = 0;
+  for (const expected of ids) {
+    const end = result.stdout.indexOf(10, offset);
+    if (end < 0) throw new Error('Git inspection failed; secret inspection was not completed.');
+    const [id, type, rawSize] = result.stdout.subarray(offset, end).toString('ascii').split(' ');
+    const size = Number(rawSize);
+    if (id !== expected || !Number.isSafeInteger(size) || size < 0) {
+      throw new Error('Git inspection failed; secret inspection was not completed.');
+    }
+    const start = end + 1, finish = start + size;
+    if (finish >= result.stdout.length || result.stdout[finish] !== 10) {
+      throw new Error('Git inspection failed; secret inspection was not completed.');
+    }
+    if (type === 'blob') blobs.set(id, result.stdout.subarray(start, finish));
+    offset = finish + 1;
+  }
+  return blobs;
+}
+
 export function inspectRepository(repo,mode='working') {
   const files=git(repo,mode==='staged'?['diff','--cached','--name-only','--diff-filter=ACMR','-z']:['ls-files','--cached','--others','--exclude-standard','-z']).split('\0').filter(Boolean);
   const findings=[];
@@ -51,15 +81,16 @@ export function inspectRepository(repo,mode='working') {
 export function inspectHistory(repo,revision='--all') {
   if (revision !== '--all' && !/^[A-Za-z0-9_/.^-]+$/.test(revision)) throw new Error('Invalid history revision.');
   const objects=git(repo,['rev-list','--objects',revision]).split('\n').filter(Boolean);
-  const findings=[];
+  const findings=[], safe=[];
   for(const entry of objects) {
     const separator=entry.indexOf(' ');
     if(separator<0) continue;
     const id=entry.slice(0,separator),file=entry.slice(separator+1);
     if(isForbiddenCredentialPath(file)) { findings.push({file,reason:'credential path in Git history'}); continue; }
-    if(git(repo,['cat-file','-t',id]).trim()!=='blob') continue;
-    if(scanCredentialContent(git(repo,['cat-file','blob',id],null))) findings.push({file,reason:'possible secret in Git history'});
+    safe.push({id,file});
   }
+  const blobs=gitBlobBatch(repo,[...new Set(safe.map(value=>value.id))]);
+  for(const {id,file} of safe) if(blobs.has(id) && scanCredentialContent(blobs.get(id))) findings.push({file,reason:'possible secret in Git history'});
   return findings;
 }
 

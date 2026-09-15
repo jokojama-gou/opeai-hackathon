@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { isForbiddenCredentialPath, scanCredentialContent, inspectRepository } from './check-repository-secrets.mjs';
+import { isForbiddenCredentialPath, scanCredentialContent, inspectRepository, inspectHistory } from './check-repository-secrets.mjs';
 
 test('credential files and private keys are blocked while examples and encrypted files are allowed', () => {
   for (const path of ['.env.audio-models.local','.env.audio-google-service-account.local.json','credentials/key.txt','nested/.env.production']) assert.equal(isForbiddenCredentialPath(path), true);
@@ -35,6 +35,25 @@ test('index scan examines staged bytes even when working file was made harmless'
     writeFileSync(join(root,'.env.test'),'NON_SECRET=example');
     git(root,['add','.env.test']);
     assert.equal(inspectRepository(root,'staged').length,1);
+  } finally { assert.ok(resolve(root).startsWith(resolve(tmpdir())+requireSeparator())); rmSync(root,{recursive:true,force:true}); }
+});
+
+test('history scan reads committed blobs in one batch and finds old secrets and credential paths', () => {
+  const root=mkdtempSync(join(tmpdir(),'repo-history-scan-'));
+  try {
+    git(root,['init','-q']);
+    git(root,['config','user.email','test@example.invalid']);
+    git(root,['config','user.name','Synthetic Test']);
+    writeFileSync(join(root,'sample.txt'),'harmless');
+    git(root,['add','sample.txt']);git(root,['commit','-qm','safe']);
+    writeFileSync(join(root,'sample.txt'),'sk-'+'z'.repeat(40));
+    writeFileSync(join(root,'.env.test'),'EXAMPLE=synthetic');
+    git(root,['add','sample.txt','.env.test']);git(root,['commit','-qm','unsafe']);
+    writeFileSync(join(root,'sample.txt'),'harmless again');
+    git(root,['rm','-q','.env.test']);git(root,['add','sample.txt']);git(root,['commit','-qm','remove']);
+    const findings=inspectHistory(root,'HEAD');
+    assert.ok(findings.some(value=>value.file==='sample.txt' && value.reason.includes('secret')));
+    assert.ok(findings.some(value=>value.file==='.env.test' && value.reason.includes('path')));
   } finally { assert.ok(resolve(root).startsWith(resolve(tmpdir())+requireSeparator())); rmSync(root,{recursive:true,force:true}); }
 });
 

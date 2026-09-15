@@ -3,6 +3,8 @@ node_modules/
 .vercel/
 dist/
 .npm-cache/
+supabase/.temp/
+supabase/.branches/
 *.tsbuildinfo
 npm-debug.*
 .env
