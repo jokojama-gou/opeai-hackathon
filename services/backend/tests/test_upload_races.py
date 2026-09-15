@@ -3,7 +3,6 @@ from test_personal_flow import (
     system,
     ready,
     create,
-    consent,
     upload,
     AUDIO,
     CHECKSUM,
@@ -14,8 +13,7 @@ from test_personal_flow import (
 def test_replayed_upload_still_validates_body(system):
     _, client, _, _ = system
     rid, _ = create(client)
-    cid = consent(client, rid)
-    headers = upload(client, rid, cid)
+    headers = upload(client, rid)
     assert (
         client.put(
             f"/v1/recordings/{rid}/audio", content=b"changed-body", headers=headers
@@ -27,13 +25,11 @@ def test_replayed_upload_still_validates_body(system):
 def test_concurrent_upload_loser_does_not_delete_published_audio(system):
     service, client, _, _ = system
     rid, _ = create(client)
-    cid = consent(client, rid)
     ticket = client.post(
         f"/v1/recordings/{rid}/uploads",
         json={
             "request_key": "concurrent-upload",
             "expected_version": 1,
-            "consent_id": cid,
             "checksum": CHECKSUM,
         },
     ).json()["ticket"]

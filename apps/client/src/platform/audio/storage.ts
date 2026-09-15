@@ -18,8 +18,6 @@ export type LocalRecording = {
   deletion_version?: number;
   operation?: {
     key: string;
-    consent_id?: string;
-    consent_version?: number;
     transcription_version?: number;
     job_id?: string;
   };

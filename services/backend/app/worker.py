@@ -36,12 +36,8 @@ def run_once(service):
             record = service.recording(
                 state, job["owner_id"], job["recording_id"], audio=True
             )
-            service.active_consent(
-                state,
-                job["owner_id"],
-                record,
-                job["consent_id"],
-                "external_audio_transcription",
+            service.check_processing_configuration(
+                job.get("processing_configuration"), "external_audio_transcription"
             )
             if record["version"] != job["recording_version"]:
                 raise DomainError("source_changed")
@@ -75,12 +71,8 @@ def run_once(service):
         with service.store.transaction() as state:
             current = state.get("jobs", job_id)
             record = service.recording(state, owner, rid, audio=True)
-            service.active_consent(
-                state,
-                owner,
-                record,
-                current["consent_id"],
-                "external_audio_transcription",
+            service.check_processing_configuration(
+                current.get("processing_configuration"), "external_audio_transcription"
             )
             if (
                 current["status"] != "processing"
@@ -129,12 +121,8 @@ def run_once(service):
         with service.store.transaction() as state:
             current = state.get("jobs", job_id)
             record = service.recording(state, owner, rid, audio=True)
-            service.active_consent(
-                state,
-                owner,
-                record,
-                current["consent_id"],
-                "external_audio_transcription",
+            service.check_processing_configuration(
+                current.get("processing_configuration"), "external_audio_transcription"
             )
             if (
                 current["status"] != "processing"

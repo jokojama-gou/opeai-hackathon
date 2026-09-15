@@ -8,7 +8,6 @@ from .adapters import MediaProbe, SupabaseAuth, SupabaseBlobs
 from .config import Settings
 from .errors import DomainError
 from .models import (
-    Consent,
     Correction,
     Login,
     Mutation,
@@ -20,7 +19,6 @@ from .models import (
 from .service import Service, identifier
 from .reviews import ReviewService
 from .openai_generation import OpenAIGeneration
-from .derived_models import GenerationConsent
 from .derived_contracts import (
     PersonalContext,
     CandidateView,
@@ -163,10 +161,6 @@ def create_app(service=None, auth=None, settings=None):
     def sources(rid: str, user: Actor):
         return service.sources(user, rid)
 
-    @api.post("/v1/recordings/{rid}/processing-consents", status_code=201)
-    def consent(rid: str, payload: Consent, user: Actor):
-        return service.consent(user, rid, payload.model_dump())
-
     @api.post("/v1/recordings/{rid}/uploads", status_code=201)
     def ticket(rid: str, payload: UploadTicket, user: Actor):
         return service.ticket(user, rid, payload.model_dump())
@@ -179,7 +173,7 @@ def create_app(service=None, auth=None, settings=None):
         x_upload_ticket: Annotated[str, Header()],
         x_audio_checksum: Annotated[str, Header()],
     ):
-        # Authenticate and verify consent/ticket BEFORE consuming request.stream().
+        # Authenticate and verify ownership/configuration/ticket BEFORE consuming request.stream().
         def gate():
             with service.store.transaction() as state:
                 record = service.check_upload(
@@ -328,10 +322,6 @@ def create_app(service=None, auth=None, settings=None):
     @api.post("/v1/contexts/{cid}/agent-runs", status_code=202)
     def create_run(cid: str, payload: RunCreate, user: Actor):
         return service.create_run(user, cid, payload.model_dump())
-
-    @api.post("/v1/contexts/{cid}/generation-consents", status_code=201)
-    def generation_consent(cid: str, payload: GenerationConsent, user: Actor):
-        return service.generation_consent(user, cid, payload.model_dump())
 
     @api.get(
         "/v1/agent-runs/{run_id}",

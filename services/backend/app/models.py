@@ -21,22 +21,12 @@ class RecordingCreate(Mutation):
     size: int = Field(gt=0, le=26214400)
 
 
-class Consent(Mutation):
-    checksum: str
-    policy_version: str
-    destinations: dict[str, str | None]
-    pc_audio_transfer: bool
-    external_audio_transcription: bool
-    external_text_generation: bool
-
-
 class UploadTicket(Mutation):
-    consent_id: str
     checksum: str
 
 
 class Transcription(Mutation):
-    consent_id: str
+    pass
 
 
 class Correction(Mutation):

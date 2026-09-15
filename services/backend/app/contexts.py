@@ -46,29 +46,6 @@ class ContextService(PersonalService):
             for s in state.table("scopes").values()
             if s.get("match_id") in matches
         }
-        # A newer explicit "no" supersedes an older "yes" for generation.
-        consents = [
-            c
-            for c in state.table("consents").values()
-            if c["actor_id"] == actor and c["recording_id"] == record["id"]
-        ]
-        consent = (
-            max(
-                consents,
-                key=lambda c: (c.get("version", 0), c["confirmed_at"], c["id"]),
-            )
-            if consents
-            else None
-        )
-        allowed = False
-        if consent:
-            try:
-                self.active_consent(
-                    state, actor, record, consent["id"], "external_text_generation"
-                )
-                allowed = True
-            except DomainError:
-                pass
         paired = any(m[1] not in ("cancelled", "expired") for m in matches.values())
         dependencies = {
             "context_id": cid,
@@ -78,7 +55,6 @@ class ContextService(PersonalService):
             "evidence_groups": {s["id"]: "personal:" + s["id"] for s in sources},
             "match_versions": matches,
             "access_versions": scopes,
-            "consent": deepcopy(consent),
             "policy": self.policy(),
             "normalization_version": "personal-v1",
         }
@@ -94,7 +70,7 @@ class ContextService(PersonalService):
             ),
             "expires_at": record["text_expires_at"],
             "manifest_hash": manifest_hash,
-            "generation_allowed": allowed,
+            "generation_allowed": self.policy()["generation_configured"],
             "status": "needs_confirmation" if paired else "ready",
             "preparation_reason": "duplicate_resolution_required" if paired else None,
             "sources": [
@@ -162,7 +138,7 @@ class ContextService(PersonalService):
         if any(c["status"] != "ready" for c in contexts):
             raise DomainError("duplicate_resolution_required")
         if any(not c["generation_allowed"] for c in contexts):
-            raise DomainError("generation_consent_required")
+            raise DomainError("generation_not_configured")
         hashes = {c["id"]: c["manifest_hash"] for c in contexts}
         mid = digest([actor, hashes])
         return state.put(

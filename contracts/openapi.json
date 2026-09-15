@@ -400,69 +400,6 @@
         }
       }
     },
-    "/v1/recordings/{rid}/processing-consents": {
-      "post": {
-        "summary": "Consent",
-        "operationId": "consent_v1_recordings__rid__processing_consents_post",
-        "parameters": [
-          {
-            "name": "rid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Rid"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Consent"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/recordings/{rid}/uploads": {
       "post": {
         "summary": "Ticket",
@@ -2233,69 +2170,6 @@
         }
       }
     },
-    "/v1/contexts/{cid}/generation-consents": {
-      "post": {
-        "summary": "Generation Consent",
-        "operationId": "generation_consent_v1_contexts__cid__generation_consents_post",
-        "parameters": [
-          {
-            "name": "cid",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Cid"
-            }
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Authorization"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GenerationConsent"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/agent-runs/{run_id}": {
       "get": {
         "summary": "Agent Run",
@@ -3306,68 +3180,6 @@
         ],
         "title": "ConnectionCreate"
       },
-      "Consent": {
-        "properties": {
-          "request_key": {
-            "type": "string",
-            "maxLength": 128,
-            "minLength": 8,
-            "title": "Request Key"
-          },
-          "expected_version": {
-            "type": "integer",
-            "minimum": 0.0,
-            "title": "Expected Version"
-          },
-          "checksum": {
-            "type": "string",
-            "title": "Checksum"
-          },
-          "policy_version": {
-            "type": "string",
-            "title": "Policy Version"
-          },
-          "destinations": {
-            "additionalProperties": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ]
-            },
-            "type": "object",
-            "title": "Destinations"
-          },
-          "pc_audio_transfer": {
-            "type": "boolean",
-            "title": "Pc Audio Transfer"
-          },
-          "external_audio_transcription": {
-            "type": "boolean",
-            "title": "External Audio Transcription"
-          },
-          "external_text_generation": {
-            "type": "boolean",
-            "title": "External Text Generation"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "request_key",
-          "expected_version",
-          "checksum",
-          "policy_version",
-          "destinations",
-          "pc_audio_transfer",
-          "external_audio_transcription",
-          "external_text_generation"
-        ],
-        "title": "Consent"
-      },
       "ContextEvidence": {
         "properties": {
           "context_id": {
@@ -3776,55 +3588,6 @@
           "end_ms"
         ],
         "title": "EvidenceRef"
-      },
-      "GenerationConsent": {
-        "properties": {
-          "request_key": {
-            "type": "string",
-            "maxLength": 128,
-            "minLength": 8,
-            "title": "Request Key"
-          },
-          "expected_version": {
-            "type": "integer",
-            "minimum": 0.0,
-            "title": "Expected Version"
-          },
-          "policy_version": {
-            "type": "string",
-            "title": "Policy Version"
-          },
-          "expected_manifest_hash": {
-            "type": "string",
-            "title": "Expected Manifest Hash"
-          },
-          "destination": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Destination"
-          },
-          "external_text_generation": {
-            "type": "boolean",
-            "title": "External Text Generation"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "request_key",
-          "expected_version",
-          "policy_version",
-          "expected_manifest_hash",
-          "destination",
-          "external_text_generation"
-        ],
-        "title": "GenerationConsent"
       },
       "HTTPValidationError": {
         "properties": {
@@ -4824,18 +4587,13 @@
             "type": "integer",
             "minimum": 0.0,
             "title": "Expected Version"
-          },
-          "consent_id": {
-            "type": "string",
-            "title": "Consent Id"
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
           "request_key",
-          "expected_version",
-          "consent_id"
+          "expected_version"
         ],
         "title": "Transcription"
       },
@@ -4876,10 +4634,6 @@
             "minimum": 0.0,
             "title": "Expected Version"
           },
-          "consent_id": {
-            "type": "string",
-            "title": "Consent Id"
-          },
           "checksum": {
             "type": "string",
             "title": "Checksum"
@@ -4890,7 +4644,6 @@
         "required": [
           "request_key",
           "expected_version",
-          "consent_id",
           "checksum"
         ],
         "title": "UploadTicket"
