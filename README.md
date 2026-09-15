@@ -6,7 +6,7 @@
 
 書き起こしモデルを知りたい仲間向けに、[Scribe v2の選定理由・実際の検証・現在の実装との違い](docs/development/ASR_MODEL.md)をまとめています。
 
-RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います。現行仕様は2.4。Setlog構成を採用し、「録音」「ルーム」の2タブ、録音の待機画面から起動、相手のルームで「記録／AI」を切り替えます。当日は2人の記録の統合から、その記録をもとにAIと会話する体験を最優先にします。各スマホから共通バックエンドへ音声を送り、workerが分割・外部ASR・統合を、Supabaseが認証・非公開保存・ジョブ管理を担います。初回UIは明色＋Liquid Glass。仕様は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。今回の仕様反映の独立レビューは未実施です。
+RN＋ExpoでiOS・Androidを共通開発します。録音アプリ全体のWeb版は保険ですが、外部共有の公開ページは必須です。現行仕様は2.7。友達登録・グループ作成から会話を始める方針を追加し、実装設計をまとめました。近距離接続は条件付きの追加入口、元の音声自動発見は保存案とします。新経路は未実装です。Setlog構成を採用し、「録音」「ルーム」の2タブ、録音の待機画面から起動、相手のルームで「記録／AI」を切り替えます。記録の統合と根拠付きAIに加え、[外部共有・公開URL（M18）](docs/product/MVP_SPEC.md#external-sharing)から受け手の利用開始につなぐ機能を必須にしています。当日のASRは各スマホから外部APIへ直接送信します。既存のクラウド接続・端末ASR・声の登録・PWAを維持し、共有保存/2入力統合/AI会話の接続先と担当は[MVP_SPEC §9](docs/product/MVP_SPEC.md#contracts)の残件として扱います。初回は明色、iOSはネイティブUI/Liquid Glass、AndroidはMaterial 3です。仕様は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。今回の仕様反映の独立レビューは未実施です。
 
 2026-09-14〜15に共通画面、人工契約、端末録音adapter、FastAPI/worker、2人の接続・共有確認、個人の訂正・保存に加え、個人Context/生成処理・ToDo/日次APIとLive画面を追加しました。開発起動は人工データの操作デモです。実ASR・2入力統合・スマホ実機の通し動作はまだ完成していません。実装範囲と残件は[現在地](docs/development/WORKFLOW.md#現在の状態)を参照してください。
 
