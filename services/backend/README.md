@@ -18,9 +18,9 @@ macOS等では、このディレクトリで仮想環境を作り、`pip install
 
 ## 実サービスの準備と起動
 
-2026-09-15、このPCではDocker/Supabase・2アカウント・ffprobe・HTTPSを準備し、人工音声のAuth/DB/Storage往復を確認済み。[結果と再起動方法](../../docs/development/LOCAL_CONNECTION_PREP.md)を参照する。実機・ASRの完了とはしない。
+ローカル構成の作業元PCでは、2026-09-15にDocker/Supabase・2アカウント・ffprobe・HTTPSを準備し、人工音声のAuth/DB/Storage往復を確認した。[結果と再起動方法](../../docs/development/LOCAL_CONNECTION_PREP.md)を参照する。現在のcheckoutや別PCでの再現・実機・ASRの完了とはしない。
 
-1. ローカルSupabaseを起動できるDocker環境とSupabase CLIを用意する。設定は[config.toml](../../supabase/config.toml)、初期DDLは[migration](../../supabase/migrations/202609140001_mvp_storage.sql)。このPCの新規ローカルDBには適用済み。別の既存DBへ適用する前にその状態を照合する。
+1. 開発用Supabaseを用意する。2026-09-15に既存クラウドプロジェクトへ下記の手順でDB/Storageを接続した。隔離したローカル構成を使う場合はDockerとSupabase CLI、[config.toml](../../supabase/config.toml)を使う。初期DDLは[migration](../../supabase/migrations/202609140001_mvp_storage.sql)。既存DBへ適用する前に状態を照合する。
 2. Supabase側で開発用の2アカウントを用意する。製品APIは新規登録・管理者操作を提供しない。
 3. [.env.example](.env.example)を参考に、このディレクトリのGit除外された `.env` に接続設定を入れる。プロセスの環境変数が優先。`UPLOAD_TICKET_SECRET` は32文字以上のランダム値。PC転送の同意に表示する `PC_DESTINATION_ID` も実際の送信先を指定する。音声APIキーの暗号化保管庫は自動では読み込まない。
 4. 実音声の受入前に、`ffprobe` をPATHへ配置する。現在の形式検査はAAC、48kHz、mono、25MiB以下、5分以下。このPCでは `backend.ps1` がローカルのffprobeを検出する。音声変換・分割・ASR呼出は別のworker処理として接続する。
@@ -34,6 +34,18 @@ macOS等では、このディレクトリで仮想環境を作り、`pip install
 serveは `127.0.0.1:8000` に待受し、アクセスログを抑止する。スマホから使うHTTPS入口、証明書、到達経路は別途必要。CORSは `.env` で指定したWeb originだけを許可する。TLS検証を無効化する設定は用意しない。
 
 未設定時のAPIは503を返す。`/health` は設定項目の存在を表示するもので、DB・認証・ASRの接続成功を証明しない。APIは設定不足や通信失敗でMemoryStore/人工結果へ切り替わらない。
+
+### クラウドSupabaseの初回準備
+
+2026-09-15に `nmidnmqnrhogehzehkjh` へ非公開の `private.app_entities` と `recordings` bucket、専用DBユーザー `conversation_mvp_backend` を作成した。接続情報はこのPCの `.env`。同ユーザーの権限はアプリテーブルに限定し、anon/authenticatedによる直接参照を許可しない。Supabase Auth/Storageの既存APIキーはバックエンドだけが使う。
+
+新しい空の対象へ同じ構成を準備する場合は、このディレクトリで `python provision_supabase.py --project <確認したref>` で状態を確認し、許可された対象にだけ `--apply` を付ける。Management APIの認証は環境変数 `SUPABASE_ACCESS_TOKEN` またはルートの `.env.supabase.local`。既存オブジェクトや `.env` がある場合は停止する。既存設定の上書き・DB初期化・不明な処理の自動再試行はしない。初期化はManagement APIのSQL経由であり、Supabase CLIのmigration履歴は自動登録していない。
+
+クラウド接続は[公式CA証明書](../../supabase/certs/README.md)と `sslmode=verify-full` を使う。Windowsの日本語フォルダーではlibpq用に同じ証明書への相対パスを使い、transaction pooler向けにprepared statementを無効にする。別PCへ設定を移すときは `.env` のCAパスをそのPCに合わせる。
+
+実DB/Storageの検証は `python check_supabase.py --run`。人工のDB行を読み書きしてロールバックし、Storageへ人工バイト列を書込・読込・削除する。モデルや実音声を使わない。この実接続チェックは通常のpytestには含まれない。
+
+開発用2アカウントは、作成が許可された空のAuthに対して `python provision_accounts.py --apply` で準備できる。架空の `example.invalid` を使い、メール送信はしない。パスワードはルートの `credentials/development-accounts.local.json` に保存する。既存ユーザーと既存の認証ファイルがある場合は停止する。作成の実施状態は[WORKFLOW](../../docs/development/WORKFLOW.md)を参照する。
 
 ## 今回の実装範囲
 

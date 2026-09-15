@@ -3,7 +3,8 @@ param(
     [ValidateSet('GET', 'POST', 'PATCH', 'PUT', 'DELETE')]
     [string]$Method = 'GET',
     [string]$Path = '/v1/projects',
-    [string]$BodyFile
+    [string]$BodyFile,
+    [string]$CredentialFile = (Join-Path $PSScriptRoot '../.env.supabase.local')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -11,13 +12,15 @@ $ErrorActionPreference = 'Stop'
 if ($Path -notmatch '^/v1/[A-Za-z0-9_/?=&.%-]+$' -or $Path.Contains('..')) {
     throw 'Use a Supabase Management API path starting with /v1/.'
 }
-$credentialPath = Join-Path $PSScriptRoot '../.env.supabase.local'
-if (-not (Test-Path -LiteralPath $credentialPath)) {
-    throw 'Create .env.supabase.local with SUPABASE_ACCESS_TOKEN first.'
+$token = $env:SUPABASE_ACCESS_TOKEN
+if (-not $token) {
+    if (-not (Test-Path -LiteralPath $CredentialFile)) {
+        throw 'SUPABASE_ACCESS_TOKEN is missing. Set it in the process environment, .env.supabase.local, or a file selected by -CredentialFile.'
+    }
+    $tokenLine = @(Get-Content -LiteralPath $CredentialFile | Where-Object { $_ -match '^SUPABASE_ACCESS_TOKEN=' })
+    if ($tokenLine.Count -ne 1) { throw 'Expected exactly one SUPABASE_ACCESS_TOKEN entry.' }
+    $token = ($tokenLine[0] -split '=', 2)[1].Trim().Trim('"', "'")
 }
-$tokenLine = @(Get-Content -LiteralPath $credentialPath | Where-Object { $_ -match '^SUPABASE_ACCESS_TOKEN=' })
-if ($tokenLine.Count -ne 1) { throw 'Expected exactly one SUPABASE_ACCESS_TOKEN entry.' }
-$token = ($tokenLine[0] -split '=', 2)[1].Trim()
 if ($token -notmatch '^sbp_[A-Za-z0-9_-]+$') { throw 'Invalid access token format.' }
 $request = @{
     Uri = 'https://api.supabase.com' + $Path

@@ -354,12 +354,12 @@ MVPでは、これらに進む前提として両入力の文字起こしが利�
 
 ### 9.1 採用技術とデータの移動
 
-採用スタックは**開発時ローカルSupabase（Auth/PostgreSQL/Storage）＋FastAPI＋Python worker＋外部書き起こしAPI、共通クライアントはReact Native＋Expo/TypeScript**。外部APIのモデルで書き起こすことを2026-09-14に採用した。バックエンドは最初はWindowsの開発PCで動かし、Mac/iPhone/Androidを同じ明示設定のHTTPS接続先へつなぐ。ASRの推論は外部プロバイダで行うため、各スマホや開発PCへのASRモデル・GPU環境導入は製品の前提にしない。バックエンドのクラウド配備は別判断であり、外部ASRの採用だけでは変更しない。TLSを無効化した製品設定を残さない。
+採用スタックは**Supabase（Auth/PostgreSQL/Storage）＋FastAPI＋Python worker＋外部書き起こしAPI、共通クライアントはReact Native＋Expo/TypeScript**。2026-09-15のユーザー依頼で、開発用Auth/DB/Storageにはトークンで確認した既存クラウドSupabaseも使用する。ローカルSupabaseは隔離開発の選択肢として残す。外部APIのモデルで書き起こすことは2026-09-14に採用済み。FastAPIとworkerはWindowsの開発PCで動かし、Mac/iPhone/Androidを同じ明示設定のHTTPS接続先へつなぐ。ASRの推論は外部プロバイダで行うため、各スマホや開発PCへのASRモデル・GPU環境導入は製品の前提にしない。FastAPI/workerのクラウド配備は別判断。TLSを無効化した製品設定を残さない。
 
 ```text
 RN＋Expo iOS / Android（録音終了 → 端末保存 → 本人の処理要求 → アップロード）
   → 開発PCのFastAPI（認証/所有者/入力検証）
-     → ローカルSupabase（非公開音声Storage、DBの録音・処理ジョブ）
+     → 開発用Supabase（非公開音声Storage、DBの録音・処理ジョブ）
      → Python worker（必要な正規化・チャンク分割）
         → ASR adapter → 設定済みの外部書き起こしAPI（音声）
         ← 書き起こし結果 → 元録音時刻への変換・結合・Source保存
@@ -376,7 +376,7 @@ RN＋Expo iOS / Android（録音終了 → 端末保存 → 本人の処理要�
 | 各スマホ | 自分の録音・端末保存・本人の処理開始操作・共通APIへのアップロード/再送・状態取得・結果表示。初回は録音終了後に1録音を送る。ASR用チャンク分割やプロバイダへの直接送信は担当しない |
 | FastAPI | Supabase Authのtoken検証、所有者/処理設定/アップロードの検証、ジョブ受付、結果の認可。クライアント指定の任意プロバイダURLや秘密鍵を受け付けない |
 | Python worker / ASR adapter | 保存音声の取得、必要な正規化・分割、外部ASRの認証/送信/状態照会、応答の正規化・結合・Source保存。プロバイダ固有の形式と制限をadapterへ閉じる |
-| ローカルSupabase | Auth、非公開Storage、録音/結果/ジョブのDB。音声分割やASR推論・外部ASR呼出はPython workerが担い、初期構成でEdge Functionsへ移さない |
+| 開発用Supabase | Auth、非公開Storage、録音/結果/ジョブのDB。音声分割やASR推論・外部ASR呼出はPython workerが担い、初期構成でEdge Functionsへ移さない。クラウドDBは証明書とホスト名を検証し、サーバー専用の限定権限で接続 |
 
 **接続設定と秘密鍵:** プロバイダのAPIキー等はバックエンドの環境設定からASR adapterだけが読み、スマホ、`EXPO_PUBLIC_`、アプリbundle、API応答、ログへ含めない。サーバー設定で接続先・アカウント・モデル/版・音声形式/上限・timeout・呼出回数/同時実行数・費用上限を固定する。未設定/無効な認証では実呼出を有効にせず、別のプロバイダへ黙って切り替えない。キーの取得済みと実認証/音声送信の成功を区別する。
 

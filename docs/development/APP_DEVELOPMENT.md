@@ -33,7 +33,7 @@ npm ci
 npm run web
 ```
 
-表示されるlocalhostのURLを開く。開発ビルドは「今日」から始まる人工データの操作デモ。記録→会話→元の記録、保存/メモ、ToDo採用、期限切れの表示を操作できる。デモの変更はメモリ内だけで、再読込すると戻る。実音声・実AIは呼ばない。Windowsでは `./scripts/dev.ps1 web` でも起動でき、このPCに用意したGit除外済みNodeキャッシュがあれば利用する。
+表示されるlocalhostのURLを開く。接続先未設定の開発ビルドは「今日」から始まる人工データの操作デモ。`EXPO_PUBLIC_API_URL`を設定すると、開発ビルドもAPIのログイン画面から始まり、ログイン後は「今日」へ進む。主タブは「今日」「記録」「保存」。人工デモでは記録→会話→元の記録、保存/メモ、ToDo採用、期限切れの表示を操作でき、変更はメモリ内だけで再読込すると戻る。Windowsでは `./scripts/dev.ps1 web` でも起動でき、このPCのGit除外済みNodeキャッシュがあれば利用する。
 
 <a id="ui-study"></a>
 ### U01/U06/U07のUI検討モック（K02準備）
@@ -142,6 +142,10 @@ EAS BuildはソースをExpoへ送信してビルド枠を使用する。料金�
 
 Expoプロジェクト連携は完了。署名、クラウドビルド、実機インストールは未実行。Expo Goのデモにこれらは不要。`build:bundles`成功をAPK/IPA完成とは扱わない。
 
+保存済みExpoトークンを使うWindows用の入口は `./scripts/expo.ps1 status`。プロセスの `EXPO_TOKEN`、またはチーム共有の `.env.expo.local`（`EXPO_TOKEN=...`）を使う。別の保存先は `-CredentialFile` で指定する。`init`でプロジェクトを接続し、`android`でAPK、`ios`で実機向け、`simulator`でSimulator向けビルドを実行する。`-Task`による明示指定と、`whoami` / `project:info` / `build --platform android --profile preview` 等のEAS引数も利用できる。既存の対話ログインは上のnpmコマンドも使える。トークンは端末bundleへ渡さない。
+
+APIのURLはローカル起動では `apps/client/.env.local` の `EXPO_PUBLIC_API_URL`、EASでは選択するEAS環境へ同じ公開変数を設定する。`.env.local`はEAS送信対象から除外しているため、PCの設定だけではクラウドビルドへ反映されない。スマホ用には到達可能なHTTPS URLが必要。
+
 公式資料：[EAS Build初回設定](https://docs.expo.dev/build/setup/)、[APK作成](https://docs.expo.dev/build-reference/apk/)、[iOS内部配布](https://docs.expo.dev/build/internal-distribution/)、[monorepo](https://docs.expo.dev/build-reference/build-with-monorepos/)。
 
 ## AI IDEのExpoトークン認証
@@ -202,7 +206,7 @@ Expoと組み合わせるライブラリは、`apps/client`から`npx expo insta
 
 音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。FastAPI・非公開Storage/PostgreSQL adapter・単一入力のASR worker境界と、個人Context/G1/G2/G5生成・ToDo/日次APIを追加した。外部ASRの具体adapter、正規化/チャンク分割、2入力統合・共有Context、G3/G4は残る。Expoの起動だけでは書き起こせない。生成adapterも接続/保持/予算の明示設定まで無効。バックエンドの依存・起動・人工テストは[backend README](../../services/backend/README.md)を参照する。
 
-実機接続は `apps/client/.env.example` を参考に `EXPO_PUBLIC_API_URL` を設定し、設定画面でAPIモードへ切り替える。スマホは証明書を検証できる明示的なHTTPS接続先が必要。開発PC自身のWeb検証に限りloopback HTTPを許す。Supabase用の秘密鍵やASRキーをクライアントのenvへ入れない。ログインにはチームが用意したアカウントを使い、画面から新規アカウントを作る機能はない。
+実機接続は `apps/client/.env.example` を参考に `EXPO_PUBLIC_API_URL` を設定する。APIモードで起動し、未設定と不正な接続先を画面で区別する。スマホは証明書を検証できる明示的なHTTPS接続先が必要。開発PC自身のWeb検証に限りloopback HTTPを許し、iOS/Androidではloopbackを含めHTTPを拒否する。Supabase用の秘密鍵やASRキーをクライアントのenvへ入れない。ログインにはチームが用意したアカウントを使い、画面から新規アカウントを作る機能はない。
 
 プロバイダの認証情報の準備は[credentialsの手順](../../credentials/README.md)を参照する。実接続時はworker側で読み込み、クライアント公開変数やアプリ配布物へ入れない。キー取得と認証確認、許可済み音声による書き起こし成功は別々に記録する。接続先/モデル・分割設定・保持条件・呼出/費用上限の確認項目は[ロードマップのK03前提](MULTIPLATFORM_DELIVERY_PLAN.md#runtime-prerequisites)から辿る。
 

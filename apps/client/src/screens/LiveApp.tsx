@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Platform, ScrollView, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { useLiveWorkspace } from "../data/useLiveWorkspace";
 import { type Choices } from "../data/processing";
 import { sourceTime } from "../data/repository";
@@ -11,6 +11,7 @@ import {
   Empty,
   Field,
   Heading,
+  colors,
   styles,
 } from "../ui/primitives";
 import { GlassSurface } from "../ui/GlassSurface";
@@ -46,8 +47,16 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
     body = (
       <>
         <Empty
-          title="実機接続の準備中です"
-          body="このビルドには接続先が設定されていません。開発用のHTTPS接続先を設定すると、ログインと録音の送信を利用できます。"
+          title={
+            w.connectionError === "invalid"
+              ? "接続設定を確認してください"
+              : "実機接続の準備中です"
+          }
+          body={
+            w.connectionError === "invalid"
+              ? "このビルドの接続先を利用できません。スマホから利用できるHTTPS接続先を設定して、ビルドし直してください。"
+              : "このビルドには接続先が設定されていません。開発用のHTTPS接続先を設定すると、ログインと録音の送信を利用できます。"
+          }
         />
         <Button label="人工データの画面を確認" onPress={onDemo} />
       </>
@@ -70,6 +79,8 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
           />
           <Button
             label="ログインする"
@@ -321,7 +332,7 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
         )}
         {w.remoteId && w.sources.length > 0 && w.api && w.connected && (
           <LiveContextTools
-            key={w.remoteId}
+            key={`context:${w.remoteId}`}
             api={w.api}
             recordingId={w.remoteId}
             onSource={(id) => run(() => w.openRemote(id))}
@@ -329,7 +340,7 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
         )}
         {w.remoteId && w.api && w.session && w.connected && (
           <LiveSharing
-            key={w.remoteId}
+            key={`sharing:${w.remoteId}`}
             api={w.api}
             userId={w.session.user_id}
             recordingId={w.remoteId}
@@ -373,7 +384,6 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
     body = (
       <>
         <Text style={styles.muted}>自分の端末で残した記録。</Text>
-        <Button label="記録を始める" onPress={() => w.setScreen("recording")} />
         <Heading>この端末の記録</Heading>
         {w.local.map((record) => (
           <Card key={record.id}>
@@ -429,52 +439,46 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
       <View style={{ padding: 16, gap: 10 }}>
         <View style={[styles.row, { flexWrap: "wrap" }]}>
           <Heading>
-            {w.screen === "personal"
-              ? "自分の記録"
-              : w.screen === "recording"
-                ? "記録中"
-                : w.screen === "settings"
-                  ? "設定"
-                  : w.screen === "saved"
-                    ? "保存"
-                    : w.screen === "today"
-                      ? "今日"
-                      : w.screen === "todos"
-                        ? "ToDo"
-                        : "記録"}
+            {!w.session
+              ? "会話の記録"
+              : w.screen === "personal"
+                ? "自分の記録"
+                : w.screen === "recording"
+                  ? "記録中"
+                  : w.screen === "settings"
+                    ? "設定"
+                    : w.screen === "saved"
+                      ? "保存"
+                      : w.screen === "today"
+                        ? "今日"
+                        : w.screen === "todos"
+                          ? "ToDo"
+                          : "記録"}
           </Heading>
           <View style={{ flex: 1 }} />
           {w.session && (
-            <View style={[styles.row, { flexWrap: "wrap" }]}>
+            <>
+              {(w.screen === "today" || w.screen === "todos") && (
+                <Button
+                  label="ToDo"
+                  secondary
+                  onPress={() => w.setScreen("todos")}
+                />
+              )}
               <Button
-                label="今日"
+                label="設定"
                 secondary
-                onPress={() => w.setScreen("today")}
+                disabled={w.recordingActive}
+                onPress={() => w.setScreen("settings")}
               />
-              <Button
-                label="ToDo"
-                secondary
-                onPress={() => w.setScreen("todos")}
-              />
-              <Button
-                label="保存"
-                secondary
-                onPress={() => w.setScreen("saved")}
-              />
-            </View>
-          )}
-          <Button
-            label="設定"
-            secondary
-            disabled={w.recordingActive}
-            onPress={() => w.setScreen("settings")}
-          />
-          {w.screen !== "records" && (
-            <Button
-              label="記録へ"
-              secondary
-              onPress={() => w.setScreen("records")}
-            />
+              {(w.screen === "personal" || w.screen === "recording") && (
+                <Button
+                  label="記録へ"
+                  secondary
+                  onPress={() => w.setScreen("records")}
+                />
+              )}
+            </>
           )}
         </View>
         <Text style={styles.small}>実機・API接続モード</Text>
@@ -507,6 +511,69 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
         )}
         {body}
       </ScrollView>
+      {w.session && (
+        <GlassSurface
+          style={{
+            padding: 12,
+            gap: 10,
+            borderTopWidth: 1,
+            borderColor: colors.line,
+          }}
+        >
+          {(w.screen === "today" || w.screen === "records") &&
+            !w.recordingActive && (
+              <Button
+                label="記録を始める"
+                onPress={() => w.setScreen("recording")}
+              />
+            )}
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            {(
+              [
+                ["today", "今日"],
+                ["records", "記録"],
+                ["saved", "保存"],
+              ] as const
+            ).map(([screen, label]) => {
+              const selected =
+                w.screen === screen ||
+                (screen === "today" && w.screen === "todos") ||
+                (screen === "records" &&
+                  ["personal", "recording"].includes(w.screen));
+              return (
+                <Pressable
+                  key={screen}
+                  accessibilityRole="tab"
+                  accessibilityLabel={label}
+                  accessibilityState={{ selected }}
+                  onPress={() => w.setScreen(screen)}
+                  style={({ pressed }) => ({
+                    flex: 1,
+                    minHeight: 52,
+                    borderRadius: 14,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: 10,
+                    backgroundColor: selected ? colors.green : "transparent",
+                    opacity: pressed ? 0.7 : 1,
+                  })}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      lineHeight: 24,
+                      fontWeight: "600",
+                      color: selected ? colors.white : colors.ink,
+                    }}
+                  >
+                    {label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </GlassSurface>
+      )}
     </View>
   );
 }

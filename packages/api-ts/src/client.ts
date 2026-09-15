@@ -44,7 +44,8 @@ export class ApiClient {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 20000);
     try {
-      const response = await this.transport(this.baseUrl + path, {
+      const send = this.transport;
+      const response = await send(this.baseUrl + path, {
         method,
         signal: controller.signal,
         cache: "no-store",

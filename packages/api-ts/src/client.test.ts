@@ -1,6 +1,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ApiClient, ApiError } from "./client";
+test("fetch is called without an ApiClient receiver, as required by browsers", async () => {
+  const api = new ApiClient(
+    "https://example.invalid",
+    async () => null,
+    async function (this: unknown) {
+      assert.ok(this === undefined || this === globalThis);
+      return new Response(JSON.stringify({ ok: true }));
+    },
+  );
+  assert.deepEqual(await api.request("/v1/check"), { ok: true });
+});
 test("reject insecure non-loopback API endpoint", () => {
   assert.throws(
     () => new ApiClient("http://192.168.1.2:8000", async () => null),

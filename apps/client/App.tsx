@@ -6,9 +6,12 @@ import { DemoApp } from "./src/screens/DemoApp";
 import { LiveApp } from "./src/screens/LiveApp";
 import UiStudy from "./src/screens/UiStudy";
 import { colors } from "./src/ui/primitives";
+import { initialMode } from "./src/data/startup";
 
 export default function App() {
-  const [mode, setMode] = useState<"fixture" | "api">(__DEV__ ? "fixture" : "api");
+  const [mode, setMode] = useState<"fixture" | "api">(
+    initialMode(__DEV__, process.env.EXPO_PUBLIC_API_URL),
+  );
   const [studyOpen, setStudyOpen] = useState(false);
   return (
     <SafeAreaProvider>

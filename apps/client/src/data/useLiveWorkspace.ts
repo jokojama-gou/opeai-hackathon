@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AppState } from "react-native";
+import { AppState, Platform } from "react-native";
 import { useNetworkState } from "expo-network";
 import { useAudioPlayer } from "expo-audio";
 import {
@@ -20,7 +20,12 @@ import {
 } from "../platform/audio/storage";
 import { useCapture } from "../platform/audio/useCapture";
 import { VisibilityScope } from "./visibility";
-const baseUrl = process.env.EXPO_PUBLIC_API_URL ?? "";
+import { apiConfiguration } from "./startup";
+const connection = apiConfiguration(
+  process.env.EXPO_PUBLIC_API_URL,
+  Platform.OS,
+);
+const baseUrl = connection.baseUrl;
 const messages: Record<string, string> = {
   backend_not_configured: "サーバーの設定が完了していません。",
   unauthenticated: "ログインし直してください。",
@@ -96,7 +101,7 @@ export function useLiveWorkspace() {
     | "saved"
     | "today"
     | "todos"
-  >("records");
+  >("today");
   const [active, setActive] = useState(AppState.currentState === "active");
   const network = useNetworkState();
   const connected = network.isConnected !== false && active;
@@ -267,6 +272,7 @@ export function useLiveWorkspace() {
     visibility.invalidate();
     sessionRef.current = result;
     setSession(result);
+    setScreen("today");
   }
   async function readSources(id: string) {
     if (!api || !connected) return;
@@ -397,6 +403,7 @@ export function useLiveWorkspace() {
     screen,
     setScreen,
     connected,
+    connectionError: connection.error,
     api,
     capture,
     recordingActive,
