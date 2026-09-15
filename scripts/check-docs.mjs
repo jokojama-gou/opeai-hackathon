@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
 import assert from 'node:assert/strict';
 
 // Repository subset: inline Markdown links/images and HTML href/src/id/name.
@@ -35,7 +36,26 @@ function inspect(file, target, exists = fs.existsSync, read = f => fs.readFileSy
   }
   return null;
 }
-if (process.argv.includes('--self-test')) {
+const excludedDirectories = new Set(['.git', 'node_modules', '.npm-cache', '.expo', '.venv',
+  '__pycache__', '.pytest_cache', 'dist', 'build', 'coverage', '.next']);
+
+export function collectDocuments(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name)).flatMap(entry => {
+    const target = path.join(directory, entry.name);
+    if (entry.isDirectory()) return excludedDirectories.has(entry.name) ? [] : collectDocuments(target);
+    return entry.isFile() && /\.(md|html)$/i.test(entry.name) ? [target] : [];
+  });
+}
+
+export function inspectDocument(file) {
+  const targets = links(fs.readFileSync(file, 'utf8'), /\.md$/i.test(file))
+    .filter(target => !/^[a-zA-Z][\w+.-]*:|^\/\//.test(target));
+  return { count: targets.length, issues: targets.map(target => inspect(file, target)).filter(Boolean) };
+}
+
+function main() {
+  const { values } = parseArgs({ options: { 'self-test': { type: 'boolean' }, 'repo-root': { type: 'string' } } });
+  if (values['self-test']) {
   const fixture = '# 見出し\n# 見出し\n<a id="fixed"></a>\n';
   assert(anchors(fixture, true).has('見出し-1'));
   assert.equal(inspect('/doc.md', '#fixed', () => true, () => fixture), null);
@@ -43,16 +63,21 @@ if (process.argv.includes('--self-test')) {
   assert.match(inspect('/doc.md', 'lost.md', () => false), /missing file/);
   assert.deepEqual(links('```text\n[example](missing.md)\n```\n[real](doc.md#fixed)', true), ['doc.md#fixed']);
   console.log('PASS: link/anchor checks detect missing targets and ignore fenced examples.');
-} else {
-  const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]);
-  const files = ['AGENTS.md', 'README.md'].map(p => path.join(root, p)).concat(walk(path.join(root, 'docs')), walk(path.join(root, '.agents'))).filter(p => /\.(md|html)$/.test(p));
+  } else {
+  const repoRoot = path.resolve(values['repo-root'] ?? root);
+  const files = collectDocuments(repoRoot);
   let count = 0; const issues = [];
-  for (const file of files) for (const target of links(fs.readFileSync(file, 'utf8'), file.endsWith('.md'))) {
-    if (/^[a-zA-Z][\w+.-]*:|^\/\//.test(target)) continue;
-    count++;
-    const issue = inspect(file, target);
-    if (issue) issues.push(`${path.relative(root, file)} -> ${issue}`);
+  for (const file of files) {
+    const result = inspectDocument(file);
+    count += result.count;
+    issues.push(...result.issues.map(issue => `${path.relative(repoRoot, file)} -> ${issue}`));
   }
   if (issues.length) { console.error(issues.join('\n')); process.exitCode = 1; }
   else console.log(`PASS: ${files.length} Markdown/HTML files, ${count} local links and used anchors (including history). External URLs and AI behavior not checked.`);
+  }
+}
+
+if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
+  try { main(); }
+  catch (error) { console.error(error.message); process.exitCode = 1; }
 }

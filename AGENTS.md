@@ -44,6 +44,6 @@
 
 ## 引き継ぎと補助資料
 
-[WORKFLOWの様式](docs/development/WORKFLOW.md#結果の記録)で、対象版・既存差分、依頼範囲、K/M/U/受入ID、担当・変更先、契約/fixture版、確認結果・証拠、残件を短く残す。別PCの動作は受け手の確認を待つ。別の開発先では既存AGENTSへ統合し、チームで読める正本へ辿れるようにする。
+[WORKFLOWの様式](docs/development/WORKFLOW.md#結果の記録)で、対象版・既存差分、依頼範囲、K/M/U/受入ID、担当・変更先、契約/fixture版、確認結果・証拠、残件を日付別の履歴へ1依頼1記録で残す。WORKFLOWは現在の状態・残件・最新結果と履歴へのリンクに絞り、目安120行以内に保つ。別PCの動作は受け手の確認を待つ。別の開発先では既存AGENTSへ統合し、チームで読める正本へ辿れるようにする。
 
 必要時だけ[AIDD-LiteのSkill/役割索引](docs/development/aidd-lite/GUIDE.md)、[採用原則](docs/decisions/AIDD_FW_ADOPTION.md)、[Codexガイド](docs/development/CODEX_OPERATING_GUIDE.md)を読む。これらの配置・選択は権限を増やさず、固定役職・二重承認・全Skillの連続実行を要求しない。

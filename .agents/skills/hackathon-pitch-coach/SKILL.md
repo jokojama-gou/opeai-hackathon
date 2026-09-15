@@ -9,9 +9,9 @@ description: OpenAI 大学生向け 夏の Codex 開発祭 2026の発表コー�
 
 ## 作業場所
 
-今回の資料と対話状態は `C:/Users/yos57/home/myApp/opeai-hackathon/hackathon-pitch` にある。以下の相対パスはすべてこのディレクトリ基準。成果物はこの資料フォルダに保存し、スキルのインストール先やアプリ実装用ディレクトリへ保存しない。
+今回の資料と対話状態は、このSKILL.mdから `../../../hackathon-pitch/` にある。作業対象のcheckout内にある[発表コーチの指示](../../../hackathon-pitch/AGENTS.md)を入口にする。以下の本文中のファイル名はすべてその発表資料ディレクトリ基準。成果物もそこへ保存し、個人のスキル登録先や別checkoutへ保存しない。
 
-開始時に `AGENTS.md`、`event-rules.md`、`event-open-questions.md`、`day-of-details.md`、`working-draft.md` を読む。ユーザーが別の資料保存先を明示した場合はそちらを使う。見つからない場合はパスの確認だけ行い、公式条件を記憶から再構成しない。
+開始時に上記のAGENTSと、[大会条件](../../../hackathon-pitch/event-rules.md)、[未定事項](../../../hackathon-pitch/event-open-questions.md)、[当日情報](../../../hackathon-pitch/day-of-details.md)、[作業メモ](../../../hackathon-pitch/working-draft.md)を読む。ユーザーが別の資料保存先を明示した場合はそちらを使う。見つからない場合はパスの確認だけ行い、公式条件を記憶から再構成しない。
 
 ## 対話の進め方
 

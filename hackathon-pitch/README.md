@@ -4,18 +4,20 @@
 
 ## 使い始める
 
-Codexで次のように依頼する。製品のパス・URLは当日渡せばよい。
+このリポジトリの対象checkoutをCodexの作業場所として開き、次のように依頼する。製品のパス・URLは当日渡せばよい。
 
 > $hackathon-pitch-coach 製品は［パスまたはURL］。大会の未定項目はそのままで、まず発表の切り口を一緒に考えたい。
 
-登録先は `C:/Users/yos57/.codex/skills/hackathon-pitch-coach`。この作業中の会話のスキル一覧には追加直後の登録が反映されない場合がある。見つからない場合は、次のようにファイルを直接指定する。
+正本はリポジトリ内の[SKILL.md](../.agents/skills/hackathon-pitch-coach/SKILL.md)。Windows/Macとも個人領域へのコピーは不要。自動発見されない場合や同名の個人skillがある場合は、対象checkoutのファイルを明示する。
 
-> C:/Users/yos57/home/myApp/opeai-hackathon/hackathon-pitch/skill/hackathon-pitch-coach/SKILL.md を読んで発表コーチとして始めて。製品は［パスまたはURL］。
+> このcheckoutの .agents/skills/hackathon-pitch-coach/SKILL.md を読んで発表コーチとして始めて。製品は［パスまたはURL］。
 
-PowerShellから起動する場合：
+Macでも上の明示読込を使う。資料・成果物は同じcheckoutの `hackathon-pitch/` に保持する。個人領域に残る旧コピーとの同期は行わない。自動発見や別PCでの対話品質は別途確認する。
+
+WindowsのPowerShellから、リポジトリルートで起動する場合：
 
 ```powershell
-& 'C:\Users\yos57\home\myApp\opeai-hackathon\hackathon-pitch\start-coach.ps1' -ProductPath '実際の製品フォルダの絶対パス'
+./hackathon-pitch/start-coach.ps1 -ProductPath '実際の製品フォルダの絶対パス'
 ```
 
 `-ProductUrl`も指定可能。引数なしでも起動でき、製品の所在から対話する。`-Check`は対話を開始せず、必要ファイルとCLIの存在、指定パス・URLを確認する。モデルや承認設定は既存設定を引き継ぐ。
@@ -32,7 +34,7 @@ PowerShellから起動する場合：
 
 対話の決定事項・根拠・構成は `working-draft.md` に保存する。構成ができた段階で `output/slides.md`、`output/pitch.md`、`output/demo.md`、`output/qa.md` を作成・更新する。出力は原稿・内容案のMarkdownで、PDF/PPTXの生成は最終形式の指定に応じて行う。
 
-スキルの編集元は[SKILL.md](skill/hackathon-pitch-coach/SKILL.md)。登録先にはコピーを配置しているため、スキルを修正した場合は登録先の同ファイルとUIメタデータも同期する。大会条件・作業メモはこのフォルダを直接参照するためコピー不要。
+スキルの編集元はリポジトリ内の[SKILL.md](../.agents/skills/hackathon-pitch-coach/SKILL.md)と隣接するUIメタデータだけ。変更後はルートで `npm run verify:docs` を実行する。大会条件・作業メモ・出力原稿はこのフォルダに保持する。
 
 - [発表コーチの指示](AGENTS.md)：対話・証拠確認・変更反映の手順。
 - [当日教えてもらいたい情報](day-of-details.md)：優先順位付きの一覧。わかった項目だけ受け取る。

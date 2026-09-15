@@ -19,6 +19,7 @@
     "verify:docs": "node scripts/verify.mjs docs",
     "verify:ui": "node scripts/verify.mjs ui",
     "verify:tooling": "node scripts/verify.mjs tooling",
+    "verify:backend": "node scripts/verify.mjs backend",
     "contracts:generate": "node contracts/schema.mjs && node contracts/generate-fixtures.mjs && node scripts/generate-contract-types.mjs",
     "test:contracts": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts",
     "test": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts apps/client/src/data/*.test.ts",
@@ -45,6 +46,7 @@
   "devDependencies": {
     "eas-cli": "24.3.0",
     "json-schema-to-typescript": "15.0.4",
+    "supabase": "2.117.0",
     "tsx": "4.23.13"
   }
 }

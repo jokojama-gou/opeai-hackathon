@@ -123,8 +123,8 @@
 | [hackathon-pitch/event-sources.md](../../hackathon-pitch/event-sources.md) | 原本どおり復元 |
 | [hackathon-pitch/output/slides.md](../../hackathon-pitch/output/slides.md) | 原本どおり復元 |
 | [hackathon-pitch/past-winner-reference.md](../../hackathon-pitch/past-winner-reference.md) | 原本どおり復元 |
-| [hackathon-pitch/skill/hackathon-pitch-coach/SKILL.md](../../hackathon-pitch/skill/hackathon-pitch-coach/SKILL.md) | 原本どおり復元 |
-| [hackathon-pitch/skill/hackathon-pitch-coach/agents/openai.yaml](../../hackathon-pitch/skill/hackathon-pitch-coach/agents/openai.yaml) | 原本どおり復元 |
+| [hackathon-pitch/skill/hackathon-pitch-coach/SKILL.md](../../.agents/skills/hackathon-pitch-coach/SKILL.md) | 原本どおり復元後、現在は標準skill配置へ移設 |
+| [hackathon-pitch/skill/hackathon-pitch-coach/agents/openai.yaml](../../.agents/skills/hackathon-pitch-coach/agents/openai.yaml) | 原本どおり復元後、現在は標準skill配置へ移設 |
 | [hackathon-pitch/start-coach.ps1](../../hackathon-pitch/start-coach.ps1) | 原本どおり復元 |
 | [hackathon-pitch/working-draft.md](../../hackathon-pitch/working-draft.md) | 原本どおり復元 |
 | [package.json](../../package.json) | 新版と差分を統合 |

@@ -21,7 +21,9 @@ site_url = "http://localhost:8081"
 enable_signup = false
 
 [auth.email]
-enable_signup = false
+# This controls the email provider, including login. Global auth.enable_signup
+# above blocks public signup while admin-created test users can sign in.
+enable_signup = true
 
 [storage]
 enabled = true
