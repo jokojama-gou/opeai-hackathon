@@ -1,0 +1,72 @@
+# Backend development
+
+MVP 2.2のFastAPI、Python worker、Supabaseの認証・非公開保存adapter。実装と残件の正本は[WORKFLOW](../../docs/development/WORKFLOW.md)。実データの扱いは[VALIDATION](../../docs/development/VALIDATION.md#音声の利用処理条件)を参照する。
+
+## 人工データで確認する
+
+Python 3.12を使う。Windowsではリポジトリのルートから実行する。
+
+```powershell
+./scripts/backend.ps1 setup
+./scripts/backend.ps1 test
+./scripts/backend.ps1 schema
+```
+
+PythonがPATH上にない場合、setupの `-Python` へPython 3.12の実行ファイルを指定する。仮想環境は `.npm-cache/backend-venv`。依存の直接指定はrequirements.txt、今回のWindows環境の固定版はrequirements.lock.txt。テストはMemoryStore/MemoryBlobs、明示した人工ASR/生成adapter、HTTP MockTransportを使い、実音声・外部APIへ送信しない。保存・取消・期限・競合のAPIをFastAPI TestClient経由で検証する。これは実PostgreSQLやSupabase Authの検証ではない。
+
+macOS等では、このディレクトリで仮想環境を作り、`pip install -r requirements.lock.txt` → `python -m pytest -q` を実行する。別OSでの再現は未確認。
+
+## 実サービスの準備と起動
+
+1. ローカルSupabaseを起動できるDocker環境とSupabase CLIを用意する。設定は[config.toml](../../supabase/config.toml)、初期DDLは[migration](../../supabase/migrations/202609140001_mvp_storage.sql)。既存DBへ適用する前にその状態を照合する。今回、このPCではDockerを検出できず、DB適用は未実行。
+2. Supabase側で開発用の2アカウントを用意する。製品APIは新規登録・管理者操作を提供しない。
+3. [.env.example](.env.example)を参考に、このディレクトリのGit除外された `.env` に接続設定を入れる。プロセスの環境変数が優先。`UPLOAD_TICKET_SECRET` は32文字以上のランダム値。PC転送の同意に表示する `PC_DESTINATION_ID` も実際の送信先を指定する。rootの音声APIキーは自動では読み込まない。
+4. 実音声の受入前に、`ffprobe` をPATHへ配置する。現在の形式検査はAAC、48kHz、mono、25MiB以下、5分以下。ffprobeは今回のPCでは未検出。音声変換・分割・ASR呼出は別のworker処理として接続する。
+5. 次の2プロセスを起動する。
+
+```powershell
+./scripts/backend.ps1 serve
+./scripts/backend.ps1 worker
+```
+
+serveは `127.0.0.1:8000` に待受し、アクセスログを抑止する。スマホから使うHTTPS入口、証明書、到達経路は別途必要。CORSは `.env` で指定したWeb originだけを許可する。TLS検証を無効化する設定は用意しない。
+
+未設定時のAPIは503を返す。`/health` は設定項目の存在を表示するもので、DB・認証・ASRの接続成功を証明しない。APIは設定不足や通信失敗でMemoryStore/人工結果へ切り替わらない。
+
+## 今回の実装範囲
+
+- 本人の録音metadata、3用途別同意、期限付きupload ticket、checksum/形式検査、非公開保存、所有者の原音/文字取得。
+- ASR adapter境界と単一入力worker。ジョブの二重作成を防ぎ、1job最大2呼出・設定したjob当たり費用枠を検査。結果不明・再起動後の処理中jobを自動再送しない。部分結果は公開しない。
+- 接続コード、相互確認、今回許可、継続許可/解除、確認し直し、取消。相手の本文は統合の公開条件が未成立なら取得不可。
+- 自分の原文訂正、旧版の無効化、個人Sourceの保存/メモ/タグ、再確認、保存解除。メモをモデルへ渡す処理はない。
+- 音声/文字の期限と削除worker。個人の保存本文・メモを即遮断し、本文なしの表示も7日後に除去する。相手の独立入力を削除しない。
+- 個人ContextView、全文脈のmanifest、G1/G2/G5 runner、本人によるToDoの採用/編集/完了/再確認、日次選択とタイムゾーン設定。個人版は統合済みと表示しない。対応するMatchがある記録はK05の被覆表ができるまで生成を保留する。
+- OpenAI Responses生成adapter。実呼出は明示設定が揃うまで無効。人工adapterとHTTP MockTransportで接続処理・上限・失効を確認する。
+
+**ASRの具体provider adapter、チャンク処理、2入力の時間対応/統合、共有ContextViewの被覆表、共有clip、指摘API、G3/G4、Google/端末カレンダーは未実装または未接続。** 共有許可が揃っても、現在は統合未設定のfailed状態を返す。人工fixtureを統合結果として返さない。保存APIのtargetは現在、本人のSourceに限定する。
+
+ASRを接続する際は[adapters.py](app/adapters.py)のAsrAdapterを実装し、[main.py](app/main.py)のfactoryへ明示的に渡す。モデル/設定版、入力上限、timeout、保持設定、呼出/費用上限を固定し、分割境界・結果不明の照会/再送を追加検証する。単にキーをenvへ入れてもASRは有効にならない。
+
+## 個人の生成・ToDo・日次
+
+実接続モードの自分の記録から、文字生成の送信先/保持条件を確認し、その記録だけの同意を追加・取り消せる。原音の7日期限後も文字が有効なら設定でき、音声転送の許可は増やさない。「内容を整理する」「ToDo候補を確認する」からG1/G2を要求する。現在は本人の操作で起動し、文字起こし確定/訂正イベントからの自動起動は後続。
+
+「ToDo」でaction/本人の作業/期限を確認して採用する。期限未定、日付、日時とIANA zoneを区別する。本人編集・完了を生成結果で上書きしない。「今日」で固定zoneを初回確認し、会話の開始日で対象を選ぶ。11件以上は自動選択せず、最大10件を明示選択する。G5には選択した原文と、存在する有効なG1整理だけを渡し、保存メモやToDo本文を入れない。
+
+生成結果は入力に渡した全Source/Context/Match/権限/同意の版に依存する。引用していない背景の訂正でも旧本文を遮断し、ToDoは同じID・完了状態を維持して現行候補から再確認する。通信断/背景化でLive画面をアンマウントし、復帰時に再取得する。表示中は15秒間隔で再確認し、期限時は消去する。別端末からの変更をpushで即時反映する仕組みは未実装。
+
+[.env.example](.env.example)の `GENERATION_*` を実設定で埋める。`GENERATION_ENABLED=true`、専用キー、モデル版、送信先、確認済み保持説明、入出力/timeout、予算ID・上限・1呼出の予約額のすべてが必要。モデル初期値は採用済みの `gpt-5-mini`。キーはbackendだけに置き、rootのキーは自動で読まない。今回は値を設定せず実APIも呼んでいない。
+
+予算の単位はmicro USD（1 USD = 1,000,000）。予約額はモデル/入出力上限/推論出力を含む最悪費用に合わせて運用者が確認する。全actor/worker共通のDB台帳で呼出前に予約し、自動返金/自動リセットしない。これは設定額の実行制限で、プロバイダ実請求額の照合ではない。全worker同時2件、本人のqueued上限10件、1run最大2呼出、手動retryは1roundのみで同じ基底キー最大4呼出。通信の結果不明やworker中断は自動再送しない。
+
+Responsesへの送信は `store:false`、toolなし、切詰めなし、構造化出力。拒否/未完了/不正根拠/11件以上の候補は公開しない。`store:false`だけで外部保持条件の確認が済んだとは扱わない。実装時の参照：[OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)、[GPT-5 mini](https://developers.openai.com/api/docs/models/gpt-5-mini)（2026-09-14閲覧）。アカウント可用性・日本語生成品質・実課金は未検証。
+
+UI確認用に、`services/backend`から `python tests/serve_artificial.py --artificial-only` を実行できる。loopback 8001に揮発性の人工APIを起動する専用entryで、本番factoryには入らない。クライアントは当該プロセスだけ `EXPO_PUBLIC_API_URL=http://localhost:8001` を指定し、`npm run web -- --host localhost --port 8082` で起動する。検証用ログインは `demo@example.invalid` / `artificial-only`。初期の記録は2026-09-14。今回、health/CORS/HTTPログインは成功したが、in-app browserからのログインは結果不明となり、Live画面の通し操作は未確認。検証用2プロセスは終了した。
+
+## 保存方式と公開契約
+
+[store.py](app/store.py)はDB transaction中だけadvisory lockを取り、APIとworkerの公開判定を直列化する。外部通信中はlockを保持しない。現在は2人の開発用で、JSONB全件読込を使う。大規模データ・複数組・運用向けの性能設計は未実施。
+
+DBのprivate schemaと音声bucketは、匿名/クライアントから直接読めるpoliciesを追加していない。APIの所有者確認を通して提供する。端末へservice-role keyやStorage全体のURLを返さない。認可エラー本文に入力されたprivate text/passwordを含めない。
+
+[OpenAPI](../../contracts/openapi.json)は実装済み経路と入力モデルの生成物。主要型は[共通JSON schema](../../contracts/mvp-v1.schema.json)、個人Context/ToDo/日次/runの応答は[追加schema](../../contracts/derived-v1.schema.json)で検査する。追加responseはFastAPIのPydanticからschemaを出し、共通TS型を生成し、端末でも失効本文の混入を拒否する。`./scripts/backend.ps1 schema` → `npm run contracts:generate` の順で再生成する。OpenAPIの全response model・§15全体の共通schemaはまだ揃っておらず、契約全体の完成とはしない。

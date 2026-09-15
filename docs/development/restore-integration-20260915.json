@@ -1,0 +1,540 @@
+{
+  "base": "4ecab1d2af34c50abb8f570de87c38dcd64b4154",
+  "stash": "1f3eb52610c7143a8c03f0ff8266a1a76117c661",
+  "files": [
+    {
+      "file": ".agents/skills/aidd-lite-handoff/SKILL.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "136a5e63f5dc005005fc9c4effdffc6dff20afffce0397f53bff4428f2aad432",
+      "integratedSha256": "136a5e63f5dc005005fc9c4effdffc6dff20afffce0397f53bff4428f2aad432"
+    },
+    {
+      "file": ".agents/skills/aidd-lite-implement/SKILL.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "299498c41f7e015b2d7004b1d5b5b7662abd466f75402d4c563aea32d79aaee0",
+      "integratedSha256": "299498c41f7e015b2d7004b1d5b5b7662abd466f75402d4c563aea32d79aaee0"
+    },
+    {
+      "file": "AGENTS.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "e943773060ef3d4d3d67850e96936340db562af975f02980df0cd7c47ff9a0ec",
+      "integratedSha256": "e943773060ef3d4d3d67850e96936340db562af975f02980df0cd7c47ff9a0ec"
+    },
+    {
+      "file": "README.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "a5b879c58f425bac869793e93f6618c794125179a6b18f10718101460b7069f0",
+      "integratedSha256": "d27a4142d2077cee019abb6d0b0c0973c54ae2a2655d5b036111d00f7aee0425"
+    },
+    {
+      "file": "apps/client/App.tsx",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "33c12c838e68786ccfb099d1e94f0f27d5fb1aefddbc7a916037c4d9535ff297",
+      "integratedSha256": "efeae68e9e66aca4c0e5ea6865acaeda06a624b620443761895992173e1a85f4"
+    },
+    {
+      "file": "apps/client/src/data/ui-study.test.mjs",
+      "disposition": "原本どおり復元",
+      "priorSha256": "eb7c43a76cb14632e33ef60951c5e737dabb63d5add7cc16c357ef4e94d1007c",
+      "integratedSha256": "eb7c43a76cb14632e33ef60951c5e737dabb63d5add7cc16c357ef4e94d1007c"
+    },
+    {
+      "file": "apps/client/src/data/ui-study.ts",
+      "disposition": "原本どおり復元",
+      "priorSha256": "c725dc51e3de44023cc02579c3938f1180fd815a8913e96b3efe1ab91ccd6a7f",
+      "integratedSha256": "c725dc51e3de44023cc02579c3938f1180fd815a8913e96b3efe1ab91ccd6a7f"
+    },
+    {
+      "file": "apps/client/src/navigation/ui-study.ts",
+      "disposition": "原本どおり復元",
+      "priorSha256": "b50ce653342ec32ab1219a4aa04c837e9eac0dc3084627419c996db3ea6ac936",
+      "integratedSha256": "b50ce653342ec32ab1219a4aa04c837e9eac0dc3084627419c996db3ea6ac936"
+    },
+    {
+      "file": "apps/client/src/screens/UiStudy.tsx",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "386ecf7bb974c9880853bab1049d2520c2cf29696c6714495f7412ca6269970b",
+      "integratedSha256": "e50660e7c926cdae79a32a01b93ae728699917bd4550a4cb47cbc87b7fd34b9f"
+    },
+    {
+      "file": "apps/client/src/ui/StudyPrimitives.tsx",
+      "disposition": "原本どおり復元",
+      "priorSha256": "b422d5946154ab00b5a9c962db24c79e7d75329ad214a28e5e1a43b4d692ca54",
+      "integratedSha256": "b422d5946154ab00b5a9c962db24c79e7d75329ad214a28e5e1a43b4d692ca54"
+    },
+    {
+      "file": "docs/development/APP_DEVELOPMENT.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "8ea91660723b8e5f64bce37d128bcbb33e0c57131f010ffee4e0bca0c11f878b",
+      "integratedSha256": "89b31f7c6521a5629faeed4e87d0e5588b1757c6c719ea7c4f147dbe904a9b0e"
+    },
+    {
+      "file": "docs/development/CODEX_OPERATING_GUIDE.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "2be46c67fa71b388dda194f15b892e4e226b834a7d6b8990c0bab4f105fa2ff8",
+      "integratedSha256": "2be46c67fa71b388dda194f15b892e4e226b834a7d6b8990c0bab4f105fa2ff8"
+    },
+    {
+      "file": "docs/development/MULTIPLATFORM_DELIVERY_PLAN.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "e60e5a9a0237beaa649cf9b7478e83b5e375429623a207f313d8f4cbc3693067",
+      "integratedSha256": "507491147f8ec6d2911cf8883d226b3bec64921640e51ae35a874cd570bb872e"
+    },
+    {
+      "file": "docs/development/WORKFLOW.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "b68cc6b804f67c6c15249825fbb692471782341386aa336fb2f1243f11bbc85c",
+      "integratedSha256": "e53f2652e80561fdde539c77a86e36ff8e2d681761ab76f055e2717e11afa24a"
+    },
+    {
+      "file": "docs/development/aidd-lite/GUIDE.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "28b67a0c1116a1e7e6f0e66015493bf3bef7745b998256ba6e615c529d16c686",
+      "integratedSha256": "28b67a0c1116a1e7e6f0e66015493bf3bef7745b998256ba6e615c529d16c686"
+    },
+    {
+      "file": "docs/product/MVP_SPEC.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "9fa4a2f5cb5c2e55e7c9aed258520024c5b8594aa40fadec695b9f9e797eb559",
+      "integratedSha256": "d7849c7a9bda093e122db95e408ab52edf9b4c53cbb36e6d88af25d171a7c569"
+    },
+    {
+      "file": "docs/product/PRODUCT_CORE.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "f3919906b2015116198ec911bea4ad615daa02c9fba8b038f36aaa0e8db05b9f",
+      "integratedSha256": "dc61a9ca36650d67d1b2bab9061b390a67f6a8fe8beff2efa3e2506b8b6265c7"
+    },
+    {
+      "file": "docs/product/SETLOG_UI_STRUCTURE.md",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "2fa43238759d4aa31b9fc13119976dc1f76286541033b8d8468510057bbfcd56",
+      "integratedSha256": "32f5d8584216d03242b36c3a169ab7a12259c3816471f150f24ac5a1e20ca52f"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/a-sport-minimal-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "00fa0560803724af77180d70cad319bc237773c2c0883631a7014a9501e0ce08",
+      "integratedSha256": "00fa0560803724af77180d70cad319bc237773c2c0883631a7014a9501e0ce08"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/a-sport-minimal.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "752d09c42be0ced844997de50d6c9db8059aec609e742a42993b9afe922058c7",
+      "integratedSha256": "752d09c42be0ced844997de50d6c9db8059aec609e742a42993b9afe922058c7"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/b-quiet-editorial.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "5023eaa3f1ecd9e60b3c0654696a7ae8db008a8980053eb8f79cceed5b60a063",
+      "integratedSha256": "5023eaa3f1ecd9e60b3c0654696a7ae8db008a8980053eb8f79cceed5b60a063"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/c-soft-modern-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "0d176e5c7d06e16743dbe3fe58504a0b03a65669009c38457c5031d065869b41",
+      "integratedSha256": "0d176e5c7d06e16743dbe3fe58504a0b03a65669009c38457c5031d065869b41"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/c-soft-modern.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "b28b47f1700c4273ef20e2de1ed8082b0fcf67da1db04d70088b0d15b51a6d21",
+      "integratedSha256": "b28b47f1700c4273ef20e2de1ed8082b0fcf67da1db04d70088b0d15b51a6d21"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/d-slack-mobile-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "bf02b4f53f348eca3d07f8676d86a926031a9da7f4925ac53abc48c65dea8119",
+      "integratedSha256": "bf02b4f53f348eca3d07f8676d86a926031a9da7f4925ac53abc48c65dea8119"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/d-slack-mobile-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "aa1f1b3e636c2d1cc60ac51ed045f67856dcb2c2a4f2db454db6479982b21774",
+      "integratedSha256": "aa1f1b3e636c2d1cc60ac51ed045f67856dcb2c2a4f2db454db6479982b21774"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/e-ios-today-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "e9d9685867308f80fd4b4a42e56b1dff6c6f4455a6b33ee0781ce07f96a864a4",
+      "integratedSha256": "e9d9685867308f80fd4b4a42e56b1dff6c6f4455a6b33ee0781ce07f96a864a4"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/e-ios-today-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "f416e1dbc72b516b5b53bafb12409fd11242cbb678e96ae83345d4f78eb2d89b",
+      "integratedSha256": "f416e1dbc72b516b5b53bafb12409fd11242cbb678e96ae83345d4f78eb2d89b"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/e-ios-today-v3.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "b0d808d290017f9024319bde9e1ab38ad923376172764e78d9d5b5b41ba41b9f",
+      "integratedSha256": "b0d808d290017f9024319bde9e1ab38ad923376172764e78d9d5b5b41ba41b9f"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-01-home-talk-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "8720ec762c0fe8d1c423dd5189db76fb15a33dfe9b1bd0be84389186eadc8ad5",
+      "integratedSha256": "8720ec762c0fe8d1c423dd5189db76fb15a33dfe9b1bd0be84389186eadc8ad5"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-02-recording-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "cfc68961d7930dbbf63da45d68508f7367ed49f9120e245b7519f46cb3e43473",
+      "integratedSha256": "cfc68961d7930dbbf63da45d68508f7367ed49f9120e245b7519f46cb3e43473"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-02-recording-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "6a11b36f56c75bff8fc226f909642e77db02e4f5a4d1888234886210fdc4c42d",
+      "integratedSha256": "6a11b36f56c75bff8fc226f909642e77db02e4f5a4d1888234886210fdc4c42d"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-03-archives-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "4bece7725becef1b50941af6bcf1d6b2b2b16fcd38eb689afc26e475da3210b1",
+      "integratedSha256": "4bece7725becef1b50941af6bcf1d6b2b2b16fcd38eb689afc26e475da3210b1"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-04-sources-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "e26fa4f7770634bbf3f1766b441671f2e6252d03b088f05ebdea035e39597959",
+      "integratedSha256": "e26fa4f7770634bbf3f1766b441671f2e6252d03b088f05ebdea035e39597959"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-04-sources-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "176f74a42d3f71daf4728b50c685f4890f0b7e72dc164c7f82e84778d7eb3f3e",
+      "integratedSha256": "176f74a42d3f71daf4728b50c685f4890f0b7e72dc164c7f82e84778d7eb3f3e"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-05-saved-export-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "fdefbc52d8a79e5ed20e16802deffea1d61a6e61ffb338738b161b8bcf185c8b",
+      "integratedSha256": "fdefbc52d8a79e5ed20e16802deffea1d61a6e61ffb338738b161b8bcf185c8b"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-05-saved-export-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "21dbc16fd28fe9118946fafa246ab99937152134850f27a558b36489f02de0bd",
+      "integratedSha256": "21dbc16fd28fe9118946fafa246ab99937152134850f27a558b36489f02de0bd"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-06-sharing-setup-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "3e7c7dddfd868dffb65218ac6be8aebacab3e6e264874b9b9fd2ae90573c6206",
+      "integratedSha256": "3e7c7dddfd868dffb65218ac6be8aebacab3e6e264874b9b9fd2ae90573c6206"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-06-sharing-setup-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "2ba0f87d661acf7d703354600ec77bf5d929e81ce1e2a8c29d7b4f2f9910e092",
+      "integratedSha256": "2ba0f87d661acf7d703354600ec77bf5d929e81ce1e2a8c29d7b4f2f9910e092"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-06-sharing-setup-v3.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "4b7b8c22a38b99531f545843998a0e8dc1414e49d4055eec9e5396c3cc723a12",
+      "integratedSha256": "4b7b8c22a38b99531f545843998a0e8dc1414e49d4055eec9e5396c3cc723a12"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-07-sharing-states-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "fb7951bc95202a6c0d26094f04e4ea4513d02fa51c1782dad2d075dad0b79651",
+      "integratedSha256": "fb7951bc95202a6c0d26094f04e4ea4513d02fa51c1782dad2d075dad0b79651"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-07-sharing-states-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "cfd24a6b78287983dcda4d3e314a1396fe9e1f2e2262785988905b6b4e7afca7",
+      "integratedSha256": "cfd24a6b78287983dcda4d3e314a1396fe9e1f2e2262785988905b6b4e7afca7"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-08-ai-states-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "f9c59cae879cfed58240165fb5bb73de21b1deb346d70fe6c924884b8292c582",
+      "integratedSha256": "f9c59cae879cfed58240165fb5bb73de21b1deb346d70fe6c924884b8292c582"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-09-chat-services-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "9b20a820e49308abdea72a87d923425e98e5ff42b7cef5d8bf93f9ccc657a4f3",
+      "integratedSha256": "9b20a820e49308abdea72a87d923425e98e5ff42b7cef5d8bf93f9ccc657a4f3"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-09-chat-services-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "db9fb3a7334a9d836bb32e1d2b54cd087cc384a7ee33b1578ac9c7e4cb0a981c",
+      "integratedSha256": "db9fb3a7334a9d836bb32e1d2b54cd087cc384a7ee33b1578ac9c7e4cb0a981c"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-10-settings-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "12c6b4ea1eb223728672f5d6b2164154f44629a3e17733cf7bafd8654df187dc",
+      "integratedSha256": "12c6b4ea1eb223728672f5d6b2164154f44629a3e17733cf7bafd8654df187dc"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-10-settings-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "0a8b7cd3bbb97cf29d0f3c7658910dcee575f0c2a413d99d3fa723137fe2e888",
+      "integratedSha256": "0a8b7cd3bbb97cf29d0f3c7658910dcee575f0c2a413d99d3fa723137fe2e888"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-11-entry-recovery-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "26b036fd3f79265e8eac7e94caf0727f9eb7a48b899738ad597ee10f935fdefa",
+      "integratedSha256": "26b036fd3f79265e8eac7e94caf0727f9eb7a48b899738ad597ee10f935fdefa"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-11-entry-recovery-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "54df27837b214abaf0b5674f22c8a9e9fce67c946a8be38d48ed8b4057e0b923",
+      "integratedSha256": "54df27837b214abaf0b5674f22c8a9e9fce67c946a8be38d48ed8b4057e0b923"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-12-review-interruption-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "48b8948e665d9697eb437e6ba0220e449119c0ebad3d76a8d3bd5be3c2d4890b",
+      "integratedSha256": "48b8948e665d9697eb437e6ba0220e449119c0ebad3d76a8d3bd5be3c2d4890b"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-13-android-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "0c9b452f82a4441c9c9dc3758b83fa999568879fa327cba98f3a3422726bf851",
+      "integratedSha256": "0c9b452f82a4441c9c9dc3758b83fa999568879fa327cba98f3a3422726bf851"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-13-android-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "a2bbdfa24e01974c534c1710f01105f308d64e60a52d27116f21bbbded0544dd",
+      "integratedSha256": "a2bbdfa24e01974c534c1710f01105f308d64e60a52d27116f21bbbded0544dd"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-14-account-filters-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "995e412c84e17f47415d1146310c726f48c9fb53a67426a5783449610a8d7db4",
+      "integratedSha256": "995e412c84e17f47415d1146310c726f48c9fb53a67426a5783449610a8d7db4"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-14-account-filters-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "73376443d2dab8cb4cc080efda4356c0583484948fb16a3fd0aa17fbb1bde603",
+      "integratedSha256": "73376443d2dab8cb4cc080efda4356c0583484948fb16a3fd0aa17fbb1bde603"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-15-progress-connection-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "bc656c30ccab1db8a0e3eda0e3047060f47bbaff0bbbca5cbb6d4d1d50f2666c",
+      "integratedSha256": "bc656c30ccab1db8a0e3eda0e3047060f47bbaff0bbbca5cbb6d4d1d50f2666c"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-15-progress-connection-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "193233fe498d085a32bbdd731d3ed2f1d70c7cc5b0669264d2227c674259ec85",
+      "integratedSha256": "193233fe498d085a32bbdd731d3ed2f1d70c7cc5b0669264d2227c674259ec85"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-15-progress-connection-v3.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "e0e30a8cd3bbc48a6490d59581b3e3442b360a8e8809e60b534301e755dcdc7b",
+      "integratedSha256": "e0e30a8cd3bbc48a6490d59581b3e3442b360a8e8809e60b534301e755dcdc7b"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-16-confirmations-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "3f49f97380eaa8968965a9d31ed474ab4e0c43d0fb72a00964dad22c07cce5ff",
+      "integratedSha256": "3f49f97380eaa8968965a9d31ed474ab4e0c43d0fb72a00964dad22c07cce5ff"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-16-confirmations-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "16f9646274182a743f26cc66be156e8067627bff1cec6b9a0881773573273130",
+      "integratedSha256": "16f9646274182a743f26cc66be156e8067627bff1cec6b9a0881773573273130"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-17-record-scope-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "4fc60abd73433908a034e63a4b8c72dbdf279908fde27533e40cfad2751553b9",
+      "integratedSha256": "4fc60abd73433908a034e63a4b8c72dbdf279908fde27533e40cfad2751553b9"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-17-record-scope-v2.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "1cd8895cffb0fcc6878c2eec7dd88a5b38622b6ea05551d45b65ded5e74dd595",
+      "integratedSha256": "1cd8895cffb0fcc6878c2eec7dd88a5b38622b6ea05551d45b65ded5e74dd595"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/f-screen-gallery.html",
+      "disposition": "原本どおり復元",
+      "priorSha256": "931d815bd172c178fd284d89ed8737485e24388e485f117b44dbfa1aa93f8595",
+      "integratedSha256": "931d815bd172c178fd284d89ed8737485e24388e485f117b44dbfa1aa93f8595"
+    },
+    {
+      "file": "docs/product/prototypes/design-directions/g-ios-home-attention-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "bbb9cfdad32fe40a6693fc16613c1ac7b2ac431a3e709786e6667c684edbc3de",
+      "integratedSha256": "bbb9cfdad32fe40a6693fc16613c1ac7b2ac431a3e709786e6667c684edbc3de"
+    },
+    {
+      "file": "docs/product/prototypes/mvp-spec-wireframes.html",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "9938e9cf8b8c942b2eea2f2fe80c4cbf410e6acff0b37b08c69955fbe9372ae1",
+      "integratedSha256": "f4238d6eeda18b2bec3cacd151625129592b20063415f84a309a20339221b0bd"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/01-main-screens-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "37b8cc03fe37cc15a15f4aaf9270367057d69da8c5752b09ffa5f46d742082f4",
+      "integratedSha256": "37b8cc03fe37cc15a15f4aaf9270367057d69da8c5752b09ffa5f46d742082f4"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/02-ai-sharing-states-v1.png",
+      "disposition": "原本どおり復元",
+      "priorSha256": "74afaf4776ff657095df1e17204203f5dde0f63b7324f1a7df39dc22fbe25668",
+      "integratedSha256": "74afaf4776ff657095df1e17204203f5dde0f63b7324f1a7df39dc22fbe25668"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/README.md",
+      "disposition": "新版を保持・旧版をhistory-v1.mdへ保存",
+      "priorSha256": "e8fb59593642f0211650bc1892202737bc7bb6fe5ec7e852eac0d31122351e29",
+      "integratedSha256": "d262785911ab2da0eae67451c459174ad3cb313f112ebede95c453148b9f61f0"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/KosugiMaru-Regular.ttf",
+      "disposition": "原本どおり復元",
+      "priorSha256": "4b8d0022c8dadd090ef67cd1f71f130714767af7806cba2eb4ebe4b0271c1d68",
+      "integratedSha256": "4b8d0022c8dadd090ef67cd1f71f130714767af7806cba2eb4ebe4b0271c1d68"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/LICENSE.txt",
+      "disposition": "原本どおり復元",
+      "priorSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "integratedSha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/METADATA.pb",
+      "disposition": "原本どおり復元",
+      "priorSha256": "33c5b54d1c79c02017fd4a132de14cb187fa503fcfdabb156d48fd76b3677b3d",
+      "integratedSha256": "33c5b54d1c79c02017fd4a132de14cb187fa503fcfdabb156d48fd76b3677b3d"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/README.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "3cdebfd1bf8e6c11bf8a6e8de99041145819791f668ad62d99d51a644c91ae81",
+      "integratedSha256": "3cdebfd1bf8e6c11bf8a6e8de99041145819791f668ad62d99d51a644c91ae81"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/noto-sans-jp/METADATA.pb",
+      "disposition": "原本どおり復元",
+      "priorSha256": "5aa23f70fba3eb1afa6d92cb89de3b5c4690018caddbdded678b5e595e56825b",
+      "integratedSha256": "5aa23f70fba3eb1afa6d92cb89de3b5c4690018caddbdded678b5e595e56825b"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/noto-sans-jp/NotoSansJP-Variable.ttf",
+      "disposition": "原本どおり復元",
+      "priorSha256": "c2f3b4d463500a2ddcd3849cded1fceeb9fd6d1c32e6cbecd568453ba50fc68f",
+      "integratedSha256": "c2f3b4d463500a2ddcd3849cded1fceeb9fd6d1c32e6cbecd568453ba50fc68f"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/fonts/noto-sans-jp/OFL.txt",
+      "disposition": "原本どおり復元",
+      "priorSha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9",
+      "integratedSha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    {
+      "file": "docs/product/prototypes/setlog-ui/kosugi-maru-body.html",
+      "disposition": "原本どおり復元",
+      "priorSha256": "ffdb8d4589862262123b8d463a24f61132c80a797c432ff162cab6f73976957e",
+      "integratedSha256": "ffdb8d4589862262123b8d463a24f61132c80a797c432ff162cab6f73976957e"
+    },
+    {
+      "file": "hackathon-pitch/AGENTS.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "d7f88eef6ba1f0d1686da27410fdfe1ee838ab77838c584136e4b7dbaf9a0a3e",
+      "integratedSha256": "d7f88eef6ba1f0d1686da27410fdfe1ee838ab77838c584136e4b7dbaf9a0a3e"
+    },
+    {
+      "file": "hackathon-pitch/README.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "8f9b7525f5f318ca63753b24b0fa3d814fbf051e0ac6c2d33ec5aeefe6235d65",
+      "integratedSha256": "8f9b7525f5f318ca63753b24b0fa3d814fbf051e0ac6c2d33ec5aeefe6235d65"
+    },
+    {
+      "file": "hackathon-pitch/day-of-details.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "f24475ac596f1c8211b3d32109c0d01d6cba120af029623666a1936087850bbd",
+      "integratedSha256": "f24475ac596f1c8211b3d32109c0d01d6cba120af029623666a1936087850bbd"
+    },
+    {
+      "file": "hackathon-pitch/event-open-questions.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "09a3c078bb0fae1989e8dc18fa68651ff19d188a78fcce9c7928ad1703670032",
+      "integratedSha256": "09a3c078bb0fae1989e8dc18fa68651ff19d188a78fcce9c7928ad1703670032"
+    },
+    {
+      "file": "hackathon-pitch/event-rules.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "bb4f4899e6f3548ccbf0b5c4393746567aba2ffc342ef80cbe2fed2b4df19289",
+      "integratedSha256": "bb4f4899e6f3548ccbf0b5c4393746567aba2ffc342ef80cbe2fed2b4df19289"
+    },
+    {
+      "file": "hackathon-pitch/event-sources.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "9bd394a11f73812e69c43933e6cf4752bfbeb31d4d341a535a186cb84a59c24c",
+      "integratedSha256": "9bd394a11f73812e69c43933e6cf4752bfbeb31d4d341a535a186cb84a59c24c"
+    },
+    {
+      "file": "hackathon-pitch/output/slides.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "72993250b0d3a9d9af8df601b167f609aaa6d185c188aced57245fdda45f7c14",
+      "integratedSha256": "72993250b0d3a9d9af8df601b167f609aaa6d185c188aced57245fdda45f7c14"
+    },
+    {
+      "file": "hackathon-pitch/past-winner-reference.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "c1fea8bccabe1a7b9f8b8b39c8ee4d15a2279bee125334460792f00a276c0c10",
+      "integratedSha256": "c1fea8bccabe1a7b9f8b8b39c8ee4d15a2279bee125334460792f00a276c0c10"
+    },
+    {
+      "file": "hackathon-pitch/skill/hackathon-pitch-coach/SKILL.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "ec959360bd97a648adf8e015f6d5aeb81988493f3b882a1368a27487e79a2acf",
+      "integratedSha256": "ec959360bd97a648adf8e015f6d5aeb81988493f3b882a1368a27487e79a2acf"
+    },
+    {
+      "file": "hackathon-pitch/skill/hackathon-pitch-coach/agents/openai.yaml",
+      "disposition": "原本どおり復元",
+      "priorSha256": "2c1dae712b48692521f05bdc93793ff2cde89cba9a33f88097a37ee9ddde492a",
+      "integratedSha256": "2c1dae712b48692521f05bdc93793ff2cde89cba9a33f88097a37ee9ddde492a"
+    },
+    {
+      "file": "hackathon-pitch/start-coach.ps1",
+      "disposition": "原本どおり復元",
+      "priorSha256": "26c2207bcdbedcfa12262381be7f208235b745d4b8bb66a750d3d54846d56ecc",
+      "integratedSha256": "26c2207bcdbedcfa12262381be7f208235b745d4b8bb66a750d3d54846d56ecc"
+    },
+    {
+      "file": "hackathon-pitch/working-draft.md",
+      "disposition": "原本どおり復元",
+      "priorSha256": "9ad95cb31b493c16a75ce35da567b05d20d1721a5f0b5aa0d4f65f002192dd5b",
+      "integratedSha256": "9ad95cb31b493c16a75ce35da567b05d20d1721a5f0b5aa0d4f65f002192dd5b"
+    },
+    {
+      "file": "package.json",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "0d5bc3ffd193393b9dbb76214ae28333171a6d599ebcc570786097a17f2c6688",
+      "integratedSha256": "64339a8d9eb1af9a35e3a08eb9d2d56899415be3f9fd669ae9dc368dd64e55b8"
+    },
+    {
+      "file": "scripts/verify.mjs",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "31b40b6212a4bf2786de0bb35a60be23f39450467fe442bfbee8fa07a6c0e976",
+      "integratedSha256": "3c7a854ad2d4c9aa5de24b302758665e9a54dee06fe5974c74dbbf75c22e4d2a"
+    },
+    {
+      "file": "scripts/verify.test.mjs",
+      "disposition": "新版と差分を統合",
+      "priorSha256": "e3981b092e9b8d4c335fe93f77b57727791bb22a89c7f26e0ea1965cd7d17ad0",
+      "integratedSha256": "6ceb9c04b6b0167b268e9da88612526e139df1d2643964948580ecc81cbae441"
+    }
+  ]
+}

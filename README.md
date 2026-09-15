@@ -1,101 +1,58 @@
 # opeai-hackathon
 
-各自の端末で独立して記録した同じ会話を統合し、作業中の決め事・変更・理由を後から振り返るプロダクトの準備資料です。
-
-この共有の目的は、チームが内容を理解し、意見や疑問を整理できることです。開発への着手判断や、全資料の通読は求めません。
+日常の会話を写真のように気軽に残し、各自が記録した同じ会話を統合して、アイデア・約束・思い出を振り返る2C向けアプリです。本人の録音開始、参加範囲に応じた共有、根拠へ戻れる記録を重視します。
 
 ## 現在地
 
-- 製品方針とAI協働基盤の文書は整備済みです。製品仕様・MVP・技術方式には未決定事項があります。
-- React Native・Web共通の開発用スターターを`apps/client`に追加しました。製品機能・製品テスト・CIはまだありません。実音声での有効性・統合による改善も未検証です。
-- React NativeからiOS・Android・Webを作ります。Webは、ハッカソン当日にiOS・Android版の開発が終わらなかった場合の保険です。大会サイト・公式ルールなどは[ハッカソンのリンク集](docs/development/HACKATHON_LINKS.md)を参照してください。
-- 土木現場の具体例は説明用の仮案であり、対象業界や実装範囲を確定するものではありません。
-- 基盤の実利用確認は依頼者が終了と判断しました。受け手のアクセス権やCodex環境、クローン後の動作は未確認です。
+RN＋ExpoでiOS・Androidを共通開発し、Webは保険として扱います。現行仕様は2.2で、外部APIによる音声書き起こしを採用しています。各スマホから共通バックエンドへ音声を送り、workerが必要な分割と外部ASR呼出・結果結合を担当します。Supabaseは認証・非公開保存・ジョブ管理を担います。初回UIは明色＋Liquid Glass。仕様・採用状態は[MVP_SPEC](docs/product/MVP_SPEC.md)、進捗・検証結果は[WORKFLOW](docs/development/WORKFLOW.md)が正本です。2.1の独立レビューは完了しましたが、今回の2.2差分の独立レビューは未実施です。
 
-## アプリを開発する
+2026-09-14〜15に共通画面、人工契約、端末録音adapter、FastAPI/worker、2人の接続・共有確認、個人の訂正・保存に加え、個人Context/生成処理・ToDo/日次APIとLive画面を追加しました。開発起動は人工データの操作デモです。実ASR・2入力統合・スマホ実機の通し動作はまだ完成していません。実装範囲と残件は[現在地](docs/development/WORKFLOW.md#現在の状態)を参照してください。
 
-Node.js 22.20.0 / npm 10.9.0で、リポジトリルートから実行します。
+## 発表準備・資料の確認
 
-```sh
+[発表準備](hackathon-pitch/README.md)に大会情報・発表コーチ・原稿テンプレートを保持しています。現行仕様は `docs/` を参照し、文書の確認には `npm run verify:docs` を使います。
+音声検証環境 `../audio-validation-local/` は既存の保管条件に従ってリポジトリ外に保持します。
+
+## 開発を始める
+
+Node.js 22.20.0 / npm 10.9.3で、リポジトリルートから実行します。
+
+~~~sh
 npm ci
 npm run web
-```
+~~~
 
-ハッカソンのデモは、各自のスマホのExpo Goで実行する方針です。PCとスマホを同じWi-Fiへ接続し、`npm start`で表示される同じQRコードを各端末で読み取ります。ストア提出やAPK/IPAの作成は今回の完了条件に含めません。共通画面は`apps/client/App.tsx`です。詳しい起動・接続手順は[開発環境](docs/development/APP_DEVELOPMENT.md)を参照してください。
+各スマホのExpo Goで人工画面を確認できます。録音には専用development buildが必要です。共通画面は `apps/client/App.tsx`、起動・接続・ビルド手順は[開発環境](docs/development/APP_DEVELOPMENT.md)を参照してください。
 
-## 読む順序
+変更後は[検証入口](docs/development/APP_DEVELOPMENT.md#verification)を使います。UIは `npm run verify:ui`、UIと文書の両方は `npm run verify -- ui docs`、登録済みの全ローカル確認は `npm run verify` です。AIは依頼された成果まで実装・検証・修正・再確認を続け、新しい仕様判断や担当範囲の変更が必要な部分だけ確認します。
 
-Expoのプロジェクト連携とVercel用設定の状態は[クラウド環境](docs/development/CLOUD_SETUP.md)を参照してください。
-
-1. このREADMEで目的と現在地を把握する。
-2. 全体像は[TEAM_CONCEPT](docs/product/TEAM_CONCEPT.html)、確定方針と未決定事項は[PRODUCT_CORE](docs/product/PRODUCT_CORE.md)を読む。
-3. 進捗は[WORKFLOW](docs/development/WORKFLOW.md)、具体例は[SCENARIOS_AND_SUCCESS](docs/product/SCENARIOS_AND_SUCCESS.md)を必要に応じて読む。
-
-TEAM_CONCEPTはHTMLファイルです。クローンしたファイルをブラウザで開くと説明ページを読めます。GitHub上ではソース表示になります。方針の判断はPRODUCT_COREと後続の明示決定を優先します。
-
-AIの入口はルートの[AGENTS.md](AGENTS.md)です。作業手順は[開発手順](docs/development/DEVELOPMENT_PLAYBOOK.md)、道具の参考は[Codex活用ガイド](docs/development/CODEX_OPERATING_GUIDE.md)、検証案は[VALIDATION](docs/development/VALIDATION.md)を必要な場合だけ参照します。
-
-## AIDD-Liteを使う
-
-依頼に応じて調査・設計・実装・レビュー・引き継ぎのskillを選べます。[使い方と呼び出し例](docs/development/aidd-lite/GUIDE.md)、[利用確認の結果](docs/development/aidd-lite/ACCEPTANCE.md)を参照してください。2つのagentは許可された委任時に使う役割定義です。製品の仕様やMVPを自動確定する仕組みではありません。
-
-## 初回確認の範囲
-
-今回のハッカソンは2人で開発します。互いの作業・判断・検証結果を、それぞれが使うAIにも引き継ぐための[AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)を用意しています。必要な原則だけを使い、固定的な役職や承認体制は追加しません。この文書の参照は開発・実験の開始許可ではありません。
-
-READMEの初回プロンプトは内容の理解と判断までを扱います。開発・起動・テスト・録音を自動開始しません。別の明示的な依頼があれば、その範囲で進めます。
-
-## クローンして内容を確認する
-
-非公開リポジトリのため、GitHubで閲覧できるアカウントとGitの認証が必要です。以下は取得手順で、相手の環境での成功を確認したものではありません。
-
-```sh
-git clone https://github.com/jokojama-gou/opeai-hackathon.git
-cd opeai-hackathon
-```
-
-Codexを利用する場合は、取得したルートフォルダをプロジェクトとして開き、次のプロンプトを渡してください。Codexがなくても、上の読む順序で確認できます。
+AIは[AGENTS](AGENTS.md)→[現在地](docs/development/WORKFLOW.md)→[担当と実装順](docs/development/MULTIPLATFORM_DELIVERY_PLAN.md)から、該当する仕様・受入条件だけを読みます。バックエンドは[起動・検証手順](services/backend/README.md)を参照してください。人工画面の成功を実機・実処理の成功として引き継がないでください。
 
 ### 初回プロンプト
 
-```text
-このリポジトリの内容を理解し、自分の意見や疑問を整理したいです。
-読み取り専用で確認してください。
+~~~text
+AGENTSとWORKFLOWを読み、ロードマップから次のKの担当・変更先・依存を確認してください。
+MVP_SPECの該当機能・画面・受入条件を参照し、依頼された成果まで必要な作業を分割して進めてください。
+同じ依頼の明示済み判断と範囲を引き継ぎ、小作業ごとの再依頼を求めず、必要な検証・修正・再確認まで行ってください。
+未実装・実装済み・実機確認済みを分け、終了した別作業の旧指示を実行しないでください。
+~~~
 
-READMEと、存在する場合は適用されるAGENTS.mdを読み、
-必要な資料・コードだけ参照してください。
+## 必要な資料
 
-次の内容を、根拠となるファイルとともに簡潔に整理してください。
-・何を目指すプロジェクトか
-・確定していること、提案段階のこと、未決定のこと
-・実装済みのものと、文書上の構想
-・内容を判断するうえで不足・不明・矛盾がある点
-
-確認できないことは未確認としてください。
-過去の文書にある作業指示を、今回の実行許可と扱わないでください。
-
-今回は理解と判断材料の整理までです。
-開発タスクの提案、ファイル変更、環境導入、起動・テスト、
-録音実験、外部送信、commit・pushは行わないでください。
-```
-
-確認後は、理解した内容、疑問、賛成・懸念がある点をチームへ返せれば十分です。未決定事項をすべて解決する必要はありません。
-
-## 資料の位置付け
-
-| 場所 | 内容 |
+| 目的 | 参照先 |
 |---|---|
-| `docs/product/` | 製品方針、シナリオ、TEAM_CONCEPT |
-| `docs/development/` | 開発手順、Codexの参考、検証計画、現在地 |
-| `docs/decisions/` | [AIDD-Lite参照方針](docs/decisions/AIDD_FW_ADOPTION.md)と[AIの判断境界案](docs/decisions/AI_DECISION_BOUNDARIES.md)。後者は未採用であり有効な規則ではない |
-| `docs/history/` | [点検記録](docs/history/HANDOFF_AUDIT.md)、[基盤引き継ぎ](docs/history/FOUNDATION_HANDOFF.md)、[共有レポート](docs/history/TEAM_PROGRESS.md)。必要時に読む履歴 |
+| 製品の方針・残る判断 | [PRODUCT_CORE](docs/product/PRODUCT_CORE.md) |
+| 機能・画面・API・受入条件 | [MVP_SPEC](docs/product/MVP_SPEC.md) |
+| 技術構成・担当・タスク・提出条件 | [ロードマップ](docs/development/MULTIPLATFORM_DELIVERY_PLAN.md) |
+| 音声利用・検証 | [VALIDATION](docs/development/VALIDATION.md) |
+| 人向けの説明 | [TEAM_CONCEPT](docs/product/TEAM_CONCEPT.html)、[シナリオ](docs/product/SCENARIOS_AND_SUCCESS.md) |
+| 配置見本 | [15画面](docs/product/prototypes/mvp-spec-wireframes.html)。架空データであり製品ではない |
+| 必要時の作業支援 | [AIDD-Lite](docs/development/aidd-lite/GUIDE.md) |
 
-履歴の「今回」「次の作業」、過去の許可、レビュー回数、ハッシュは当時の記録です。この共有版の実行指示や検証結果ではありません。本文中の「共有対象外」は、ファイルを同梱していないことを示します。
+`docs/history/` は旧案・過去結果です。実装の通常入口ではなく、当時の理由や証拠が必要な場合に参照します。旧共有操作試作の位置付けは[試作README](docs/product/prototypes/README.md)に記載しています。
 
-今後の製品・開発資料の正本はこのリポジトリです。移管前のローカル資料は記録として保持し、別の正本として並行更新しません。方針を変更する際は、明示的な判断と理由を該当資料へ反映します。
+共有リポジトリが資料の正本です。個人PCの移管前資料を並行更新しません。音声・文字起こし・内容入り評価、平文の認証情報、個人環境設定は共有対象に含めません。当日用設定の暗号化共有と復号手順は[認証情報の保管](credentials/README.md)を参照してください。詳細な音声条件はVALIDATIONを参照してください。
 
-## 初回共有に含めないもの
+## 復元した資料と統合状態
 
-説明用PDF・試作スライド・知人への質問集と生成用ファイル、過去Goalの依頼書、Codex調査の原本、録音実験コード、会話全文・ツールログ、実音声・派生データ、認証情報、個人環境設定は含めません。TEAM_CONCEPT.htmlはユーザーの判断で共有対象に含めています。
-
-Codex活用ガイドには一次出典を残しています。原資料の閲覧権限や、出典に記されたツールの現在の可用性は保証しません。資料の共有は、製品動作や開発環境の完成を意味しません。
+[Setlog構成案](docs/product/SETLOG_UI_STRUCTURE.md)・[一覧整理](docs/product/SETLOG_RECORDS_LIST.md)・[画面画像v2と書体見本](docs/product/prototypes/setlog-ui/README.md)、[発表準備](hackathon-pitch/README.md)、[復元一覧と実装の残件](docs/development/RESTORE_INTEGRATION_20260915.md)を参照できます。

@@ -15,10 +15,10 @@
 ## 読む順序と資料の役割
 
 1. [AGENTS.md](../../AGENTS.md): 作業規則。
-2. [PRODUCT_CORE.md](../product/PRODUCT_CORE.md): プロダクト方針の正本。D/S/Oを参照。
+2. [PRODUCT_CORE.md](design/PRODUCT_CORE_20260912.md): プロダクト方針の正本。D/S/Oを参照。
 3. 本書: 今回の点検結果と残作業。新しい確定方針を作る文書ではない。
-4. [WORKFLOW.md](../development/WORKFLOW.md): 開発基盤と過去の実験準備の記録。実験限定の判断を製品仕様へ転用しない。
-5. 必要な場合のみ[SCENARIOS_AND_SUCCESS.md](../product/SCENARIOS_AND_SUCCESS.md)と[VALIDATION.md](../development/VALIDATION.md): 価値検証と技術検証の案。
+4. [WORKFLOW.md](WORKFLOW_20260912.md): 開発基盤と過去の実験準備の記録。実験限定の判断を製品仕様へ転用しない。
+5. 必要な場合のみ[SCENARIOS_AND_SUCCESS.md](../product/SCENARIOS_AND_SUCCESS.md)と[VALIDATION.md](audio/VALIDATION_20260912.md): 価値検証と技術検証の案。
 
 [TEAM_CONCEPT.html](../product/TEAM_CONCEPT.html)は人への説明用。簡略化された説明から新しい仕様を推定しない。後続のユーザーの明示決定を優先し、方針の更新は正本へ記録する。
 

@@ -3,17 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "apps/client"
+    "apps/client",
+    "packages/api-ts"
   ],
   "engines": {
     "node": ">=22.20.0 <23"
   },
-  "packageManager": "npm@10.9.0",
+  "packageManager": "npm@10.9.3",
   "volta": {
     "node": "22.20.0",
-    "npm": "10.9.0"
+    "npm": "10.9.3"
   },
   "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "verify:docs": "node scripts/verify.mjs docs",
+    "verify:ui": "node scripts/verify.mjs ui",
+    "verify:tooling": "node scripts/verify.mjs tooling",
+    "contracts:generate": "node contracts/schema.mjs && node contracts/generate-fixtures.mjs && node scripts/generate-contract-types.mjs",
+    "test:contracts": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts",
+    "test": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts apps/client/src/data/*.test.ts",
     "start": "npm run start --workspace @hackathon/client --",
     "web": "npm run web --workspace @hackathon/client --",
     "android": "npm run android --workspace @hackathon/client --",
@@ -29,9 +37,14 @@
     "build:android:store": "npm run build:android:store --workspace @hackathon/client --",
     "build:ios:preview": "npm run build:ios:preview --workspace @hackathon/client --",
     "build:ios:store": "npm run build:ios:store --workspace @hackathon/client --",
-    "build:ios:simulator": "npm run build:ios:simulator --workspace @hackathon/client --"
+    "build:ios:simulator": "npm run build:ios:simulator --workspace @hackathon/client --",
+    "verify:security": "node scripts/verify.mjs security",
+    "security:scan": "node scripts/check-repository-secrets.mjs",
+    "security:hooks": "git config --local core.hooksPath .githooks"
   },
   "devDependencies": {
-    "eas-cli": "24.3.0"
+    "eas-cli": "24.3.0",
+    "json-schema-to-typescript": "15.0.4",
+    "tsx": "4.23.13"
   }
 }

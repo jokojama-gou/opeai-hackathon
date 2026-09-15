@@ -37,4 +37,8 @@ expo-env.d.ts
 /scripts/
 /.agents/
 /.codex/
+/.githooks/
 /AGENTS.md
+/credentials/
+/services/
+/supabase/

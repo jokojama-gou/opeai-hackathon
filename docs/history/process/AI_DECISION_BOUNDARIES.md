@@ -1,10 +1,14 @@
+<!-- archive: historical evidence; not current implementation instructions -->
+
+> 履歴資料。2026-09-13に現行入口から分離。本文は当時の判断・状態であり、現在の実装指示ではありません。現行入口は[AGENTS](../../../AGENTS.md)。
+
 # AIへ任せる判断と、人が決める判断
 
 > 共有版（2026-09-11）。旧企画資料から参照先を整理して移管しました。今後の正本はこのリポジトリです。元のローカル資料は移管前の記録として保持し、並行更新しません。
 
 版: 0.1 / 2026-09-11
 状態: 提案・未採用。今回許可されたのはこの境界案の作成。実装や包括的な委任の承認ではない。
-関連: [AGENTS.md](../../AGENTS.md)、[PRODUCT_CORE.md](../product/PRODUCT_CORE.md)、[HANDOFF_AUDIT.md](../history/HANDOFF_AUDIT.md)のU8。
+関連: [AGENTS.md](../../../AGENTS.md)、[PRODUCT_CORE.md](../design/PRODUCT_CORE_20260912.md)、[HANDOFF_AUDIT.md](../HANDOFF_AUDIT.md)のU8。
 
 ## 目的
 

@@ -1,0 +1,841 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hackathon.invalid/contracts/mvp-v1.schema.json",
+  "title": "MvpFixture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "case_id",
+    "viewer_id",
+    "now",
+    "scenarios"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "mvp-2.2-k01-v1"
+    },
+    "case_id": {
+      "type": "string",
+      "enum": [
+        "duplicate",
+        "conflict",
+        "pending",
+        "expired"
+      ]
+    },
+    "viewer_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "now": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Scenario"
+      },
+      "minItems": 1
+    }
+  },
+  "definitions": {
+    "Recording": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "owner_id",
+        "installation_id",
+        "mode",
+        "duration_ms",
+        "stopped_at",
+        "capture_status",
+        "upload_status",
+        "audio_expires_at",
+        "text_expires_at",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "installation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "group"
+          ]
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 300000
+        },
+        "stopped_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "capture_status": {
+          "type": "string",
+          "enum": [
+            "idle",
+            "recording",
+            "stopping",
+            "saved",
+            "interrupted",
+            "save_failed"
+          ]
+        },
+        "upload_status": {
+          "type": "string",
+          "enum": [
+            "local",
+            "uploading",
+            "uploaded",
+            "transcribing",
+            "ready",
+            "failed",
+            "empty"
+          ]
+        },
+        "audio_expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "text_expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "Source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "recording_id",
+        "original_text",
+        "start_ms",
+        "end_ms",
+        "timing_quality",
+        "speaker_label",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recording_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "original_text": {
+          "type": "string"
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "end_ms": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timing_quality": {
+          "type": "string",
+          "enum": [
+            "estimated",
+            "unknown"
+          ]
+        },
+        "speaker_label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "source_version",
+        "char_start",
+        "char_end",
+        "start_ms",
+        "end_ms"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "char_start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "char_end": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_ms": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "end_ms": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ScriptItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "evidence_refs",
+        "uncertainty",
+        "order_status",
+        "speaker_label"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "duplicate",
+            "single",
+            "conflict"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EvidenceRef"
+          },
+          "minItems": 1
+        },
+        "uncertainty": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "order_status": {
+          "type": "string",
+          "enum": [
+            "aligned",
+            "unknown"
+          ]
+        },
+        "speaker_label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "Highlight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "section",
+        "text",
+        "interpretation",
+        "utterance_ids"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "enum": [
+            "content",
+            "reasons",
+            "decisions",
+            "unresolved"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "interpretation": {
+          "type": "boolean"
+        },
+        "utterance_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "Conversation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "mode",
+        "revision",
+        "access_revision",
+        "status",
+        "script",
+        "highlights",
+        "confirmation_reason"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "group"
+          ]
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "access_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "processing",
+            "ready",
+            "needs_confirmation",
+            "failed",
+            "stale"
+          ]
+        },
+        "script": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ScriptItem"
+          }
+        },
+        "highlights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Highlight"
+          }
+        },
+        "confirmation_reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "alignment_unresolved",
+                "attribution_disputed",
+                "scope_changed"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ConnectionSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "connection_id",
+        "status",
+        "expires_at",
+        "peer_display",
+        "verification_code",
+        "match_id",
+        "match_version",
+        "scope_id",
+        "scope_version",
+        "own_selection",
+        "confirmation_states",
+        "share_states",
+        "continuing_state",
+        "conversation_id",
+        "job_id",
+        "next_actions"
+      ],
+      "properties": {
+        "connection_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "peer_display": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "verification_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "match_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "match_version": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scope_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scope_version": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "own_selection": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EvidenceRef"
+          }
+        },
+        "confirmation_states": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "disputed"
+            ]
+          }
+        },
+        "share_states": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "allowed",
+              "rejected",
+              "expired",
+              "revoked"
+            ]
+          }
+        },
+        "continuing_state": {
+          "type": "string",
+          "enum": [
+            "inactive",
+            "mutual_active",
+            "revoked"
+          ]
+        },
+        "conversation_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "job_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "Job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "stage",
+        "attempts",
+        "error_code",
+        "retryable",
+        "result_revision"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "processing",
+            "ready",
+            "failed",
+            "stale",
+            "needs_confirmation"
+          ]
+        },
+        "stage": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "result_revision": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "ProcessingPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_version",
+        "destinations",
+        "descriptions",
+        "transcription_configured",
+        "generation_configured"
+      ],
+      "properties": {
+        "policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "destinations": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pc_audio_transfer",
+            "external_audio_transcription",
+            "external_text_generation"
+          ],
+          "properties": {
+            "pc_audio_transfer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "external_audio_transcription": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "external_text_generation": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "descriptions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pc_audio_transfer",
+            "external_audio_transcription",
+            "external_text_generation"
+          ],
+          "properties": {
+            "pc_audio_transfer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "external_audio_transcription": {
+              "type": "string",
+              "minLength": 1
+            },
+            "external_text_generation": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "transcription_configured": {
+          "type": "boolean"
+        },
+        "generation_configured": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Scenario": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "kind",
+        "response_status",
+        "recordings",
+        "sources",
+        "conversation",
+        "connection",
+        "expected"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "personal",
+            "shared",
+            "pending"
+          ]
+        },
+        "response_status": {
+          "type": "integer",
+          "enum": [
+            200,
+            404,
+            410
+          ]
+        },
+        "recordings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Recording"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Source"
+          }
+        },
+        "conversation": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Conversation"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "connection": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ConnectionSnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "script_count",
+            "source_count",
+            "audio_available",
+            "next_screen"
+          ],
+          "properties": {
+            "script_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "source_count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "audio_available": {
+              "type": "boolean"
+            },
+            "next_screen": {
+              "type": "string",
+              "enum": [
+                "U03",
+                "U04",
+                "U06"
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

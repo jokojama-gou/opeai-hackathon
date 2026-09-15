@@ -8,8 +8,12 @@ npm-debug.*
 .env
 .env.*
 !.env.example
+# Credentials stay outside Git, including private repositories.
 .DS_Store
 credentials.json
+credentials/*
+!credentials/README.md
+!credentials/*.enc.json
 *.keystore
 *.jks
 *.p8
@@ -18,3 +22,6 @@ credentials.json
 *.ipa
 *.apk
 *.aab
+__pycache__/
+.pytest_cache/
+.venv/

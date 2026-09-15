@@ -8,7 +8,7 @@
 
 ## 再開する人・AIへ
 
-まず[AGENTS.md](../../AGENTS.md)を読み、現在の依頼を確認する。日々の進め方は[DEVELOPMENT_PLAYBOOK.md](../development/DEVELOPMENT_PLAYBOOK.md)の必要節、道具は[CODEX_OPERATING_GUIDE.md](../development/CODEX_OPERATING_GUIDE.md)。製品判断がある場合だけ[PRODUCT_CORE.md](../product/PRODUCT_CORE.md)と関連資料を読む。
+まず[AGENTS.md](../../AGENTS.md)を読み、現在の依頼を確認する。日々の進め方は[DEVELOPMENT_PLAYBOOK.md](process/DEVELOPMENT_PLAYBOOK.md)の必要節、道具は[CODEX_OPERATING_GUIDE.md](../development/CODEX_OPERATING_GUIDE.md)。製品判断がある場合だけ[PRODUCT_CORE.md](design/PRODUCT_CORE_20260912.md)と関連資料を読む。
 
 新しい会話用の依頼例（まだ実利用試験していない）：
 

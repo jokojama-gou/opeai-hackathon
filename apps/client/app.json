@@ -28,6 +28,18 @@
         "projectId": "143962b8-7d31-413d-9b43-74ea32106cff"
       }
     },
-    "owner": "yokoyamago"
+    "owner": "yokoyamago",
+    "plugins": [
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "会話を記録するためにマイクを使用します。録音は自分で開始・停止できます。",
+          "enableBackgroundRecording": true,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      ["expo-secure-store", { "configureAndroidBackup": false }],
+      "./plugins/with-recording-backup-exclusion.cjs"
+    ]
   }
 }
