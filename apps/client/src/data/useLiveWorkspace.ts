@@ -94,6 +94,7 @@ export function useLiveWorkspace() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<Job | null>(null);
   const [screen, setScreen] = useState<
+    | "room"
     | "records"
     | "recording"
     | "personal"
@@ -101,7 +102,7 @@ export function useLiveWorkspace() {
     | "saved"
     | "today"
     | "todos"
-  >("today");
+  >("recording");
   const [active, setActive] = useState(AppState.currentState === "active");
   const network = useNetworkState();
   const connected = network.isConnected !== false && active;
@@ -272,7 +273,7 @@ export function useLiveWorkspace() {
     visibility.invalidate();
     sessionRef.current = result;
     setSession(result);
-    setScreen("today");
+    setScreen("recording");
   }
   async function readSources(id: string) {
     if (!api || !connected) return;

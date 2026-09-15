@@ -142,11 +142,6 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
             .toString()
             .padStart(2, "0")}
         </Text>
-        {w.capture.durationMs >= 270000 && (
-          <Text accessibilityRole="alert" style={styles.body}>
-            残り30秒以内です。5分で自動停止します。
-          </Text>
-        )}
         <Text style={styles.body}>
           周りの人に、会話を記録することを伝えてください。録音は5分までです。
         </Text>
@@ -180,6 +175,41 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
           </Text>
         )}
       </GlassSurface>
+    );
+  else if (w.screen === "room")
+    body = (
+      <>
+        <Card>
+          <Heading>自分の記録</Heading>
+          <Text style={styles.body}>自分で残した会話を振り返れます。</Text>
+          <Button
+            label="自分の記録を開く"
+            onPress={() => w.setScreen("records")}
+          />
+        </Card>
+        <Empty
+          title="相手のルームは準備中です"
+          body="会話を持ち寄る操作は、自分の記録の「一緒にまとめる」から進められます。"
+        />
+        <Card>
+          <Heading>振り返る</Heading>
+          <Button
+            label="保存したもの"
+            secondary
+            onPress={() => w.setScreen("saved")}
+          />
+          <Button
+            label="日付から振り返る"
+            secondary
+            onPress={() => w.setScreen("today")}
+          />
+          <Button
+            label="ToDoを確認"
+            secondary
+            onPress={() => w.setScreen("todos")}
+          />
+        </Card>
+      </>
     );
   else if (w.screen === "saved")
     body = w.connected ? (
@@ -438,22 +468,32 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
     <View style={styles.page}>
       <View style={{ padding: 16, gap: 10 }}>
         <View style={[styles.row, { flexWrap: "wrap" }]}>
+          {w.session && (
+            <Button
+              label="設定"
+              secondary
+              disabled={w.recordingActive}
+              onPress={() => w.setScreen("settings")}
+            />
+          )}
           <Heading>
             {!w.session
               ? "会話の記録"
               : w.screen === "personal"
                 ? "自分の記録"
                 : w.screen === "recording"
-                  ? "記録中"
+                  ? "録音"
                   : w.screen === "settings"
                     ? "設定"
                     : w.screen === "saved"
                       ? "保存"
                       : w.screen === "today"
-                        ? "今日"
+                        ? "日付から振り返る"
                         : w.screen === "todos"
                           ? "ToDo"
-                          : "記録"}
+                          : w.screen === "room"
+                            ? "ルーム"
+                            : "記録"}
           </Heading>
           <View style={{ flex: 1 }} />
           {w.session && (
@@ -465,17 +505,11 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
                   onPress={() => w.setScreen("todos")}
                 />
               )}
-              <Button
-                label="設定"
-                secondary
-                disabled={w.recordingActive}
-                onPress={() => w.setScreen("settings")}
-              />
-              {(w.screen === "personal" || w.screen === "recording") && (
+              {w.screen !== "room" && w.screen !== "recording" && (
                 <Button
-                  label="記録へ"
+                  label="ルームへ"
                   secondary
-                  onPress={() => w.setScreen("records")}
+                  onPress={() => w.setScreen("room")}
                 />
               )}
             </>
@@ -530,16 +564,14 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
           <View style={{ flexDirection: "row", gap: 8 }}>
             {(
               [
-                ["today", "今日"],
-                ["records", "記録"],
-                ["saved", "保存"],
+                ["recording", "録音"],
+                ["room", "ルーム"],
               ] as const
             ).map(([screen, label]) => {
               const selected =
-                w.screen === screen ||
-                (screen === "today" && w.screen === "todos") ||
-                (screen === "records" &&
-                  ["personal", "recording"].includes(w.screen));
+                screen === "recording"
+                  ? w.screen === "recording"
+                  : w.screen !== "recording";
               return (
                 <Pressable
                   key={screen}
