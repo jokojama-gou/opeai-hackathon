@@ -7,7 +7,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $coachRoot = $PSScriptRoot
-$skillPath = Join-Path $coachRoot 'skill/hackathon-pitch-coach/SKILL.md'
+$skillPath = Join-Path (Split-Path $coachRoot -Parent) '.agents/skills/hackathon-pitch-coach/SKILL.md'
 $requiredFiles = @('AGENTS.md', 'event-rules.md', 'event-open-questions.md', 'day-of-details.md', 'working-draft.md')
 foreach ($fileName in $requiredFiles) {
     if (-not (Test-Path -LiteralPath (Join-Path $coachRoot $fileName) -PathType Leaf)) {

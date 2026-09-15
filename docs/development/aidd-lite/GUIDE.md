@@ -9,6 +9,7 @@
 | 実装・修正 | [implement](../../../.agents/skills/aidd-lite-implement/SKILL.md) |
 | レビュー | [review](../../../.agents/skills/aidd-lite-review/SKILL.md) |
 | 引き継ぎ | [handoff](../../../.agents/skills/aidd-lite-handoff/SKILL.md) |
+| 発表準備 | [発表コーチ](../../../.agents/skills/hackathon-pitch-coach/SKILL.md)。資料・原稿は[発表準備](../../../hackathon-pitch/README.md)に保持 |
 
 名前で選べない場合は対象SKILL.mdを明示して読ませます。全skillの連続実行・追加インストール・全資料通読は不要です。[製品チェック索引](PROJECT_CHECKS.md)から該当受入条件へ進みます。
 

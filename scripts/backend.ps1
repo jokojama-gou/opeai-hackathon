@@ -6,6 +6,11 @@ $ErrorActionPreference = 'Stop'
 $taskRepoRoot = Split-Path $PSScriptRoot -Parent
 $taskVenv = Join-Path $taskRepoRoot '.npm-cache/backend-venv'
 $taskPython = Join-Path $taskVenv 'Scripts/python.exe'
+$taskMediaRoot = Join-Path $taskRepoRoot '.npm-cache/tools/ffmpeg'
+if (Test-Path -LiteralPath $taskMediaRoot) {
+  $taskProbe = Get-ChildItem -LiteralPath $taskMediaRoot -Filter ffprobe.exe -Recurse -File | Select-Object -First 1
+  if ($taskProbe) { $env:PATH = $taskProbe.DirectoryName + ';' + $env:PATH }
+}
 if ($Task -eq 'setup') {
   if (-not (Test-Path -LiteralPath $taskPython)) {
     & $Python -m venv $taskVenv

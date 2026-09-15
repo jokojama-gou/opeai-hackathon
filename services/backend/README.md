@@ -1,6 +1,6 @@
 # Backend development
 
-MVP 2.2のFastAPI、Python worker、Supabaseの認証・非公開保存adapter。実装と残件の正本は[WORKFLOW](../../docs/development/WORKFLOW.md)。実データの扱いは[VALIDATION](../../docs/development/VALIDATION.md#音声の利用処理条件)を参照する。
+FastAPI、Python worker、Supabaseの認証・非公開保存adapter。現行コードにはMVP 2.2の同意前提が残り、採用仕様2.4への移行は未完。実装と残件の正本は[WORKFLOW](../../docs/development/WORKFLOW.md)。実データの扱いは[VALIDATION](../../docs/development/VALIDATION.md#音声の利用処理条件)を参照する。
 
 ## 人工データで確認する
 
@@ -18,10 +18,12 @@ macOS等では、このディレクトリで仮想環境を作り、`pip install
 
 ## 実サービスの準備と起動
 
-1. ローカルSupabaseを起動できるDocker環境とSupabase CLIを用意する。設定は[config.toml](../../supabase/config.toml)、初期DDLは[migration](../../supabase/migrations/202609140001_mvp_storage.sql)。既存DBへ適用する前にその状態を照合する。今回、このPCではDockerを検出できず、DB適用は未実行。
+2026-09-15、このPCではDocker/Supabase・2アカウント・ffprobe・HTTPSを準備し、人工音声のAuth/DB/Storage往復を確認済み。[結果と再起動方法](../../docs/development/LOCAL_CONNECTION_PREP.md)を参照する。実機・ASRの完了とはしない。
+
+1. ローカルSupabaseを起動できるDocker環境とSupabase CLIを用意する。設定は[config.toml](../../supabase/config.toml)、初期DDLは[migration](../../supabase/migrations/202609140001_mvp_storage.sql)。このPCの新規ローカルDBには適用済み。別の既存DBへ適用する前にその状態を照合する。
 2. Supabase側で開発用の2アカウントを用意する。製品APIは新規登録・管理者操作を提供しない。
-3. [.env.example](.env.example)を参考に、このディレクトリのGit除外された `.env` に接続設定を入れる。プロセスの環境変数が優先。`UPLOAD_TICKET_SECRET` は32文字以上のランダム値。PC転送の同意に表示する `PC_DESTINATION_ID` も実際の送信先を指定する。rootの音声APIキーは自動では読み込まない。
-4. 実音声の受入前に、`ffprobe` をPATHへ配置する。現在の形式検査はAAC、48kHz、mono、25MiB以下、5分以下。ffprobeは今回のPCでは未検出。音声変換・分割・ASR呼出は別のworker処理として接続する。
+3. [.env.example](.env.example)を参考に、このディレクトリのGit除外された `.env` に接続設定を入れる。プロセスの環境変数が優先。`UPLOAD_TICKET_SECRET` は32文字以上のランダム値。PC転送の同意に表示する `PC_DESTINATION_ID` も実際の送信先を指定する。音声APIキーの暗号化保管庫は自動では読み込まない。
+4. 実音声の受入前に、`ffprobe` をPATHへ配置する。現在の形式検査はAAC、48kHz、mono、25MiB以下、5分以下。このPCでは `backend.ps1` がローカルのffprobeを検出する。音声変換・分割・ASR呼出は別のworker処理として接続する。
 5. 次の2プロセスを起動する。
 
 ```powershell
