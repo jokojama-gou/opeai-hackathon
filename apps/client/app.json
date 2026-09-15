@@ -22,6 +22,12 @@
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
       "output": "single"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "143962b8-7d31-413d-9b43-74ea32106cff"
+      }
+    },
+    "owner": "yokoyamago"
   }
 }

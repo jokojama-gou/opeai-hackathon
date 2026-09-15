@@ -1,6 +1,7 @@
 # Dependencies and local/generated files
 node_modules/
 .expo/
+.vercel/
 dist/
 .npm-cache/
 *.tsbuildinfo

@@ -21,9 +21,11 @@ npm ci
 npm run web
 ```
 
-スマホ向けは`npm start`。単体のAndroid APKはExpo初回連携後に`npm run build:android:apk`で作成できます。iOS・ストア向けの設定も用意しています。共通画面は`apps/client/App.tsx`です。初回のアカウント・署名設定、実機・エミュレーターの前提、型チェック、ビルド手順は[開発環境](docs/development/APP_DEVELOPMENT.md)を参照してください。
+ハッカソンのデモは、各自のスマホのExpo Goで実行する方針です。PCとスマホを同じWi-Fiへ接続し、`npm start`で表示される同じQRコードを各端末で読み取ります。ストア提出やAPK/IPAの作成は今回の完了条件に含めません。共通画面は`apps/client/App.tsx`です。詳しい起動・接続手順は[開発環境](docs/development/APP_DEVELOPMENT.md)を参照してください。
 
 ## 読む順序
+
+Expoのプロジェクト連携とVercel用設定の状態は[クラウド環境](docs/development/CLOUD_SETUP.md)を参照してください。
 
 1. このREADMEで目的と現在地を把握する。
 2. 全体像は[TEAM_CONCEPT](docs/product/TEAM_CONCEPT.html)、確定方針と未決定事項は[PRODUCT_CORE](docs/product/PRODUCT_CORE.md)を読む。
