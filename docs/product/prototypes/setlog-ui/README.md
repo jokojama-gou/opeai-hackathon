@@ -1,14 +1,14 @@
-# Setlog参考案：画面画像 v2
+# Setlogの参考画像とOS別デザインへの参照
 
-2026-09-15。ユーザーの「変更があった分の画像のページは作り直して」に対応した、架空データによるデザイン検討用の静止画。既存MVPの画面とは別に管理する。
+2026-09-15更新。以下は架空データによる既存の画像v2と検討履歴。機能/配置の正本は[MVP_SPEC §4](../../MVP_SPEC.md#ui-rules)、OS別の具体値・部品・動き・画像優先順位は[§18](../../MVP_SPEC.md#platform-design)。iOS/Androidの完成見本は[ロードマップ](../../../development/MULTIPLATFORM_DELIVERY_PLAN.md#platform-design-tasks)に従ってこれから制作/確認する。
 
 [個人記録の一覧整理方針](../../SETLOG_RECORDS_LIST.md)を反映した。本文はKosugi Maru Regular（400）、見出し・記録名はNoto Sans JP SemiBold（600）を指定して再生成した。書体変更が全8画面に関わるため、既存の2枚構成を維持して両方をv2に更新した。
 
-## 録音の動く見本
+## 録音素材の参照と旧見本
 
-現在の画像提案：[C / DREAM TAPE](recording-dream-tape-v1/README.md)。ユーザーがCのカセットを選択し、夢やワクワクする要素を追加。白・淡いミント・丸い操作を土台に、透明なケース内へ星・雲・朝焼けを閉じ込めた。具体表現は検討案で、現在の動く見本は保持する。[3案の比較v2](recording-pop-concepts-v2/README.md)と[先行案v1](recording-pop-concepts-v1/README.md)は検討履歴として残す。
+U02の最初の素材制作見本：[C / DREAM TAPE](recording-dream-tape-v1/README.md)。ユーザーがCのカセットを選択し、夢やワクワクする要素を追加。白・淡いミント・丸い操作を土台に、透明なケース内へ星・雲・朝焼けを閉じ込めた。具体表現は実装見本で確認する。旧立体オブジェクトの動く見本は状態比較の履歴であり、完成するカセットの形/配置/動きの基準にはしない。[3案の比較v2](recording-pop-concepts-v2/README.md)と[先行案v1](recording-pop-concepts-v1/README.md)は検討履歴として残す。
 
-2026-09-15追加：[声でゆれる立体の見本](recording-motion-v1.html)。疑似音量3段階、開始・停止・保存・失敗・中断を操作できる。本文と見出しは同梱の実フォントで表示する。[起動手順・画面画像・確認結果](recording-motion-v1/README.md)を参照。以下の画像v2は比較用に保持する。
+旧状態比較用の見本：[声でゆれる立体の見本](recording-motion-v1.html)。疑似音量3段階、開始・停止・保存・失敗・中断を操作できる。本文と見出しは同梱の実フォントで表示する。[起動手順・画面画像・確認結果](recording-motion-v1/README.md)を参照。マイク/立体/波形の形と、300ms/900msの疑似成功待ちは製品へ移植しない。以下の画像v2は録音以外の情報階層の比較用に保持する。
 
 ## 既存の画像v2
 
@@ -159,4 +159,4 @@ Return one complete final board with all four screens, not a crop.
 
 ## 構成・書体と旧版への参照
 
-[構成案](../../SETLOG_UI_STRUCTURE.md)、[一覧整理](../../SETLOG_RECORDS_LIST.md)、[実フォントの見本](kosugi-maru-body.html)、[フォントとライセンス](fonts/README.md)、[v1の画像・生成指示](history-v1.md)を同じリポジトリ内に保持する。現在の画面案は本ページのv2。
+[構成案](../../SETLOG_UI_STRUCTURE.md)、[一覧整理](../../SETLOG_RECORDS_LIST.md)、[実フォントの見本](kosugi-maru-body.html)、[フォントとライセンス](fonts/README.md)、[v1の画像・生成指示](history-v1.md)を同じリポジトリ内に保持する。v2は参考画像。実装の優先順位はMVP_SPEC §18、OS別の確認済み実描画、参考画像の順とする。

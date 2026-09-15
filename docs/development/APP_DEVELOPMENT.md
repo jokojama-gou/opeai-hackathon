@@ -24,6 +24,8 @@
 
 2026-09-15の[スマホ接続環境と再起動方法](LOCAL_CONNECTION_PREP.md)、[iPhone/Androidへのインストール手順](DEVICE_INSTALLATION.md)を追加。接続用のAuth/DB/Storageは人工音声で確認済み。アプリのSetlog対応・実ASR・実機確認は残る。
 
+OS別UIの実装準備は[MVP_SPEC §18](../product/MVP_SPEC.md#platform-design)と[ロードマップの12工程](MULTIPLATFORM_DELIVERY_PLAN.md#platform-design-tasks)を使う。現在のSDKは57。計画はNativeTabs/StackとOS別操作部品へ移行するもので、Router/Expo UIやカセット素材が導入済みという意味ではない。標準部品と独自Glassを分け、代表実装見本の画像/動画を確認してから全画面へ展開する。
+
 Node.js 22.20.0、npm 10.9.3を使用する。Volta利用時はルートの設定で切り替わる。nvm利用時は`.nvmrc`を参照する。
 
 リポジトリルートで実行する。
@@ -38,7 +40,7 @@ npm run web
 <a id="ui-study"></a>
 ### U01/U06/U07のUI検討モック（K02準備）
 
-開発時の人工デモ上部で「UI検討モックを開く（K02準備）」を選ぶ。`__DEV__`だけの入口で、閉じると人工デモへ戻る。現行コードには旧「今日」U12の配置が残るが、採用仕様2.4の初回起動先は録音の待機画面U02。製品ビルドのAPIモードと、Setlog構成への未対応を区別する。表示はRN＋Expoの共通部品、状態とデータはすべて人工の検討用。保存・共有・取消・訂正・指摘・録音・再生・APIの成功は返さない。
+開発時の人工デモ上部で「UI検討モックを開く（K02準備）」を選ぶ。`__DEV__`だけの入口で、閉じると人工デモへ戻る。現行コードには旧「今日」U12の配置が残るが、採用仕様2.5の初回起動先は録音の待機画面U02。製品ビルドのAPIモードと、Setlog構成への未対応を区別する。表示はRN＋Expoの共通部品、状態とデータはすべて人工の検討用。保存・共有・取消・訂正・指摘・録音・再生・APIの成功は返さない。
 
 1. 左のパネルで18状態を切替。狭い画面では「状態・配色を比較する」を開き、状態を選ぶと画面案へ戻る。
 2. U01の個人行はU03の宛先確認、共有行はU06へ。「会話の整理」の根拠から対象発言を開き、「元の記録」でU07へ。シートを閉じると本文の位置を保つ。
@@ -111,6 +113,8 @@ AIは完了報告前に、今回変更した内容に該当する対象を下表
 各確認のPASS/FAIL/UNAVAILABLEと集計を表示し、スクリプトは一つでも失敗・起動不能・タイムアウト（各確認120秒）なら終了コード1を返す。対象名の誤記は、確認を開始せず終了コード2を返す。npm経由の終了コードはnpmの版により変わるため、呼出側は非0を失敗として扱う。失敗後も他の選択済み確認を実行する。AIは依頼範囲で原因調査→修正→関連確認の再実行を進め、必要な確認が失敗・未実行・実施不能の成果は完了と報告しない。対象指定は変更に基づいて選び、失敗した確認を外して成功扱いにしない。
 
 これはAIが変更後に起動するローカルの実行入口で、常駐監視ではない。認証情報の検査と保管テストはGitHub Actionsでもpush/PR時に実行するが、全ローカル確認の代替ではない。既存のUIテストはデータ/宛先の検査であり、見た目・タップ・戻る操作はブラウザ等で別途確認する。実機・実API・実音声・ビルドの必要性は該当Kの受入条件から選び、未登録の将来機能をこのコマンドだけで検証済みにしない。
+
+デザイン変更は上記コマンドに加え、[VD01〜08](../product/MVP_SPEC.md#platform-acceptance)の該当条件を実行する。OS別の固定fixture画像・MXの操作動画・文字拡大/読み上げ・端末のフレーム時間が必要。これらの自動検査は現時点では未登録であり、コマンド成功だけでnative UI/Glass/Material/モーションを完成にしない。撮影条件/基準版/未実行項目はplatform-v1のmanifestとWORKFLOWへ記録する。
 
 ## スマホアプリを書き出す（EAS Build）
 
@@ -198,7 +202,7 @@ Expoと組み合わせるライブラリは、`apps/client`から`npx expo insta
 
 - Glass、expo-audio、FileSystem、SecureStore、Network、SafeArea、expo-system-uiを導入済み。カレンダーadapterは未実装。
 - development profileとexpo-dev-clientを追加済み。録音保存先のバックアップ除外はconfig pluginで設定し、iOSでは起動時の設定成功を確認できない場合に録音を開始しない。OS上の実効性は実機で検証する。
-- 初回はlight固定。主タブ/録音操作面は対応iOSでGlass、非対応環境と透明度低減設定では通常面を使う。実機の文字拡大・読み上げ・OSの戻るは未検証。
+- 現行コードはlight固定とGlassSurfaceを使用。主タブの独自Pressable、画面切替、低減設定の不足は新しい[MVP_SPEC §18](../product/MVP_SPEC.md#platform-design)へ未対応。nativeタブ/スタック、Android Material 3、カセット、実機の文字拡大/読み上げ/戻るはOS別工程で実装/確認する。
 
 音声処理は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)の外部API構成を採用する。FastAPI・非公開Storage/PostgreSQL adapter・単一入力のASR worker境界と、個人Context/G1/G2/G5生成・ToDo/日次APIを追加した。外部ASRの具体adapter、正規化/チャンク分割、2入力統合・共有Context、G3/G4は残る。Expoの起動だけでは書き起こせない。生成adapterも接続/保持/予算の明示設定まで無効。バックエンドの依存・起動・人工テストは[backend README](../../services/backend/README.md)を参照する。
 
