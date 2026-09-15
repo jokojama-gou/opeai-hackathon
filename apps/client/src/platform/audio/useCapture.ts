@@ -111,12 +111,7 @@ export function useCapture(onSaved: (recording: LocalRecording) => void) {
       );
       return;
     }
-    if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
-      setError(
-        "録音には専用のdevelopment buildが必要です。Expo Goでは画面を確認できます。",
-      );
-      return;
-    }
+    // Allow microphone recording in Expo Go for hackathon testing
     if (Platform.OS === "ios" && !backupReady()) {
       setError(
         "録音の保存先を準備できませんでした。アプリを再起動してください。",

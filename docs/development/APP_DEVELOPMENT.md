@@ -119,7 +119,7 @@ AIは完了報告前に、今回変更した内容に該当する対象を下表
 | 認証情報の保管・Git除外・漏出検査 | `npm run verify:security` | 追跡候補の秘密情報検査と、人工キーによる暗号化/改ざん/実行時処理/配布物検査 |
 | 共通契約・APIクライアント・製品画面用データ | `npm run verify -- contracts`（または `npm test`） | mainのTypeScript契約・クライアント・データテスト |
 | UIと文書の両方 | `npm run verify -- ui docs` | 重複を除いて両方を実行 |
-| 端末直接ASR・比較・設定生成 | `npm run verify -- ui contracts tooling docs` | 型、各社adapter・候補保持・引用検査、設定生成。実機/実APIは [DIRECT_ASR](DIRECT_ASR.md) で区別 |
+| 端末直接ASR・雑音除去・比較・設定生成 | `npm run verify -- ui contracts tooling docs` | 型、各社adapter・雑音除去・音声保存/削除（テスト用IndexedDB）・候補保持・引用検査、設定生成。実機/実APIは [DIRECT_ASR](DIRECT_ASR.md) で区別 |
 
 入口は[scripts/verify.mjs](../../scripts/verify.mjs)。対象未指定または `all` は上表の全確認、`--help` は使い方を表示する。追加依存・ネットワーク通信・CI設定は不要で、Node.jsとPowerShell 7（`pwsh`）、UI対象では導入済みの開発依存を使う。型チェックはクライアントの `typecheck` と同じTypeScript・引数を直接起動する。コマンドや新しいテストを追加・変更した場合は、この入口と対応表も更新する。
 

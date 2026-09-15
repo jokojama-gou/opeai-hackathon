@@ -25,3 +25,13 @@
 - 文書検証成功：`npm run verify:docs` が2/2 PASS。98 Markdown/HTML・1009参照と、6 skills・18管理ファイルを検査。外部URLの内容・意味・モデル動作を保証する検査ではない。
 - 未実行：モデル導入、人工/実音声処理、ASR比較、端末性能測定、独立レビュー。調査のみの依頼のため実装・仕様採用・外部書込なし。
 - 残る確認：消したい音が環境音か別の人の声か、録音中か録音後か。目的の人の声だけを残す場合は目的話者抽出等を別途調べる。
+
+## 継続質問：APIとキー取得先（2026-09-15）
+
+- 依頼：「Apiあるのは？ apiキーおれがもらってくるよ」。APIを提供する候補と取得先の案内まで。対象版 `307d1a6`、開始時差分なし。主担当が本記録とWORKFLOWのみ更新。K/M/U/受入・契約/fixture変更なし。
+- 第一候補：[ElevenLabs Voice Isolator](https://elevenlabs.io/docs/overview/capabilities/voice-isolator)。[API](https://elevenlabs.io/docs/api-reference/audio-isolation/convert)は `POST /v1/audio-isolation` にファイルを送る。[キー取得先](https://elevenlabs.io/app/developers/api-keys)は公式quickstartから確認。録音の雑音除去からASRへ渡す比較候補であり、認識精度の改善は未検証。
+- 第二候補：[Resemble Audio Enhancement](https://docs.resemble.ai/audio-tools/audio-enhancement)。非同期で送信・状態確認・音声取得。`remove_noise`、`normalize`、`studio_sound`を個別指定できる。[認証手順](https://docs.resemble.ai/getting-started/authentication)のAccount → APIからキーを取得。先のOSS Resemble EnhanceとホストAPIの使用モデルの同一性は確認していない。
+- その他：[Audo API](https://www.audo.ai/api)は録音後の雑音除去APIを提供し、公式サイトにRequest Access導線がある。即時発行は未確認。
+- 既存[直接ASR](../development/DIRECT_ASR.md)にはElevenLabs `scribe_v2`経路がある。既存キーの再利用は権限・残高次第。今回キー自体を読取・発行・認証確認していない。
+- 一次情報を2026-09-15に確認。価格はResembleの製品ページとAPI文書に請求単位の相違があるため、今回は料金の断定を避ける。WebからのCORS、実スマホ、処理遅延、原音/処理後のASR比較は未検証。
+- 実API実行・音声処理・導入・製品仕様採用・外部書込・独立レビューは依頼対象外。文書確認は `npm run verify:docs` の実行出力を証拠とする。

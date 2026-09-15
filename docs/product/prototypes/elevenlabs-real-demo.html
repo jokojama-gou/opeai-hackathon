@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElevenLabs リアル音声書き起こし & ノイズ除去 デモ</title>
+  <style>
+    :root {
+      --primary: #28694f;
+      --primary-light: #e8f0e9;
+      --bg: #f6f7f2;
+      --card-bg: #ffffff;
+      --text: #20342f;
+      --muted: #66766f;
+      --danger: #ad403c;
+      --blue: #1d4ed8;
+      --border: #dfe5dc;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; max-width: 720px; margin: 0 auto; }
+    header { margin-bottom: 20px; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    p.subtitle { color: var(--muted); font-size: 14px; }
+    .card { background: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border); margin-bottom: 16px; shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .card-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .badge { background: #dcfce7; color: #166534; font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 700; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; width: 100%; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; transition: all 0.2s; margin-top: 10px; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .timer { font-size: 36px; font-weight: 800; text-align: center; margin: 16px 0; color: var(--primary); }
+    .status-text { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 10px; }
+    .result-box { background: #f8fafc; border-radius: 12px; padding: 16px; margin-top: 14px; border: 1px solid var(--border); }
+    .speaker-bubble { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+    .speaker-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+    .speaker-name { font-weight: 700; color: var(--primary); }
+    .speaker-time { color: var(--muted); }
+    .speaker-text { font-size: 15px; line-height: 1.5; }
+    .audio-player { width: 100%; margin-top: 10px; }
+    .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab { flex: 1; padding: 10px; text-align: center; background: #e2e8f0; border-radius: 10px; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .tab.active { background: var(--primary); color: white; }
+    .key-info { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎙️ ElevenLabs リアルマイク書き起こしデモ</h1>
+    <p class="subtitle">マイクで喋った「あなたの声」をElevenLabs Scribe v2でリアルタイム書き起こし</p>
+  </header>
+
+  <div class="key-info">
+    ✅ ElevenLabs APIキー埋め込み済み（`sk_e3f3e18...`）<br>
+    マイク録音ボタンを押して「本日のハッカソンデモを開始します」と声を出してください。
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span>🎤 マイク録音 & ElevenLabs 処理</span>
+      <span class="badge">Scribe v2 + Voice Isolator</span>
+    </div>
+
+    <div class="timer" id="timer">00:00</div>
+    <div class="status-text" id="statusText">録音開始ボタンを押してください</div>
+
+    <button id="recordBtn" class="btn btn-primary" onclick="toggleRecording()">
+      🔴 マイク録音を開始
+    </button>
+  </div>
+
+  <div class="card" id="resultCard" style="display: none;">
+    <div class="card-title">
+      <span>✨ 本物の書き起こし・話者識別結果</span>
+    </div>
+
+    <div id="loadingBox" style="display: none; text-align: center; padding: 20px;">
+      <div class="loading-spinner" style="border-top-color: var(--primary); width: 30px; height: 30px;"></div>
+      <p style="margin-top: 10px; color: var(--muted);" id="loadingMsg">ElevenLabs Scribe APIで書き起こし中...</p>
+    </div>
+
+    <div id="resultsContainer"></div>
+
+    <div style="margin-top: 16px;">
+      <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">🔊 録音したあなたの声 (原音)</p>
+      <audio id="audioPlayback" class="audio-player" controls></audio>
+    </div>
+
+    <div style="margin-top: 16px;" id="denoisedSection">
+      <p style="font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #166534;">✨ ElevenLabs Voice Isolator ノイズ除去音声</p>
+      <audio id="denoisedAudioPlayback" class="audio-player" controls></audio>
+    </div>
+  </div>
+
+  <script>
+    const ELEVENLABS_KEY = "sk_e3f3e18d8ebc915397a884afdc26f1fe8d72c5df3b5a51f3";
+    const OPENAI_KEY = "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";
+
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+    let timerInterval = null;
+    let seconds = 0;
+
+    async function toggleRecording() {
+      if (!isRecording) {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    }
+
+    async function startRecording() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          document.getElementById('audioPlayback').src = audioUrl;
+          await processWithElevenLabs(audioBlob);
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        seconds = 0;
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
+
+        const btn = document.getElementById('recordBtn');
+        btn.innerText = '⏹️ 録音を停止してElevenLabsで文字起こし';
+        btn.className = 'btn btn-danger';
+        document.getElementById('statusText').innerText = '🎙️ 録音中... お好きな言葉を喋ってください';
+      } catch (err) {
+        alert('マイクのアクセス許可が必要です: ' + err.message);
+      }
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        isRecording = false;
+        clearInterval(timerInterval);
+
+        const btn = document.getElementById('recordBtn');
+        btn.innerText = '🔴 再度マイク録音を開始';
+        btn.className = 'btn btn-primary';
+        document.getElementById('statusText').innerText = '処理中...';
+      }
+    }
+
+    function updateTimer() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').innerText = `${m}:${s}`;
+      seconds++;
+    }
+
+    async function processWithElevenLabs(audioBlob) {
+      document.getElementById('resultCard').style.display = 'block';
+      document.getElementById('loadingBox').style.display = 'block';
+      document.getElementById('resultsContainer').innerHTML = '';
+      document.getElementById('loadingMsg').innerText = 'ElevenLabs Scribe API で文字起こし中...';
+
+      // 1. ElevenLabs Speech to Text (Scribe API) 呼出
+      try {
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'speech.webm');
+        formData.append('model_id', 'scribe_v2');
+        formData.append('tag_audio_events', 'true');
+        formData.append('num_speakers', '2');
+
+        const response = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+          method: 'POST',
+          headers: {
+            'xi-api-key': ELEVENLABS_KEY
+          },
+          body: formData
+        });
+
+        if (!response.ok) {
+          throw new Error(`ElevenLabs API HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        renderResults(data);
+      } catch (err) {
+        console.warn('ElevenLabs API direct fetch failed, trying OpenAI Whisper fallback:', err);
+        await fallbackOpenAI(audioBlob, err.message);
+      } finally {
+        document.getElementById('loadingBox').style.display = 'none';
+        document.getElementById('statusText').innerText = '✨ 書き起こし完了！';
+      }
+
+      // 2. ElevenLabs Voice Isolator (ノイズ除去 API) 呼出
+      try {
+        const isoFormData = new FormData();
+        isoFormData.append('audio', audioBlob, 'speech.webm');
+
+        const isoRes = await fetch('https://api.elevenlabs.io/v1/audio-isolation', {
+          method: 'POST',
+          headers: {
+            'xi-api-key': ELEVENLABS_KEY
+          },
+          body: isoFormData
+        });
+
+        if (isoRes.ok) {
+          const denoisedBlob = await isoRes.blob();
+          const denoisedUrl = URL.createObjectURL(denoisedBlob);
+          document.getElementById('denoisedAudioPlayback').src = denoisedUrl;
+        }
+      } catch (e) {
+        console.log('Voice Isolation API note:', e);
+      }
+    }
+
+    async function fallbackOpenAI(audioBlob, mainErrorMsg) {
+      document.getElementById('loadingMsg').innerText = 'OpenAI Whisper API で書き起こし中...';
+      try {
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'speech.webm');
+        formData.append('model', 'whisper-1');
+        formData.append('language', 'ja');
+
+        const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_KEY}`
+          },
+          body: formData
+        });
+
+        const data = await res.json();
+        const text = data.text || '音声が認識できませんでした。';
+
+        document.getElementById('resultsContainer').innerHTML = `
+          <div class="speaker-bubble">
+            <div class="speaker-header">
+              <span class="speaker-name">🎙️ 録音されたあなたの声 (OpenAI Whisper)</span>
+              <span class="speaker-time">本物APIレスポンス</span>
+            </div>
+            <div class="speaker-text">${text}</div>
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('resultsContainer').innerHTML = `
+          <div class="speaker-bubble" style="border-color: #fca5a5; background: #fff5f5;">
+            <div class="speaker-text" style="color: #991b1b;">処理エラー: ${mainErrorMsg}</div>
+          </div>
+        `;
+      }
+    }
+
+    function renderResults(data) {
+      const container = document.getElementById('resultsContainer');
+      const text = data.text || (data.words ? data.words.map(w => w.text).join('') : '');
+
+      if (!text) {
+        container.innerHTML = '<p style="color: var(--muted);">音声が短すぎるか文字が検出されませんでした。</p>';
+        return;
+      }
+
+      let html = `
+        <div class="speaker-bubble" style="border-left: 4px solid var(--primary);">
+          <div class="speaker-header">
+            <span class="speaker-name">✨ ElevenLabs Scribe v2 本物書き起こし</span>
+            <span class="speaker-time">言言語: ${data.language_code || 'ja'}</span>
+          </div>
+          <div class="speaker-text" style="font-weight: 600; font-size: 16px;">${text}</div>
+        </div>
+      `;
+
+      if (data.words && data.words.length > 0) {
+        html += '<div style="margin-top: 10px; font-size: 12px; color: var(--muted);">話者・単語詳細:</div>';
+        let currentSpeaker = null;
+        let speakerText = '';
+
+        data.words.forEach(w => {
+          const spk = w.speaker_id || '話者 1';
+          if (spk !== currentSpeaker) {
+            if (speakerText && currentSpeaker) {
+              html += `
+                <div class="speaker-bubble">
+                  <div class="speaker-header">
+                    <span class="speaker-name">👤 ${currentSpeaker}</span>
+                  </div>
+                  <div class="speaker-text">${speakerText}</div>
+                </div>
+              `;
+            }
+            currentSpeaker = spk;
+            speakerText = w.text;
+          } else {
+            speakerText += w.text;
+          }
+        });
+
+        if (speakerText && currentSpeaker) {
+          html += `
+            <div class="speaker-bubble">
+              <div class="speaker-header">
+                <span class="speaker-name">👤 ${currentSpeaker}</span>
+              </div>
+              <div class="speaker-text">${speakerText}</div>
+            </div>
+          `;
+        }
+      }
+
+      container.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

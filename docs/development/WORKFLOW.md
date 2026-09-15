@@ -4,6 +4,15 @@
 
 ## 現在の状態
 
+### 録音後の雑音除去・音声保存（2026-09-15）
+
+- 本人依頼で端末直接ASR画面へElevenLabs Voice Isolatorを接続。原音保存後に除去音声を端末保存・再生し、後処理ASRへ利用。原音の即時側と結果を分離し、期限・取消・再利用を維持。Supabase変更なし。
+- 型/関連検査、Android/iOS/Web export、人工音声の雑音除去→保存→実Scribe、ブラウザの保存/再生/結果切替を確認。実スマホ・品質評価・別デモ/旧共有APIへの接続は未確認/対象外。[変更・対象版・証拠・残件](../history/AUDIO_ISOLATION_IMPLEMENTATION_20260915.md)。
+
+### リアルタイム書き起こしはElevenLabs（2026-09-15）
+
+- 本人の選択をMVP_SPEC §9.0へ反映。録音中は `scribe_v2_realtime`、録音後の全社結果・別LLM比較は維持する。接続コード・実機遅延は未実装/未測定。[判断・対象版・残件](../history/ELEVENLABS_REALTIME_DECISION_20260915.md)。
+
 ### ログイン不要の声の登録準備（2026-09-15）
 
 - iOSはひなた、Androidはごう（Webは選択）。本人用音声を端末内へ最大7日の利用期限で保存・確認・削除する入口を追加。外部話者登録/照合は未接続。[手順](VOICE_ENROLLMENT.md)、[対象版・検証・残件](../history/VOICE_ENROLLMENT_20260915.md)。実機録音・配布は未確認。
@@ -14,7 +23,7 @@
 
 ### 音声の雑音除去モデル候補（2026-09-15）
 
-- 質問への調査：DeepFilterNet3、RNNoise、Resemble Enhanceの用途を一次情報で整理。方式採用・導入・音声処理は未実行。[根拠・対象版・限界](../history/NOISE_SUPPRESSION_RESEARCH_20260915.md)。
+- 質問への調査：モデル3候補に加え、APIはElevenLabs Voice Isolator、Resemble Audio Enhancement、Audoを確認し、キー取得先を案内。方式採用・導入・音声処理は未実行。[根拠・対象版・限界](../history/NOISE_SUPPRESSION_RESEARCH_20260915.md)。
 
 ### バックエンド現行仕様への移行（2026-09-15）
 

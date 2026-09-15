@@ -1,5 +1,6 @@
 import { Directory, File, Paths } from "expo-file-system";
 import * as Crypto from "expo-crypto";
+import type { IsolationState } from "../../data/audio-isolation";
 export type LocalRecording = {
   id: string;
   owner_id: string;
@@ -15,6 +16,7 @@ export type LocalRecording = {
   remote_id: string | null;
   remote_version: number | null;
   processing_key: string;
+  denoising?: IsolationState;
   voice_profile?: {
     display_name: string;
     state: "prepared";
@@ -58,6 +60,7 @@ export async function readLocal(ownerId: string): Promise<LocalRecording[]> {
     if (!recording.id || !recording.audio_expires_at || !recording.owner_id)
       continue;
     if (new Date(recording.audio_expires_at).getTime() <= Date.now()) {
+      deleteDenoisedLocal(recording);
       if (recording.uri.startsWith(Paths.document.uri)) {
         const audio = new File(recording.uri);
         if (audio.exists) audio.delete();
@@ -117,12 +120,20 @@ export async function finishLocal(
   return result;
 }
 export function deleteLocal(recording: LocalRecording) {
+  deleteDenoisedLocal(recording);
   if (recording.uri.startsWith(Paths.document.uri)) {
     const audio = new File(recording.uri);
     if (audio.exists) audio.delete();
   }
   const metadata = new File(directory(), `${recording.id}.json`);
   if (metadata.exists) metadata.delete();
+}
+function deleteDenoisedLocal(recording: LocalRecording) {
+  // Deterministic sibling also cleans an interrupted write before metadata commit.
+  for (const extension of ["mp3", "wav", "m4a", "flac", "ogg"]) {
+    const audio = new File(directory(), `${recording.id}-denoised.${extension}`);
+    if (audio.exists) audio.delete();
+  }
 }
 export function audioFile(uri: string) {
   return new File(uri);

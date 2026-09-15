@@ -2,9 +2,13 @@ import { isVoiceSample, voiceExpiresAt, voiceOwner, requireVoiceOwner, prepareVo
 import { useEffect, useRef, useState } from "react";
 import type { LocalRecording } from "./storage";
 import { AsrError, restoreRun, type AudioInput, type EnsembleRun } from "../../data/direct-asr";
+import type { AudioVariant, IsolatedAudio, IsolationState, IsolationStore } from "../../data/audio-isolation";
 export type { LocalRecording } from "./storage";
 export const providerFetch: typeof fetch = (...args) => fetch(...args);
-type Entry = { recording: LocalRecording; blob: Blob | null; run: EnsembleRun | null };
+type Entry = { recording: LocalRecording; blob: Blob | null; run: EnsembleRun | null; denoisedBlob?: Blob | null; denoisedRun?: EnsembleRun | null };
+export async function audioDigest(bytes: ArrayBuffer) {
+  return Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), n => n.toString(16).padStart(2, "0")).join("");
+}
 function database(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open("setlog-direct-asr-v1", 1);
@@ -31,14 +35,17 @@ export async function loadRecordings(ownerId = "direct-device"): Promise<LocalRe
       const values: Entry[] = request.result;
       for (const entry of values) {
         if ((isVoiceSample(entry.recording) ? voiceExpiresAt(entry.recording) : expiry(entry.recording)) <= Date.now()) store.delete(entry.recording.id);
-        else if (entry.blob && Date.parse(entry.recording.audio_expires_at) <= Date.now()) store.put({ ...entry, blob: null });
+        else if ((entry.blob || entry.denoisedBlob) && Date.parse(entry.recording.audio_expires_at) <= Date.now()) store.put({ ...entry, blob: null, denoisedBlob: null });
       }
       finish(values.filter(e => e.recording.owner_id === ownerId && (isVoiceSample(e.recording) ? voiceExpiresAt(e.recording) : expiry(e.recording)) > Date.now()).map(e => e.recording).sort((a, b) => b.started_at.localeCompare(a.started_at)));
     };
   });
 }
-export async function loadRun(id: string): Promise<EnsembleRun | null> {
-  return tx("readonly", (store, finish) => { const req = store.get(id); req.onsuccess = () => finish(req.result?.run ? restoreRun(req.result.run) : null); });
+export async function loadRun(id: string, variant: AudioVariant = "original"): Promise<EnsembleRun | null> {
+  return tx("readonly", (store, finish) => { const req = store.get(id); req.onsuccess = () => {
+    const run = variant === "denoised" ? req.result?.denoisedRun : req.result?.run;
+    finish(run ? restoreRun(run) : null);
+  }; });
 }
 export async function saveRun(run: EnsembleRun): Promise<void> {
   const saved = await tx<boolean>("readwrite", (store, finish) => {
@@ -47,7 +54,9 @@ export async function saveRun(run: EnsembleRun): Promise<void> {
       const entry: Entry | undefined = request.result;
       if (!entry || expiry(entry.recording) <= Date.now()) { finish(false); return; }
       if (isVoiceSample(entry.recording)) { finish(false); return; }
-      store.put({ ...entry, run }); finish(true);
+      const denoised = run.audioVariant === "denoised";
+      if (run.checksum !== (denoised ? entry.recording.denoising?.audio?.checksum : entry.recording.checksum)) { finish(false); return; }
+      store.put({ ...entry, [denoised ? "denoisedRun" : "run"]: run }); finish(true);
     };
   });
   if (!saved) throw new AsrError("text_expired");
@@ -55,16 +64,46 @@ export async function saveRun(run: EnsembleRun): Promise<void> {
 export async function removeRecording(recording: LocalRecording): Promise<void> {
   await tx<void>("readwrite", (store, finish) => { store.delete(recording.id); finish(); });
 }
-export async function getAudio(recording: LocalRecording): Promise<AudioInput> {
+export async function getAudio(recording: LocalRecording, variant: AudioVariant = "original"): Promise<AudioInput> {
   const entry = await tx<Entry | undefined>("readonly", (store, finish) => { const req = store.get(recording.id); req.onsuccess = () => finish(req.result); });
   if (!entry?.blob) throw new AsrError("audio_expired");
   requireConversationAudio(entry.recording);
-  const type = entry.blob.type.split(";")[0];
-  return { recordingId: recording.id, checksum: recording.checksum!, durationMs: recording.duration_ms,
+  if (entry.recording.owner_id !== recording.owner_id || entry.recording.checksum !== recording.checksum || Date.parse(entry.recording.audio_expires_at) <= Date.now()) throw new AsrError("audio_expired");
+  const cleaned = variant === "denoised" ? entry.recording.denoising?.audio : undefined;
+  if (variant === "denoised" && (entry.recording.denoising?.status !== "ready" || !entry.denoisedBlob || !cleaned)) throw new AsrError("denoised_audio_missing");
+  const blob = variant === "denoised" ? entry.denoisedBlob! : entry.blob;
+  const type = blob.type.split(";")[0];
+  return { recordingId: recording.id, checksum: cleaned?.checksum ?? recording.checksum!, durationMs: recording.duration_ms, audioVariant: variant,
     stoppedAt: recording.stopped_at!, audioExpiresAt: recording.audio_expires_at, textExpiresAt: new Date(expiry(recording)).toISOString(),
-    name: `${recording.id}.${type.includes("mp4") ? "m4a" : type.includes("ogg") ? "ogg" : "webm"}`,
-    mimeType: type.includes("mp4") ? "audio/m4a" : type, blob: entry.blob };
+    name: cleaned?.name ?? `${recording.id}.${type.includes("mp4") ? "m4a" : type.includes("ogg") ? "ogg" : "webm"}`,
+    mimeType: cleaned?.mimeType ?? (type.includes("mp4") ? "audio/m4a" : type), blob };
 }
+
+export function isolationStore(recording: LocalRecording): IsolationStore {
+  const update = async (state: IsolationState, audio?: IsolatedAudio, valid: () => boolean = () => true) => {
+    const saved = await tx<boolean>("readwrite", (store, finish) => {
+      const request = store.get(recording.id);
+      request.onsuccess = () => {
+        const entry: Entry | undefined = request.result;
+        if (!valid() || !entry?.blob || isVoiceSample(entry.recording) || entry.recording.owner_id !== recording.owner_id ||
+            entry.recording.checksum !== state.sourceChecksum || Date.parse(entry.recording.audio_expires_at) <= Date.now()) { finish(false); return; }
+        store.put({ ...entry, recording: { ...entry.recording, denoising: state }, ...(audio ? { denoisedBlob: new Blob([audio.bytes], { type: audio.mimeType }) } : {}) }); finish(true);
+      };
+    });
+    if (!saved) throw new AsrError("audio_expired");
+  };
+  return {
+    original: () => getAudio(recording), denoised: () => getAudio(recording, "denoised"),
+    state: () => tx<IsolationState | undefined>("readonly", (store, finish) => {
+      const request = store.get(recording.id); request.onsuccess = () => finish(request.result?.recording.denoising);
+    }),
+    mark: state => update(state), save: (audio, state, valid) => update(state, audio, valid),
+  };
+}
+export async function playbackUri(recording: LocalRecording, variant: AudioVariant): Promise<string> {
+  return URL.createObjectURL((await getAudio(recording, variant)).blob);
+}
+export function releasePlaybackUri(uri: string) { URL.revokeObjectURL(uri); }
 export function useDirectCapture(onSaved: (recording: LocalRecording) => void) {
   const [phase, setPhase] = useState("idle");
   const [durationMs, setDuration] = useState(0);
