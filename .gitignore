@@ -10,7 +10,12 @@ npm-debug.*
 .env
 .env.*
 !.env.example
-# Credentials stay outside Git, including private repositories.
+# User-authorized plaintext sharing for this private hackathon repository (2026-09-15).
+!/.env.openai.local
+!/.env.expo.local
+!/.env.pyannote.local
+!/.env.supabase.local
+!/.env.vercel.local
 .DS_Store
 credentials.json
 credentials/*

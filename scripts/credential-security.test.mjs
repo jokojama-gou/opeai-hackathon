@@ -4,7 +4,18 @@ import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { isForbiddenCredentialPath, scanCredentialContent, inspectRepository, inspectHistory } from './check-repository-secrets.mjs';
+import { isForbiddenCredentialPath, isSharedSetting, scanCredentialContent, inspectRepository, inspectHistory } from './check-repository-secrets.mjs';
+
+test('plaintext sharing is limited to the five authorized root paths', () => {
+  for (const path of ['.env.openai.local', '.env.expo.local', '.env.pyannote.local', '.env.supabase.local', '.env.vercel.local']) {
+    assert.equal(isSharedSetting(path), true);
+    assert.equal(isForbiddenCredentialPath(path), false);
+    assert.equal(isSharedSetting('nested/' + path), false);
+    assert.equal(isForbiddenCredentialPath('nested/' + path), true);
+  }
+  assert.equal(isForbiddenCredentialPath('.env.audio-models.local'), true);
+  assert.equal(scanCredentialContent(Buffer.from('sk-' + 's'.repeat(40))), true);
+});
 
 test('credential files and private keys are blocked while examples and encrypted files are allowed', () => {
   for (const path of ['.env.audio-models.local','.env.audio-google-service-account.local.json','credentials/key.txt','nested/.env.production']) assert.equal(isForbiddenCredentialPath(path), true);

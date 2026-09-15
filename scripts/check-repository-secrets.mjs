@@ -4,6 +4,10 @@ import { basename, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+// Explicit user decision on 2026-09-15: these five root files are shared in plaintext
+// with the team through this private repository. All other paths retain scanning.
+const sharedSettings = new Set(['.env.openai.local', '.env.expo.local', '.env.pyannote.local', '.env.supabase.local', '.env.vercel.local']);
+export function isSharedSetting(file) { return sharedSettings.has(file.replaceAll('\\', '/')); }
 const credentialNames = ['OPENAI_API_KEY','ELEVENLABS_API_KEY','PYANNOTE_API_KEY','GEMINI_API_KEY','SPEECHMATICS_API_KEY','DEEPGRAM_API_KEY','ASSEMBLYAI_API_KEY','HF_TOKEN'];
 const knownValues = credentialNames.flatMap(name => process.env[name]?.length >= 12 ? [Buffer.from(process.env[name])] : []);
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS && existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
@@ -16,7 +20,7 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS && existsSync(process.env.GOOGLE_
 export function isForbiddenCredentialPath(file) {
   const normalized=file.replaceAll('\\','/');
   const name=basename(normalized);
-  if (name === '.env.example') return false;
+  if (name === '.env.example' || isSharedSetting(file)) return false;
   return /^\.env(?:\.|$)/i.test(name) || /\.(?:pem|key|p12|p8|pfx)$/i.test(name)
     || /service[-_]account.*\.json$/i.test(name)
     || (/^credentials\//i.test(normalized) && name !== 'README.md' && !name.endsWith('.enc.json'));
@@ -70,6 +74,7 @@ export function inspectRepository(repo,mode='working') {
   const files=git(repo,mode==='staged'?['diff','--cached','--name-only','--diff-filter=ACMR','-z']:['ls-files','--cached','--others','--exclude-standard','-z']).split('\0').filter(Boolean);
   const findings=[];
   for(const file of new Set(files)) {
+    if (isSharedSetting(file)) continue;
     if (isForbiddenCredentialPath(file)) { findings.push({file,reason:'credential file must not be tracked'}); continue; }
     if (mode!=='staged' && !existsSync(resolve(repo,file))) continue;
     const bytes=mode==='staged'?git(repo,['show',':'+file],null):readFileSync(resolve(repo,file));
@@ -86,6 +91,7 @@ export function inspectHistory(repo,revision='--all') {
     const separator=entry.indexOf(' ');
     if(separator<0) continue;
     const id=entry.slice(0,separator),file=entry.slice(separator+1);
+    if (isSharedSetting(file)) continue;
     if(isForbiddenCredentialPath(file)) { findings.push({file,reason:'credential path in Git history'}); continue; }
     safe.push({id,file});
   }
@@ -104,6 +110,6 @@ if(process.argv[1] && pathToFileURL(resolve(process.argv[1])).href===import.meta
     const findings=args.includes('--history')?inspectHistory(repo):inspectRepository(repo,args.includes('--staged')?'staged':'working');
     for(const finding of findings) console.error(`${finding.reason}: ${finding.file}`);
     if(findings.length) { console.error(`FAIL: ${findings.length} findings. No secret values were printed.`);process.exitCode=1; }
-    else console.log('PASS: repository credential inspection found no blocked files or recognized secret content.');
+    else console.log('PASS: no blocked credentials outside the five explicitly authorized plaintext settings paths.');
   } catch { console.error('FAIL: credential inspection could not complete. No secret values were printed.');process.exitCode=2; }
 }
