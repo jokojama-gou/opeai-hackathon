@@ -15,6 +15,7 @@ export type Segment = { id: string; text: string; startMs: number | null; endMs:
 export type AudioInput = {
   recordingId: string; checksum: string; durationMs: number; stoppedAt: string;
   audioExpiresAt: string; textExpiresAt: string; name: string; mimeType: string; blob: Blob;
+  audioVariant?: "original" | "denoised";
 };
 export type Candidate = {
   id: string; provider: ProviderId; model: string; kind: "transcript" | "speakers";
@@ -30,6 +31,7 @@ export type EnsembleRun = {
   schema: "direct-asr-v1"; recordingId: string; checksum: string; stoppedAt: string;
   textExpiresAt: string; candidates: Candidate[]; comparison: Comparison | null;
   previousAttempts?: Candidate[]; previousComparisons?: Comparison[];
+  audioVariant?: "original" | "denoised";
 };
 export type IO = {
   fetch: typeof fetch; signal: AbortSignal; now: () => number;
@@ -44,8 +46,8 @@ export function keyFor(keys: Keys, id: ProviderId) {
 }
 export function newRun(input: AudioInput, keys: Keys): EnsembleRun {
   return { schema: "direct-asr-v1", recordingId: input.recordingId, checksum: input.checksum,
-    stoppedAt: input.stoppedAt, textExpiresAt: input.textExpiresAt, comparison: null,
-    candidates: providers.map(p => ({ id: `${input.recordingId}:${p.id}`, provider: p.id, model: p.model,
+    stoppedAt: input.stoppedAt, textExpiresAt: input.textExpiresAt, comparison: null, audioVariant: input.audioVariant ?? "original",
+    candidates: providers.map(p => ({ id: `${input.recordingId}:${input.audioVariant ?? "original"}:${p.id}`, provider: p.id, model: p.model,
       kind: p.kind, status: keyFor(keys, p.id) ? "queued" : "unconfigured", text: "", segments: [],
       elapsedMs: 0, error: null, remoteJobId: null, raw: null })) };
 }
@@ -77,14 +79,16 @@ export async function runEnsemble(input: AudioInput, keys: Keys, adapter: Adapte
 }): Promise<EnsembleRun> {
   const now = options.now ?? Date.now;
   assertAudio(input, now());
-  if (active.has(input.recordingId)) throw new AsrError("already_running");
+  const activeId = `${input.recordingId}:${input.audioVariant ?? "original"}`;
+  if (active.has(activeId)) throw new AsrError("already_running");
   if (!providers.some(p => p.kind === "transcript" && keyFor(keys, p.id))) throw new AsrError("no_asr_keys");
-  active.add(input.recordingId);
+  active.add(activeId);
   const run = newRun(input, keys);
   if (options.previous) {
     const previous = options.previous;
-    if (previous.recordingId !== input.recordingId || previous.checksum !== input.checksum) {
-      active.delete(input.recordingId); throw new AsrError("invalid_recording");
+    if (previous.recordingId !== input.recordingId || previous.checksum !== input.checksum ||
+        (previous.audioVariant ?? "original") !== (input.audioVariant ?? "original")) {
+      active.delete(activeId); throw new AsrError("invalid_recording");
     }
     run.previousAttempts = [...(previous.previousAttempts ?? [])];
     run.previousComparisons = [...(previous.previousComparisons ?? []), ...(previous.comparison ? [previous.comparison] : [])];
@@ -141,7 +145,7 @@ export async function runEnsemble(input: AudioInput, keys: Keys, adapter: Adapte
     if (failedWrite?.status === "rejected") throw failedWrite.reason;
     await writes;
     return run;
-  } finally { active.delete(input.recordingId); }
+  } finally { active.delete(activeId); }
 }
 
 export function errorLabel(code: string | null) {
@@ -157,6 +161,11 @@ export function errorLabel(code: string | null) {
     invalid_comparison: "比較結果の根拠を確認できませんでした。", input_limit: "比較する本文が長すぎます。",
     text_expired: "文字の保存期限が切れています。", job_failed: "提供元で処理に失敗しました。",
     model_incomplete: "比較モデルの回答が完了しませんでした。",
+    no_isolation_key: "雑音除去にはElevenLabsのAPIキーが必要です。原音は保存されています。",
+    invalid_isolated_audio: "雑音除去の応答が対応する音声形式ではありません。原音は保存されています。",
+    isolation_retry_required: "雑音除去が未完了です。再試行ボタンから処理してください。",
+    denoised_audio_missing: "雑音除去済みの音声がまだ保存されていません。",
+    isolated_save_failed: "雑音除去音声を保存できませんでした。端末の空き容量を確認してください。原音は保存されています。",
   };
   if (code?.startsWith("http_")) return `提供元の応答: HTTP ${code.slice(5)}（認証・利用枠・入力形式を確認）`;
   return code ? labels[code] ?? "処理を完了できませんでした。" : "";

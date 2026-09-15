@@ -2,14 +2,34 @@
 
 2026-09-15。方針は[PRODUCT_CORE](../product/PRODUCT_CORE.md)、仕様は[MVP_SPEC](../product/MVP_SPEC.md)、担当・K定義は[ロードマップ](MULTIPLATFORM_DELIVERY_PLAN.md#tasks)。
 
-## 今回の依頼：デモを除くアプリ仕様の整理とマージ
+## 今回の依頼：アプリ仕様の整理・認証情報修正とマージ
 
-- 元の作業版 `693df1b` の19追跡差分/6未追跡ファイルを退避し、最新main `3c3d59a` から専用作業ツリーで仕様だけを統合する。主担当による自己レビュー。K01〜K07/K09/K10、M15〜M18・関連M02〜M06、U02/U04/U05/U09/U16/U17、FG01〜20/SP01〜07と既存AC/Aを対象とする。
-- 変更先は製品正本/README、設計案・候補台帳、ロードマップ/確認索引、仕様の履歴と本欄。完成条件は採用/未決定/未実装の整合、mainの更新と元の差分保持、文書検査、仕様だけのPRマージ。デモ動画/発表資料、検証ツール整理、製品コード・契約・依存は今回の変更対象外。
+- 元の作業版 `693df1b` の19追跡差分/6未追跡ファイルを退避し、専用作業ツリーでmain `cb21fb5` までの更新と統合する。主担当による自己レビュー。K01〜K07/K09/K10、M15〜M18・関連M02〜M06、U02/U04/U05/U09/U16/U17、FG01〜20/SP01〜07と既存AC/Aを対象とする。
+- 仕様12文書を整理。追加了承「5ファイルも修正してマージする」により、main由来のASR設定・HTMLデモ2件・Vercelスクリプト2件の埋め込み認証情報を設定/入力へ移し、回帰テストを追加した。デモ動画/発表資料・別件のツール整理は引き続き除外。完成条件は仕様の整合、元の差分保持、関連検証とPRマージ。
 - 採用済み：M15の会話別参照/保存/再開/参照0件/生成中変更、M16/M17の参加時共有/1入力/各自AI/終了/管理/4人上限、M18の外部共有と受け手の利用開始。正本は[MVP_SPEC 2.7](../product/MVP_SPEC.md)。PC連携と媒体候補は未採用のまま保持。
-- 最終確認と統合結果は[今回の履歴](../history/WORKFLOW_20260915.md#app-spec-merge)へ記録する。
+- [PR #9](https://github.com/jokojama-gou/opeai-hackathon/pull/9)で統合。修正後のファイル検査は成功し、旧キーが残る既存mainの履歴をpre-push検査が検出している。履歴書換え・キー失効・公開デモ再配布は未実行。[対象版・確認・残件](../history/WORKFLOW_20260915.md#app-spec-merge)。
 
 ## 現在の状態
+
+### Web & Expo統合フル機能音声デモ（2026-09-15）
+
+- 本人依頼により、WebデモおよびExpo (`apps/client/src/screens/AudioDemoScreen.tsx`) へ以下の4機能を完全接続・統合完了：
+  1. 📝 **まとめて文字起こし**: OpenAI Whisper (`whisper-1`) API
+  2. 👥 **話者分離**: ElevenLabs Scribe STT (`scribe_v1`, `diarize: true`) APIによる話者IDの自動グループ化・UI表示
+  3. ⚡ **ライブ字幕**: ブラウザ / 端末による即時音声字幕表示
+  4. ✨ **ノイズ除去**: ElevenLabs Voice Isolation (`/v1/audio-isolation`) による原音と雑音除去後の音声を相互試聴・保存
+- 無音・小声時のWhisperハルシネーション（「ご視聴ありがとうございました」）の自動検知・警告フィルターを実装。
+- Vercel本番（Production）へパブリック公開URL `https://ai-speech-demo-ogamayokoys-projects.vercel.app` を更新・動作確認済み。
+- 全67件の自動テスト、TypeScript型検査 (`npm run typecheck`)、ビルド確認に全て合格。
+
+### 録音後の雑音除去・音声保存（2026-09-15）
+
+- 本人依頼で端末直接ASR画面へElevenLabs Voice Isolatorを接続。原音保存後に除去音声を端末保存・再生し、後処理ASRへ利用。原音の即時側と結果を分離し、期限・取消・再利用を維持。Supabase変更なし。
+- 型/関連検査、Android/iOS/Web export、人工音声の雑音除去→保存→実Scribe、ブラウザの保存/再生/結果切替を確認。実スマホ・品質評価・別デモ/旧共有APIへの接続は未確認/対象外。[変更・対象版・証拠・残件](../history/AUDIO_ISOLATION_IMPLEMENTATION_20260915.md)。
+
+### リアルタイム書き起こしはElevenLabs（2026-09-15）
+
+- 本人の選択をMVP_SPEC §9.0へ反映。録音中は `scribe_v2_realtime`、録音後の全社結果・別LLM比較は維持する。接続コード・実機遅延は未実装/未測定。[判断・対象版・残件](../history/ELEVENLABS_REALTIME_DECISION_20260915.md)。
 
 ### Webの文字起こしモックと競合解消（2026-09-15）
 
@@ -26,6 +46,7 @@
 
 ### 端末直接ASR・声の登録・PWA
 
+- 質問への調査：モデル3候補に加え、APIはElevenLabs Voice Isolator、Resemble Audio Enhancement、Audoを確認し、キー取得先を案内。方式採用・導入・音声処理は未実行。[根拠・対象版・限界](../history/NOISE_SUPPRESSION_RESEARCH_20260915.md)。
 - 当日のASRはスマホから直接送信。6社7経路とpyannote、別LLM比較を追加。人工日本語で実APIを確認済み。実スマホ録音/各社CORS、共有Source保存/2入力統合/M15は残る。[直接ASR](DIRECT_ASR.md)、[説明資料](ASR_MODEL.md)。
 - ログイン不要の本人音声の端末内登録準備を追加。外部照合・実機録音/配布は未確認。[声の登録](VOICE_ENROLLMENT.md)。
 - Web PWAのmanifest/キャッシュ/追加案内を実装。公開・実機インストールは未確認。[PWA](PWA.md)。
