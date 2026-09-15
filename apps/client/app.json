@@ -2,6 +2,7 @@
   "expo": {
     "name": "Setlog",
     "slug": "hackathon-client",
+    "scheme": "setlog",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -17,7 +18,7 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": true
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -31,6 +32,8 @@
     },
     "owner": "yokoyamago",
     "plugins": [
+      "expo-router",
+      "expo-font",
       [
         "expo-audio",
         {

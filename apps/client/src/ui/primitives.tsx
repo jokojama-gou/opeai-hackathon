@@ -6,42 +6,44 @@ import {
   Text,
   TextInput,
   View,
+  Platform,
   type TextInputProps,
   type ViewStyle,
 } from "react-native";
 export const colors = {
-  ink: "#20342f",
-  muted: "#66766f",
-  green: "#28694f",
-  pale: "#e8f0e9",
-  page: "#f6f7f2",
-  line: "#dfe5dc",
-  red: "#ad403c",
-  amber: "#81591d",
+  ink: "#1D2B25",
+  muted: "#56645F",
+  green: "#255C45",
+  pale: "#DCEED3",
+  page: "#F8FBF8",
+  line: "#D5DED6",
+  red: "#B42332",
+  amber: "#7A4D00",
   white: "#ffffff",
 };
 export const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: colors.page },
   content: {
-    padding: 20,
+    padding: Platform.OS === "android" ? 16 : 20,
     paddingBottom: 36,
     gap: 18,
     width: "100%",
-    maxWidth: 880,
+    maxWidth: 640,
     alignSelf: "center",
   },
-  title: { fontSize: 29, lineHeight: 39, color: colors.ink, fontWeight: "700" },
+  title: { fontSize: 28, lineHeight: 36, color: colors.ink, fontFamily: "NotoSansJP", fontWeight: "600" },
   heading: {
     fontSize: 20,
-    lineHeight: 29,
+    lineHeight: 28,
+    fontFamily: "NotoSansJP",
     color: colors.ink,
     fontWeight: "600",
   },
-  body: { fontSize: 16, lineHeight: 26, color: colors.ink },
-  muted: { fontSize: 14, lineHeight: 23, color: colors.muted },
+  body: { fontSize: 17, lineHeight: 28, color: colors.ink, fontFamily: "KosugiMaru" },
+  muted: { fontSize: 14, lineHeight: 22, color: colors.muted, fontFamily: "KosugiMaru" },
   card: {
     backgroundColor: colors.white,
-    borderRadius: 20,
+    borderRadius: Platform.OS === "android" ? 16 : 20,
     padding: 20,
     gap: 12,
     borderWidth: 1,
@@ -101,8 +103,8 @@ export function Button({
       disabled={disabled || busy}
       onPress={onPress}
       style={({ pressed }) => ({
-        minHeight: 48,
-        borderRadius: 13,
+        minHeight: 56,
+        borderRadius: 28,
         paddingHorizontal: 18,
         paddingVertical: 13,
         alignItems: "center",
@@ -186,6 +188,7 @@ export function Check({
     <Pressable
       accessibilityRole="checkbox"
       accessibilityLabel={label}
+      aria-checked={checked}
       accessibilityState={{ checked, disabled }}
       disabled={disabled}
       onPress={() => onChange(!checked)}

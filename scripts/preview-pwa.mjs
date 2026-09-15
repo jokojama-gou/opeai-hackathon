@@ -11,8 +11,10 @@ createServer(async (req, res) => {
     const name = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     const file = path.resolve(root, `.${name === '/' ? '/index.html' : name}`);
     if (!file.startsWith(root)) { res.writeHead(403).end(); return; }
-    const bytes = await readFile(file);
-    res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
+    // Expo Router's single-page export serves extensionless routes via index.html.
+    const served = path.extname(file) ? file : path.join(root, 'index.html');
+    const bytes = await readFile(served);
+    res.writeHead(200, { 'Content-Type': types[path.extname(served)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     res.end(req.method === 'HEAD' ? undefined : bytes);
   } catch { res.writeHead(404).end('Not found'); }
-}).listen(4173, '127.0.0.1', () => console.log('PWA preview: http://127.0.0.1:4173'));
+}).listen(Number(process.env.PORT || 4173), '127.0.0.1', () => console.log(`PWA preview: http://127.0.0.1:${process.env.PORT || 4173}`));

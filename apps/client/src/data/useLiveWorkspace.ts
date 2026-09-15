@@ -66,7 +66,8 @@ export const errorText = (error: unknown) =>
     ? (messages[error.code] ??
       "処理を完了できませんでした。状態を確認してください。")
     : (error as Error).message;
-export function useLiveWorkspace() {
+export type WorkspaceScreen = "room" | "records" | "recording" | "personal" | "settings" | "saved" | "today" | "todos" | "confirmation";
+export function useWorkspaceState(navigation: { screen: WorkspaceScreen; go: (screen: WorkspaceScreen) => void }) {
   const [session, setSession] = useState<Session | null>(null);
   const sessionRef = useRef<Session | null>(null);
   const visibility = useRef(new VisibilityScope()).current;
@@ -91,16 +92,7 @@ export function useLiveWorkspace() {
   const [policy, setPolicy] = useState<ProcessingPolicy | null>(null);
   const [jobId, setJobId] = useState<string | null>(null);
   const [job, setJob] = useState<Job | null>(null);
-  const [screen, setScreen] = useState<
-    | "room"
-    | "records"
-    | "recording"
-    | "personal"
-    | "settings"
-    | "saved"
-    | "today"
-    | "todos"
-  >("recording");
+  const { screen, go: setScreen } = navigation;
   const [active, setActive] = useState(AppState.currentState === "active");
   const network = useNetworkState();
   const connected = network.isConnected !== false && active;

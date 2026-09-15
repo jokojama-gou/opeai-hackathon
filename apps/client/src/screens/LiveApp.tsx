@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Platform, Pressable, ScrollView, Text, View } from "react-native";
-import { useLiveWorkspace } from "../data/useLiveWorkspace";
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { useLiveWorkspace } from "../data/WorkspaceProvider";
+import { type WorkspaceScreen } from "../data/useLiveWorkspace";
+import { RecordingScreen, RoomScreen, RecordsScreen } from "./SetlogScreens";
 import { sourceTime } from "../data/repository";
 import {
   Badge,
@@ -24,8 +26,9 @@ const captureLabels = {
   interrupted: "中断した記録",
   save_failed: "保存の確認が必要",
 };
-export function LiveApp({ onDemo }: { onDemo: () => void }) {
-  const w = useLiveWorkspace();
+export function LiveApp({ onDemo, nativeNavigation = false, routeScreen }: { onDemo: () => void; nativeNavigation?: boolean; routeScreen?: WorkspaceScreen }) {
+  const workspace = useLiveWorkspace();
+  const w = { ...workspace, screen: routeScreen ?? workspace.screen };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -56,9 +59,13 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
   else if (!w.session)
     body = (
       <>
+        <View style={{ alignItems: "center", gap: 8, paddingTop: 20 }}>
+          <Text style={[styles.title, { fontSize: 36, letterSpacing: -1 }]}>Setlog</Text>
+          <Text style={styles.body}>今日の声を、明日の自分へ。</Text>
+          <Image source={require("../../assets/setlog/cassette-v1.png")} style={{ width: "100%", maxWidth: 360, aspectRatio: 1.5 }} accessibilityIgnoresInvertColors />
+        </View>
         <Card>
-          <Badge>自分のアカウントで利用</Badge>
-          <Heading>ログイン</Heading>
+          <Heading>おかえりなさい</Heading>
           <Field
             label="メールアドレス"
             value={email}
@@ -86,10 +93,9 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
             }
           />
           <Text style={styles.muted}>
-            開発用に用意した2人のアカウントを使います。
+            自分のアカウントで、会話の続きを残しましょう。
           </Text>
         </Card>
-        <Button label="人工データの画面を確認" secondary onPress={onDemo} />
       </>
     );
   else if (w.screen === "settings")
@@ -115,94 +121,10 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
         />
       </>
     );
-  else if (w.screen === "recording")
-    body = (
-      <GlassSurface style={{ borderRadius: 24, padding: 24, gap: 20 }}>
-        <Badge>
-          {w.capture.phase === "recording"
-            ? "録音中"
-            : w.capture.phase === "stopping"
-              ? "端末へ保存中"
-              : "本人が開始・停止"}
-        </Badge>
-        <Text style={[styles.title, { fontSize: 44 }]}>
-          {Math.floor(w.capture.durationMs / 60000)
-            .toString()
-            .padStart(2, "0")}
-          :
-          {Math.floor((w.capture.durationMs / 1000) % 60)
-            .toString()
-            .padStart(2, "0")}
-        </Text>
-        <Text style={styles.body}>
-          周りの人に、会話を記録することを伝えてください。録音は5分までです。
-        </Text>
-        {w.capture.phase === "recording" ? (
-          <Button
-            label="自分の記録を終了"
-            danger
-            onPress={() => void w.capture.stop()}
-          />
-        ) : w.capture.phase === "save_failed" ? (
-          <Button
-            label="保存を再試行"
-            onPress={() => void w.capture.retrySave()}
-          />
-        ) : (
-          <Button
-            label="記録を始める"
-            busy={
-              w.capture.phase === "preparing" || w.capture.phase === "stopping"
-            }
-            disabled={Platform.OS === "web"}
-            onPress={() => void w.capture.start(w.session!.user_id)}
-          />
-        )}
-        <Text style={styles.muted}>
-          停止後はまず端末に保存します。音声の転送と外部処理は別に確認します。
-        </Text>
-        {Platform.OS === "web" && (
-          <Text style={styles.muted}>
-            端末録音はiOS / Androidのdevelopment buildで確認してください。
-          </Text>
-        )}
-      </GlassSurface>
-    );
-  else if (w.screen === "room")
-    body = (
-      <>
-        <Card>
-          <Heading>自分の記録</Heading>
-          <Text style={styles.body}>自分で残した会話を振り返れます。</Text>
-          <Button
-            label="自分の記録を開く"
-            onPress={() => w.setScreen("records")}
-          />
-        </Card>
-        <Empty
-          title="相手のルームは準備中です"
-          body="会話を持ち寄る操作は、自分の記録の「一緒にまとめる」から進められます。"
-        />
-        <Card>
-          <Heading>振り返る</Heading>
-          <Button
-            label="保存したもの"
-            secondary
-            onPress={() => w.setScreen("saved")}
-          />
-          <Button
-            label="日付から振り返る"
-            secondary
-            onPress={() => w.setScreen("today")}
-          />
-          <Button
-            label="ToDoを確認"
-            secondary
-            onPress={() => w.setScreen("todos")}
-          />
-        </Card>
-      </>
-    );
+  else if (w.screen === "recording") body = <RecordingScreen />;
+  else if (w.screen === "room") body = <RoomScreen />;
+  else if (w.screen === "records") body = <RecordsScreen />;
+  else if (w.screen === "confirmation") body = <Empty title="確認" body="会話の共有や記録の確認を、ここにまとめます。このモックでは準備中です。" />;
   else if (w.screen === "saved")
     body = w.connected ? (
       <LiveSaved api={w.api} onSource={(id) => run(() => w.openRemote(id))} />
@@ -372,63 +294,10 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
           ))}
       </>
     );
-  else
-    body = (
-      <>
-        <Text style={styles.muted}>自分の端末で残した記録。</Text>
-        <Heading>この端末の記録</Heading>
-        {w.local.map((record) => (
-          <Card key={record.id}>
-            <Badge>{captureLabels[record.capture_status]}</Badge>
-            <Text style={styles.body}>
-              {new Date(record.started_at).toLocaleString("ja-JP")}
-            </Text>
-            <Button
-              label="自分の記録を開く"
-              secondary
-              onPress={() =>
-                run(async () => {
-                  setDeleting(false);
-                  await w.openLocal(record);
-                })
-              }
-            />
-          </Card>
-        ))}
-        {!w.local.length && (
-          <Empty
-            title="まだ記録はありません"
-            body="会話を記録すると、ここから振り返れます。"
-          />
-        )}
-        <Heading>サーバーの記録</Heading>
-        {w.remote
-          .filter(
-            (record) => !w.local.some((value) => value.remote_id === record.id),
-          )
-          .map((record) => (
-            <Card key={record.id}>
-              <Text style={styles.body}>
-                {new Date(record.stopped_at).toLocaleString("ja-JP")}
-              </Text>
-              <Button
-                label="文字起こしを開く"
-                secondary
-                onPress={() => run(() => w.openRemote(record.id))}
-              />
-            </Card>
-          ))}
-        <Button
-          label="一覧を再取得"
-          secondary
-          disabled={!w.connected}
-          onPress={() => run(w.refresh)}
-        />
-      </>
-    );
+  else body = <RecordsScreen />;
   return (
     <View style={styles.page}>
-      <View style={{ padding: 16, gap: 10 }}>
+      {!nativeNavigation && <View style={{ padding: 16, gap: 10 }}>
         <View style={[styles.row, { flexWrap: "wrap" }]}>
           {w.session && (
             <Button
@@ -485,11 +354,13 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
             onPress={() => w.setScreen("recording")}
           />
         )}
-      </View>
+      </View>}
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
+        contentInsetAdjustmentBehavior="automatic"
       >
+        {nativeNavigation && w.session && w.recordingActive && w.screen !== "recording" && <Button label="録音中の画面へ" danger onPress={() => w.setScreen("recording")} />}
         {(w.error || w.capture.error) && (
           <Card>
             <Text accessibilityRole="alert" style={styles.body}>
@@ -507,7 +378,7 @@ export function LiveApp({ onDemo }: { onDemo: () => void }) {
         )}
         {body}
       </ScrollView>
-      {w.session && (
+      {w.session && !nativeNavigation && (
         <GlassSurface
           style={{
             padding: 12,
