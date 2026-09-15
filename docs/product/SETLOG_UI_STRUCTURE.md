@@ -1,6 +1,6 @@
 # Setlogを参考にしたUI構成案
 
-版: 1.5 / 2026-09-15。状態: **ユーザーがSetlog構成を実装仕様に採用。正本MVP_SPEC 2.4へ反映。主要8画面の静止画あり・構成の製品実装は未完了**。本文はKosugi Maru、タイトルはNoto Sans JP。
+版: 1.6 / 2026-09-15。状態: **ユーザーがSetlog構成を実装仕様に採用。正本MVP_SPEC 2.5へ反映。OS別の具体仕様は同書§18。主要8画面の静止画あり・構成の製品実装は未完了**。本文はKosugi Maru、タイトルはNoto Sans JP。
 
 ユーザーの「setlog案を採用」により、録音起点の構成を[MVP_SPEC §4/16/17](MVP_SPEC.md)へ統合した。配置・導線の正本はMVP_SPEC、本書は詳細と制作経緯の補助資料。旧3タブ・独立Homeは現行配置から置き換える。個人記録の一覧は[一覧整理](SETLOG_RECORDS_LIST.md)、画面は[画像v2](prototypes/setlog-ui/README.md)を参照する。API・共有条件・保存期限は維持し、録音後の自動処理・AI参照/履歴・外部実行の未決定を採用済みにしない。Setlogは参考構成名で、製品名は別途選定する。
 
@@ -15,7 +15,7 @@
 
 | 入口 | 内容と主な操作 |
 |---|---|
-| 録音タブ | 起動画面。大きな丸い「記録を始める」ボタンを中心に置く。相手指定・ルーム作成なしで開始でき、起動だけでは録音しない。録音中は経過時間と停止操作を表示 |
+| 録音タブ | 起動画面。カセットのheroと「記録を始める」ボタンを分ける。OS別配置/動作は[MVP_SPEC §18](MVP_SPEC.md#platform-design)。相手指定・ルーム作成なしで開始でき、起動だけでは録音しない |
 | ルームタブ | 先頭に「自分の記録」、その下に会話した相手ごとのルームを並べる |
 | 自分の記録 | 本人の元記録を日付ごと・新しい順にまとめ、通常1〜2行のコンパクトな記録行から詳細を開く。今日を展開し、過去の日付は折りたたむ。共有手続きのない記録も通常の記録として表示 |
 | 相手のルーム | 「記録／AI」を切り替える。初期表示は記録カード。記録面に許可範囲の共有会話、AI面に本人用の質問・参照操作を置く |
@@ -94,21 +94,21 @@ AI参照の初期値、新規記録を加えたときの選択、チェック変
 
 ## 6. 見た目の方向
 
-Setlogの[公式画面例](https://setlog.kr/setlog-preview-720.png)を参考に、白〜淡い背景、丸い操作、大きな時刻付きカード、控えめなパステル色を使う。具体的な配色・余白は画像検討で決める。
+Setlogの[公式画面例](https://setlog.kr/setlog-preview-720.png)を参考にした白/ミントの方向を維持する。具体的な配色・余白・OS別部品・モーションは[MVP_SPEC §18](MVP_SPEC.md#platform-design)へ集約した。旧画像から値を推測し直さない。
 
-本文は濃色で読みやすくし、状態は色だけで伝えない。文字拡大でも開始・停止・戻る操作が隠れず、既存の操作領域48×48以上、Glassの適用範囲と通常面への代替を維持する。
+本文は濃色で読みやすくし、状態は色だけで伝えない。文字拡大でも開始・停止・戻る操作が隠れず、独自の操作領域48×48以上を維持する。標準部品のmetrics、Glassの適用範囲と低減時の表示はMVP_SPEC §4/18に従う。
 
 ### タイトルと本文のフォント（2026-09-15決定）
 
 ユーザー指定により、Setlog案の本文には **Kosugi Maru Regular（400）** を採用する。記録の本文・要約、AI回答、説明文に使う。
 
-追加指定の「タイトルははっきりしたフォント」に合わせ、画面タイトル・見出し・記録カードのタイトルには **Noto Sans JP SemiBold（600）** を使う。本文との違いを明確にし、タイトルの輪郭と階層を読み取りやすくする。大きな時刻・ボタン／タブ等の短い操作ラベルの書体は今回の決定に含めない。
+追加指定の「タイトルははっきりしたフォント」に合わせ、画面タイトル・見出し・記録カードのタイトルには **Noto Sans JP SemiBold（600）** を使う。本文との違いを明確にし、タイトルの輪郭と階層を読み取りやすくする。時刻・短い操作ラベル・OS標準barの書体/拡大規則は[MVP_SPEC §18.3](MVP_SPEC.md#platform-tokens)を使う。
 
-[公式配布のメタデータ](https://github.com/google/fonts/blob/main/apache/kosugimaru/METADATA.pb)に従い、Regular 400を使用する。本文の擬似的な太字化は行わず、読みやすさは文字サイズ・行間・余白・色で調整する。[実フォントの本文見本](prototypes/setlog-ui/kosugi-maru-body.html)では、17px・行間1.75を比較用の初期値として変更できる。最終的なアプリの寸法値ではない。
+[公式配布のメタデータ](https://github.com/google/fonts/blob/main/apache/kosugimaru/METADATA.pb)に従い、Regular 400を使用する。本文の擬似的な太字化は行わず、読みやすさは文字サイズ・行間・余白・色で調整する。[実フォントの本文見本](prototypes/setlog-ui/kosugi-maru-body.html)では、17px・行間1.75を比較用の初期値として変更できる。比較見本の値であり、実装見本の拘束値は[MVP_SPEC §18.3](MVP_SPEC.md#platform-tokens)へ統一した。
 
 Noto Sans JPは[公式配布の可変フォント](https://github.com/google/fonts/blob/main/ofl/notosansjp/METADATA.pb)の600を使用する。[実フォントの書体見本](prototypes/setlog-ui/kosugi-maru-body.html)にタイトルと本文の組合せを反映した。[画像v1](prototypes/setlog-ui/history-v1.md)はフォント選定前の構成・配色の履歴。[画像v2](prototypes/setlog-ui/README.md)は採用書体を生成指示へ反映した現在の画面案だが、字形は近似であり実フォントの正確な組版を保証しない。
 
-既存の[配置見本](prototypes/mvp-spec-wireframes.html)、[F系列の画面画像](prototypes/design-directions/f-screen-gallery.html)、[G系列のHome画像](prototypes/design-directions/g-ios-home-attention-v1.png)は既存案の資料として保持する。本書に対応する[Setlog案の画像と生成指示](prototypes/setlog-ui/README.md)は専用フォルダに保存した。録音・ルーム・自分の記録・記録／AI・確認・共有範囲の8画面例で、具体配色と配置は検討用の候補。空・失敗・期限切れの画像は未展開。
+既存の[配置見本](prototypes/mvp-spec-wireframes.html)、[F系列の画面画像](prototypes/design-directions/f-screen-gallery.html)、[G系列のHome画像](prototypes/design-directions/g-ios-home-attention-v1.png)は既存案の資料として保持する。本書に対応する[Setlog案の画像と生成指示](prototypes/setlog-ui/README.md)は専用フォルダに保存した。録音・ルーム・自分の記録・記録／AI・確認・共有範囲の8画面例で、情報階層の参照として保持する。OS別の具体値・録音の基準素材・旧見本の扱いは[MVP_SPEC §18.1](MVP_SPEC.md#platform-design)。空・失敗・期限切れの画像は未制作で、[OS別工程](../development/MULTIPLATFORM_DELIVERY_PLAN.md#platform-design-tasks)に制作/確認を組み込んだ。
 
 ## 7. 確認条件と今回の範囲
 
@@ -123,5 +123,7 @@ Noto Sans JPは[公式配布の可変フォント](https://github.com/google/fon
 - 空・読込・失敗・期限切れでも次の操作が分かる。
 
 1.0〜1.4では構成案の分離、8画面の画像、実フォント、一覧整理、残り時間を表示しない録音画面を準備した。1.5でユーザーが構成を採用し、MVP_SPECへ統合・旧配置を置換した。今回の仕様反映はアプリコード・公開API／型の変更ではない。録音後の自動処理、AI参照の初期値・履歴、外部実行・書出し条件、ルームの正式契約は別の仕様判断として残す。
+
+1.6でOS別デザインの方針・具体値・状態表・モーション・受入をMVP_SPEC §18へ集約し、ロードマップに12工程を追加した。数値/素材は代表実装見本の基準で、OS別画像・操作動画の確認は未実施。既存の構成/書体/カセット方向の了承は取り直さない。
 
 文書の整合性確認を、新構成の操作・実機・録音・共有・AI・外部サービスの動作検証とは扱わない。作業結果は[WORKFLOW](../development/WORKFLOW.md)に記録する。

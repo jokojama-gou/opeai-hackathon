@@ -1,10 +1,10 @@
 # RN＋Expoの開発ロードマップ
 
-2026-09-14。RN＋Expo統一、明色＋Liquid Glass、MVP A/B/Cと外部API書き起こしの採用はユーザー決定。仕様は[MVP_SPEC](../product/MVP_SPEC.md)、現在地は[WORKFLOW](WORKFLOW.md)。本書だけがKタスク・担当・依存・提出条件を定義します。
+2026-09-15。RN＋Expo統一、iOSのネイティブUI/Liquid Glass・AndroidのMaterial 3、明色のSetlog構成を使う。仕様は[MVP_SPEC](../product/MVP_SPEC.md)、現在地は[WORKFLOW](WORKFLOW.md)。本書だけがKタスク・担当・依存・提出条件を定義します。OS別UIは[詳細工程](#platform-design-tasks)から着手する。
 
 ## 構成と契約
 
-既存 `apps/client` が唯一のアプリ基盤です。独立したSwiftUIアプリは作りません。UI・状態・通信をTypeScriptで共通化し、OS固有差だけ部品境界で分けます。必要なSwift/Kotlin拡張はExpo Modulesで追加できますが、独立アプリの再開にはしません。
+既存 `apps/client` が唯一のアプリ基盤です。状態・通信・本文/権限の意味とブランドは共有し、ナビゲーション・操作部品・モーションは`.ios.tsx`/`.android.tsx`等の境界で分けます。Expo Router/Expo UIを使うnative部品の検証をK02で先行し、全画面を同一JSX/形状に揃えません。必要なSwift/Kotlin拡張はExpo Modulesで追加できますが、独立したSwiftUI/Composeアプリへ分岐しません。
 
 API・保存・処理の仕様は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)、カレンダーは[§14](../product/MVP_SPEC.md#calendar)、5役割は[§15](../product/MVP_SPEC.md#agents)。APIが認証・区間認可を行い、workerが音声の前処理/分割・外部ASR呼出・結果結合・統合・生成・clip処理を担います。各スマホはWindows側の共通APIへ接続します。端末/開発PCにASR推論環境を構築することを前提にせず、Supabaseの保存/認証とworkerの処理責務を分けます。外部ASRの採用とバックエンドのクラウド移行は別です。 外部ASRの提供者・モデルはGo君の選定結果を受領して確定します。
 
@@ -57,7 +57,7 @@ services/backend/, supabase/                          処理・API・DB（Go君�
 
 | 段階 | UI/UX担当 | Go君 | 合流条件 |
 |---|---|---|---|
-| 最初 | U01→U06→U07の導線・文言・状態別ラフ、主タブとGlassの見本。既存M/U/ACの意味を維持 | 外部ASRの候補を比較し、出力例・欠ける情報・分割/保持条件への影響を整理 | 入出力と担当案を確認。技術名が未決定でもUI検討は進める |
+| 最初 | U02/U16の2タブ→U06→U07のOS別代表見本、カセット、tokens/操作動画。詳細はK02-ui01〜04。既存M/U/ACの意味を維持 | 外部ASRの候補を比較し、出力例・欠ける情報・分割/保持条件への影響を整理 | 入出力と担当案を確認。技術名が未決定でもUI検討は進める |
 | K01/K02 | 共通fixtureで一覧→本文→出典、読込/空/失敗/確認待ち/期限切れを操作できるRN画面 | contractsとfixtureを取りまとめ、処理結果をSource/Conversationへ変換する境界を決める | 同じID/版/不明/出典と期待表示。画面内のデータ直書きをrepository経由へ置換 |
 | K03〜K06 | 録音画面の表示、保存/送信/処理状態、共有確認、再試行、出典/訂正UIをfixtureで先行 | 端末録音・API・ASR・認可・統合・clipを必要な条件成立後に接続 | まず1録音→保存→個人結果→出典、次に2入力→許可→統合。実音声/外部送信は既存条件に従う |
 | K09/K10/K08 | 今日・ToDo・保存・日次・予定確認の画面を人工出力で先行 | 生成runner・manifest失効・Google executorとAPI | 機能単位でfixtureから実adapterへ切替。成功だけでなく取消・期限・再送も同じ画面で確認 |
@@ -73,7 +73,7 @@ fixtureは開発用と明示し、実API失敗時に自動で成功fixtureへ戻
 
 ### 4. 各AIへ渡す依頼例
 
-UI/UX担当：AGENTS・WORKFLOW・本書の並行作業を読み、MVP_SPECのU01/U06/U07とUI共通ルールを前提に、状態別の画面案を具体化する。配置案を確認してから、明示された実装範囲でfixture接続のRN画面を作る。音声技術やサーバー実装を独自に決めず、必要な出力と不足をGo君へ渡せる形に整理する。
+UI/UX担当：AGENTS・WORKFLOW・本書のOS別デザイン工程を読み、MVP_SPEC §4/18のU02/U16/U06/U07を両OSの代表見本にする。K02-ui04で新しい具体表現を一括確認し、確認した基準でfixture接続の各画面へ展開する。採用済み配置の了承は取り直さない。音声技術やサーバー実装を独自に決めず、必要な出力と不足をGo君へ渡せる形に整理する。
 
 Go君側：音声技術選定の現在の成果を確認し、採用仕様の入出力・保持/送信条件を満たすか比較する。出力例、欠ける情報、UIに影響する制約、推奨と未検証を返す。担当案を確認した後、依頼範囲のcontracts/adapter/APIを実装し、同じfixtureでUI側へ渡す。共有・保持・送信先を変える場合はその変更判断を記録する。
 
@@ -88,7 +88,7 @@ Go君側：音声技術選定の現在の成果を確認し、採用仕様の入
 |---|---|---|
 | 確定仕様の具体化 | 既存M/U/ACの状態表、対応テスト、人工例、画面内の部品分割を作る | 正本間で矛盾があれば該当動作を止める |
 | 局所的な実装選択 | 関数/ファイル名、純粋な表示変換、テストの配置。選択理由を引継ぎに残す | 依存追加・公開する型/enum・共通設定は取りまとめ担当へ渡す |
-| UI/UXの未確定部分 | 配色値・余白・アイコン・アニメーションの具体案と比較用モックを作る | 最終デザインとして固定する前にUI/UX担当が判断。タブ/操作/状態の意味は変更しない |
+| UI/UXの具体化 | MVP_SPEC §18のtokens/OS別部品/MXを拘束値にして代表見本を作る | K02-ui04で新しい具体表現を一括確認。旧画像から値を推測し直さず、必要な変更は比較で示す。タブ/操作/状態の意味は維持 |
 | 技術・運用の未確定部分 | 要求との比較、必要情報の列挙、人工adapterの設計 | 外部ASRの具体プロバイダ/モデル・分割設定・費用・実データ条件・対応OS/配布を推測で決定しない。外部APIを使う採用判断は再度未決定に戻さない |
 
 開始前にWORKFLOWへ「依頼された担当と小作業／基準版と未コミット差分／編集するファイル／参照仕様と受入／未決定と停止範囲」を一行ずつ記録する。同じファイルの編集中申告がある場合は担当へ返し、重ねて編集しない。別PCは同じ資料を持つことを対象版または受け渡した差分で確認する。現在のローカル変更が相手へ共有済みとは仮定しない。
@@ -97,7 +97,7 @@ Go君側：音声技術選定の現在の成果を確認し、採用仕様の入
 |---|---|---|
 | 契約/API/worker・設定の担当案 | 両担当が受け持つ範囲と共通ファイルの取りまとめ役を回答 | 未割当領域の実装／UI案・音声比較は先行 |
 | 公開するJSONの厳密な形 | K01担当が§9/15の各項目を型・必須/null・enum・エラーへ対応付け、両者確認。意味が未定義なら企画者へ判断依頼 | 影響する正式fixture/API接続／既知状態の表示検討は先行 |
-| 配色・配置・動きの最終形 | UI/UX担当が状態別画面案を確認 | 最終デザイン固定／仕様準拠の案・共通表示処理は先行 |
+| 配色・配置・動きの最終形 | UI/UX担当がK02-ui04のOS別代表画像/動画を一括確認 | 確認後の全画面展開／§18の拘束値による部品・素材・代表見本は先行 |
 | 外部ASRの選定と端末adapter | Go君がプロバイダ/モデル・入力上限・分割/時刻対応・出力例・不足・利用条件を提示。採用構成への適合性を照合し、残る選択は企画者が判断 | 具体設定に依存する実音声adapter接続／契約と人工UIは先行 |
 | 実機/運用の設定 | [後段の前提](#runtime-prerequisites)の該当担当が端末/OS、接続先、予算、許可、署名等の実値を確認 | その環境での実行と完了判定／人工検証は先行 |
 
@@ -111,13 +111,13 @@ Go君側：音声技術選定の現在の成果を確認し、採用仕様の入
 
 | 小作業 | 入力・編集先 | 完了時に見せるもの／停止条件 |
 |---|---|---|
-| UI検討（UI/UX担当、K02準備） | §4/6/8からU01/U06/U07。検討用データはapps/client/src/data/ | 通常・相違・確認待ち・期限切れの画面案と操作先。未決定の配色/配置は案と明示。実API契約・製品実装の完了とはしない |
+| UI検討（UI/UX担当、K02準備） | §4/6/8/18からU02/U16/U06/U07。検討用データはapps/client/src/data/ | OS別デザイン工程ui01〜04の代表画像/動画・部品帳。実API契約・製品実装の完了とはしない |
 | K01-a 契約対応表（担当確認後） | §9/15→contracts/mvp-v1.schema.jsonの設計 | 必須/null、版、時刻、文字範囲、状態軸、エラーを出典節へ対応付ける。未定義の意味/矛盾は欄を埋めずWORKFLOWへ。設計段階の不完全schemaを有効な契約と称さない |
 | K01-b schemaと人工ケース | 解決済みK01-a→contracts/ | [4fixtureの期待結果](../product/MVP_SPEC.md#initial-fixtures)と期待する拒否を機械検証。共有未成立/音声期限/文字期限を混同しない。未解決の必須項目があればK01完了にしない |
 | K02-a データ境界（UI/UX担当） | K01-b→apps/client/src/data/ | 一覧・会話・出典のfixture取得と表示状態変換。画面から直接JSON本文へ依存しない。型検査とunknown/空/失敗の変換確認。ネットワーク・録音はまだ呼ばない |
 | K02-b 記録から本文（UI/UX担当） | K02-a→src/screens/・src/navigation/（apps/client内） | U01の一覧/空/フィルタ0件→共有会話U06、相違/不明を保持。個人記録の行はU03へ向かう仕様を守り、U06に代用しない。未実装遷移は下記規則へ |
 | K02-c 出典往復（UI/UX担当） | K02-b→同screens/、src/ui/ | 発言→U07の該当原文/版→閉じて元位置。自分の訂正と他者への指摘を区別。期限切れ/時刻不明は再生成功にしない。人工状態の確認で実音声再生は完了しない |
-| K02-d 共通面と操作確認（UI/UX担当） | K02-b/c→src/ui/・navigation、設定変更は取りまとめ役 | [UI共通ルール](../product/MVP_SPEC.md#ui-rules)で通常面/Glass、文字拡大/読み上げ/戻るを確認。依存は実manifestを確認して導入。未導入のGlassを使えたと報告しない |
+| K02-d OS別面と操作確認（UI/UX担当） | K02-b/c＋下記OS別デザイン工程→src/ui/・navigation、設定変更は取りまとめ役 | §18の部品/tokens/MXとVDの該当条件を確認。Glass素材の導入とnativeタブ/操作体験を区別。ui02で依存版/実機の裏付けを取り、ui04で代表見本、ui06で全操作を確認 |
 
 K02中にU03/U04/U08/U12/U14/U16/U17等の未実装画面へ向かう場合、開発用の遷移確認で宛先IDと引数を検査し、未実装と分かる戻れる仮画面を使える。架空の保存・共有・再生成功を返さない。採用仕様2.4では初回起動先は録音待機U02、主タブは録音/ルームの2つ。旧U12起動・3タブは置き換える。K02の完了は関連する表示部分であり、AI会話・未実装画面・全43条件の完了を意味しない。
 
@@ -128,6 +128,44 @@ K03以降も、該当Kの中で「状態別UI→人工API/adapterで境界確認
 取りまとめ担当は、受け取った差分の対象版と契約版を照合し、変更ファイルの重複を確認する。K01-bの同じfixtureを双方で検証し、K02-b/cの往復操作と本文遮断を確認してからAPI版へ接続する。片方だけの成功、型チェックだけ、リンク検査だけで合流完了にしない。衝突は一方のファイルを丸ごと優先せず、仕様・各差分の目的・テストを照合して解消する。
 
 実接続前の引継ぎには、操作名、入力と期待結果、契約版、実装済み/仮画面、検証したOS/環境、未実行条件を記録する。受信後に契約を変更する場合は両者の影響箇所とfixtureを同時更新し、旧契約のまま片側だけを完成扱いにしない。
+
+
+<a id="platform-design-tasks"></a>
+### 8. OS別デザインの実装工程（K02/K03/K04/K06/K07/K09）
+
+2026-09-15のレビュー修正。見た目の正本は[MVP_SPEC §18](../product/MVP_SPEC.md#platform-design)。以下はAI内部の成果単位で、独立した新機能/製品IDではない。**今回は計画を整備した状態。native移行・素材制作・実装見本・実機検証の完了チェックはまだ付けない。**
+
+UI/UX担当が両OSのデザインとUI実装を取りまとめる。Androidの実機確認をGo君へ依頼する通常案は維持するが、Androidのデザインそのものを未割当にしない。外部の人/AIへの送信や新規エージェント起動は、この工程表だけでは指示しない。
+
+編集先の `src/` はapps/client/src。新しいパスは予定。既存のApp.tsx、DemoApp、LiveApp、UiStudyの人工/API/検討モードを照合して移行し、ユーザーの保存/認証/録音状態を移行の都合で消さない。
+
+| 順/内部作業ID | 依存と具体作業 | 編集先/成果物 | 完了条件・検証 |
+|---|---|---|---|
+| 1 / K02-ui01 版の固定 | §4/18を読んで画面ID→仕様→素材→状態→確認結果の表を作る。旧資料を現在の基準に混ぜない | src/data/内の人工表示ケース、platform-v1/manifest.json（§18.7の予定場所） | 全必須画面/状態をmanifestに列挙。未制作はpending。通常/失敗等のfixture ID、OS/文字/時刻を固定。公開schemaへ未採用のM15既定値を足さない |
+| 2 / K02-ui02 native基盤の検証 | SDK57のNativeTabs/Stack、Compose Host/sheet/input、SF/Material iconsのAPIを確認。2タブ→詳細→出典の最小経路を両OSで作る | App.tsx/index.ts、src/app/、src/navigation/、src/ui/platform/。package/lock/app設定は取りまとめ担当一人 | iOS実Glass/選択/戻る取消、AndroidのMaterial/予測型戻る、文字拡大・Web代替を実buildで確認。依存の解決版/OS/SDKを記録。使えないAPIの推測実装や共通Pressableへの無言置換なし |
+| 3 / K02-ui03 tokens/部品帳 | ui02の実APIに§18.3の色・書体・metricsを適用。共有/ios/androidの境界を作る | src/ui/tokens/{brand,ios,android}.ts、src/ui/platform/、assets/fonts/、既存primitives/StudyPrimitives | title/body/label/time、button/field/tab/segment/menu/badge/sheet/録音帯の通常/押下/選択/無効/処理中/失敗を両OSで撮影。実フォント・contrast・操作領域を確認 |
+| 4 / K03-ui01 カセット素材 | ui03。DREAM TAPEを制作見本に固定背景/前面/左右リール/空/星/影を分離制作。実録音なしの人工a=0/0.5/1を用意 | assets/recording/platform-v1/、cassette.layers.json、src/ui/recording/ | pivot/clip/z-orderを実素材と照合。通常/録音/失敗/低減の実描画画像。以前の立体やマイクを完成素材にしない。原案との差を比較 |
+| 5 / K02-ui04 代表画面の見た目確認 | ui01〜03/K03-ui01。U02/U16/U06/U07を§18の配置・動きで一続きの人工見本にする | src/screens/・navigation/、platform-v1/{ios,android}/の画像・動画 | 同じfixtureの画像とMX01〜04/06/07/09の動画。採用済み構成の了承は取り直さず、新しい具体表現をUI/UX担当が一括確認。調整時はtokens/素材/動画を同版へ更新。確認前の全画面展開はしない |
+| 6 / K02-ui05 記録/ルーム展開 | ui04の確認版＋K02-a。U16→U01/U17→U03/U06、日付折畳み、相手/本人待ち、本文/出典を接続 | src/screens/・data/・navigation/ | §18.4の該当全状態、50件/長文/低減、2タブ履歴/位置、失効を確認。既存データ/宛先テストを更新し、verify:ui。両OS画像・戻る動画 |
+| 7 / K03-ui02 録音表示接続 | ui04＋K03の端末adapter契約。開始/停止/保存/中断・期限・音量を実状態へ接続 | src/screens/RecordingScreen、src/ui/recording/、共通provider。audio adapter変更はK03担当 | 二重開始/結果不明/遅い保存/失敗/5分停止。タイマー成功なし。録音中のtab/stack切替、後着通知で勝手に画面移動なし。人工確認後、許可済み範囲で実録音・音量を両OS確認 |
+| 8 / K06-ui01 出典/訂正 | ui05＋K06契約。U07/U08と半高→全高、focus、IME、破棄確認を接続 | EvidenceSheet等src/screens/、src/ui/platform/Sheet.*、関連data | 閉じる/Back/途中取消、版競合、本文/音声期限、再生切替。保存は実結果。元の発言/scroll/focusへ復帰。verify:uiと両OS操作動画 |
+| 9 / K04-ui01 接続/共有/設定 | ui04＋K04契約。U04/U05/U09、範囲control、相手待ち、取消をOS別部品で実装 | src/screens/LiveSharing等、src/ui/platform/・data/ | §18.4全状態、rangeの読み上げ/端点境界、未許可本文なし、二重送信/期限切れ。該当ACと両OSの画像/動画 |
+| 10 / K09-ui01 AI/確認 | ui05＋M15の確定した意味/契約。U17 AI/U15、参照・draft・IME・生成中・出典を実装 | src/screens/・data/・navigation/ | 未決定の参照/履歴は依存部分だけ保留し人工画面を先行。本人のAI面と相手DMを混同しない。長文/失効/0件/失敗、IME時tab/録音帯、追加M15受入と両OS画像 |
+| 11 / K02-ui06 動き/低減の総確認 | ui05〜K09-ui01の実装済み範囲でMX01〜10。AppState/設定購読・解除、割込/連打を確認 | src/ui/motion/、src/ui/platform/、各画面。共通規則は§18へ反映 | 標準動作の二重animationなし。透明度×動き低減4組合せ、OS復帰、VoiceOver/TalkBack、Glass opacity制約を確認。各MXの正常/取消/失敗動画 |
+| 12 / K07-ui01 両OS完成検査 | 上記＋既存機能ACの接続。§18.7 VD01〜08をrelease相当の同じ候補buildで実施 | platform-v1/manifest・比較画像・動画・計測記録、WORKFLOW | 条件/版を固定してiOS/Androidを別々に合否。静止画の差・tap/back・フレーム時間・読み上げを実測。未実行をPASSにしない。修正後は影響した条件だけ再確認 |
+
+**工程のまとまり**
+
+- 依頼範囲内のui01〜03と素材制作は連続して進める。ui04で「iOS/Android代表4画面・カセット・主要操作動画」を一括して見せ、個々の角丸や色値ごとに質問しない。
+- ui04の確認後は、各画面工程の最初に人工描画で全遷移先の状態別画像を同じ版で揃え、その画面群の画像化が終わってから製品機能へ接続する。画像/操作見本のためのfixture実装は先行できる。割り当て済みの実装/検証/局所修正は続け、未制作のまま最終デザイン完成にしない。
+- 実機未準備でもtokens・人工状態・素材・Webのlayout確認は進められる。実Glass/ネイティブ操作確認が必要なui02/ui04/VDの該当部分は未実行のまま残し、Web動画をiOS確認の代替にしない。
+- 機能を追加するためのデザイン変更、M15の参照/履歴、ASR/共有条件は該当する仕様判断へ返す。依存していない画面/部品を止めない。U10〜U14等の追加枠は当日必達の後、同じ形式へ展開する。
+
+**一つのAI実装依頼に渡す情報**
+
+基準commit/未コミット差分、K/ui作業IDと担当、編集ファイル、M/U/AC/VD/MX、fixture/素材/font版、OS/API/依存版、§18の該当表、基準画像/動画、必要な正常/失敗/取消/低減ケース、実行コマンド、提出先と未決定の停止範囲を渡す。「iOSらしく」「Material風に」だけで依頼しない。複数のAIを使う場合も共通tokens/route登録/package/lockは取りまとめ担当だけが更新する。
+
+依頼文例：「MVP_SPEC §18と確認済みplatform-ui-v1を使い、K06-ui01のU07/U08をiOS/Android別のSheet部品で完成させてください。指定fixtureで出典→訂正→IME→未保存で戻る取消→保存失敗→再試行→元位置の復帰を確認し、VD02/03/04の画像・動画とverify:uiを提出してください。本文/共有/版の意味を変えず、既存差分を保持し、許可された実装と検証を途中で再依頼待ちにしないでください。」
 
 <a id="tasks"></a>
 ## Kタスクと着手順
@@ -145,7 +183,7 @@ K03以降も、該当Kの中で「状態別UI→人工API/adapterで境界確認
 | K | 担当・成果と完了条件 | 依存・受入 |
 |---|---|---|
 | K01 契約 | Go君がcontractsのschemaと4fixtureを取りまとめる案。UI/UX担当が必要な表示・期待結果を渡し、両者でID/版/文字範囲とunknownを確認。技術未確定でもUIラフは先行可 | [§9](../product/MVP_SPEC.md#contracts)。人工入力のみ。JSON検証・TSの受理/拒否テスト。署名・クラウド・音声不要 |
-| K02 表示 | UI/UX担当がSetlogのU02/U16の2タブ→U01/U17→U03/U06→U07とGlassを共通実装。同じfixtureで原文/相違/不明・根拠への移動を確認 | K01。[AC06/07/15の表示部分](../product/MVP_SPEC.md#ac)と[UIルール](../product/MVP_SPEC.md#ui-rules)。録音操作面へのGlass接続はK03、AI会話はM15。人工デモと明示 |
+| K02 表示 | UI/UX担当がU02/U16→U01/U17→U03/U06→U07を、共通状態＋OS別native部品で実装。ui01〜06の基準版/部品帳/見本/画像/動画を揃える | K01。[AC06/07/15](../product/MVP_SPEC.md#ac)と[§18](../product/MVP_SPEC.md#platform-design)。録音表示接続はK03、AI会話はM15。人工デモと明示 |
 | K03 録音・ASR | UI/UX担当がU02/U03の状態と操作、U09のアクションボタン設定案内を設計/実装。Go君が端末録音adapter・保存/送信・workerの正規化/分割・外部ASR adapter・結果結合/Source生成・秘密鍵と呼出上限を担当する案。iOS App Intents/Live Activity/adapter接続の実装担当は未確定 | K01/K02、実機と処理設定。[AC01/02/14/19](../product/MVP_SPEC.md#ac)と[アクションボタン開始](../product/MVP_SPEC.md#action-button-recording)。処理同意のアプリ内判定は作らない。分割なし/複数チャンク/境界/部分失敗/結果不明/期限失効を人工adapterで確認し、実録音の実行範囲は確認済み条件と照合 |
 | K04 持ち寄り・許可 | UI/UX担当がU04/U05/U09。Go君がsnapshot・再確認・相互許可・継続/取消のAPI/認可を担当する案。人工入力をAPIまで接続 | K01、Auth/DB。[AC03/04/09〜12/16/19](../product/MVP_SPEC.md#ac) |
 | K05 統合 | Go君がworker/G1・APIとContextView/根拠group接続を担当する案。UI/UX担当がpending/失敗/出典/結果更新の表示を接続 | K01/K03/K04、実adapter設定。[AC05/06](../product/MVP_SPEC.md#ac)。fixtureを実生成と称さない |
@@ -153,11 +191,11 @@ K03以降も、該当Kの中で「状態別UI→人工API/adapterで境界確認
 | K09 今日・保存・ToDo | UI/UX担当がU12〜U15の本人操作・保存/メモ/確認。Go君が対応API/永続化を担当する案。人工G2/G4出力を接続 | K01/K04、UIはK02から並行可。[§15とA条件](../product/MVP_SPEC.md#agents-ac) |
 | K10 役割・日次 | Go君がG2/G3/G5生成・G4決定的処理とrunner/APIを担当する案。UI/UX担当が日次・失効・失敗/再試行の表示を接続 | K05/K09、定義済みの処理範囲と現在の閲覧/共有権限。[A01〜A15](../product/MVP_SPEC.md#agents-ac) |
 | K08 カレンダー | UI/UX担当がU10/U11・OS編集への導線。Go君がGoogle executor/APIと端末カレンダーadapterを担当する案。iPhoneの操作はUI/UX担当が確認 | K05/K10のG3実生成。人工UIはK09と並行可。[C01〜C09](../product/MVP_SPEC.md#calendar-ac) |
-| K07 完成・提出 | UI/UX担当が通しUX/iPhone/署名、Go君がAndroid/API/workerを担当する案。統合→相違→ToDo→保存/メモ→予定→日次→根拠を両者で確認 | 他Kの接続後。[AC01〜19](../product/MVP_SPEC.md#ac)、[C01〜09](../product/MVP_SPEC.md#calendar-ac)、[A01〜15](../product/MVP_SPEC.md#agents-ac)。計43条件の証拠 |
+| K07 完成・提出 | UI/UX担当が通しUX/iPhone/署名、Go君がAndroid/API/workerを担当する案。統合→相違→ToDo→保存/メモ→予定→日次→根拠を両者で確認 | 他Kの接続後。[AC01〜19](../product/MVP_SPEC.md#ac)、[C01〜09](../product/MVP_SPEC.md#calendar-ac)、[A01〜15](../product/MVP_SPEC.md#agents-ac)。既存43条件＋M15追加受入と[VD01〜08](../product/MVP_SPEC.md#platform-acceptance)の証拠。OS別の画像/動画/計測をK07-ui01で提出 |
 
 K01の成果物は `contracts/mvp-v1.schema.json`、`contracts/fixtures/{duplicate,conflict,pending,expired}.json` と各期待結果。JSON検証・TS受理/拒否テストを含みます。既存音声由来の文言は使いません。unknownを0/空の成功へ置換せず、共有未回答・期限切れの結果を成功にしません。各Kのテストは仕様の関連節を読み、API/worker/画面の境界を跨ぐ必要がある条件を単体表示だけで代替しません。
 
-2026-09-13追加の[M15 人ごとのAI会話](../product/MVP_SPEC.md#saved-context-chat)は、UI/UX担当が保存タブの再構成を設計中。人物/参照単位/履歴/生成状態の判断後、K01の追加契約、K09の画面、K10の会話処理、K07の追加受入を具体化する。既存5役割と計43条件でM15まで完了と判定しない。新しいAPI/永続化/AI会話処理の担当は未確定で、Go君の音声技術選定の担当から自動で割り当てない。配置検討は先行できるが、未定義の契約や実モデル接続には進まない。
+2026-09-15配置更新：[M15 人ごとのAI会話](../product/MVP_SPEC.md#saved-context-chat)は、UI/UX担当がU17相手のルームのAI面を設計/実装する。入口はU16→U17、保存U14は補助画面のまま。人物/参照単位/履歴/生成状態の判断後、K01の追加契約、K09の画面、K10の会話処理、K07の追加受入を具体化する。既存5役割と計43条件でM15まで完了と判定しない。新しいAPI/永続化/AI会話処理の担当は未確定で、Go君の音声技術選定の担当から自動で割り当てない。配置検討は先行できるが、未定義の契約や実モデル接続には進まない。
 
 <a id="runtime-prerequisites"></a>
 ## 後段で確認する前提
