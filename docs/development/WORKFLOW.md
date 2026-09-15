@@ -20,6 +20,7 @@
   4. ✨ **ノイズ除去**: ElevenLabs Voice Isolation (`/v1/audio-isolation`) による原音と雑音除去後の音声を相互試聴・保存
 - 無音・小声時のWhisperハルシネーション（「ご視聴ありがとうございました」）の自動検知・警告フィルターを実装。
 - Vercel本番（Production）へパブリック公開URL `https://ai-speech-demo-ogamayokoys-projects.vercel.app` を更新・動作確認済み。
+- 全6社の実接続記録はmain `825ce10` の作業による。認証情報は今回の修正でソースへの固定埋め込みを除去し、[ASR設定](../../apps/client/src/data/asr-settings.ts)の既存環境変数から渡す。
 - 全67件の自動テスト、TypeScript型検査 (`npm run typecheck`)、ビルド確認に全て合格。
 
 ### 録音後の雑音除去・音声保存（2026-09-15）
