@@ -10,7 +10,8 @@ npm-debug.*
 .env.*
 !.env.example
 .DS_Store
-.git/
+# EAS checks this literal path before removing its shallow Git clone.
+.git
 credentials.json
 *.keystore
 *.jks
@@ -42,3 +43,6 @@ expo-env.d.ts
 /credentials/
 /services/
 /supabase/
+/hackathon-pitch/
+/outputs/
+/b.includes(Buffer.from(s))))throw

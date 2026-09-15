@@ -42,7 +42,7 @@ const checks = {
   runner: nodeCheck('runner', ['--test', 'scripts/verify.test.mjs']),
   'repository-tooling': nodeCheck('repository-tooling', ['--test', 'scripts/repository-tooling.test.mjs']),
   secrets: nodeCheck('secrets', ['scripts/check-repository-secrets.mjs']),
-  'credential-tests': nodeCheck('credential-tests', ['--test', 'scripts/audio-credentials.test.mjs', 'scripts/credential-security.test.mjs', 'scripts/share-credentials.test.mjs']),
+  'credential-tests': nodeCheck('credential-tests', ['--test', 'scripts/audio-credentials.test.mjs', 'scripts/credential-security.test.mjs', 'scripts/share-credentials.test.mjs', 'scripts/client-output.test.mjs']),
 };
 const scopes = {
   docs: ['docs', 'skills'],

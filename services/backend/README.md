@@ -75,7 +75,7 @@ ASRを接続する際は[adapters.py](app/adapters.py)のAsrAdapterを実装し�
 
 Responsesへの送信は `store:false`、toolなし、切詰めなし、構造化出力。拒否/未完了/不正根拠/11件以上の候補は公開しない。`store:false`だけで外部保持条件の確認が済んだとは扱わない。実装時の参照：[OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)、[GPT-5 mini](https://developers.openai.com/api/docs/models/gpt-5-mini)（2026-09-14閲覧）。アカウント可用性・日本語生成品質・実課金は未検証。
 
-UI確認用に、`services/backend`から `python tests/serve_artificial.py --artificial-only` を実行できる。loopback 8001に揮発性の人工APIを起動する専用entryで、本番factoryには入らない。クライアントは当該プロセスだけ `EXPO_PUBLIC_API_URL=http://localhost:8001` を指定し、`npm run web -- --host localhost --port 8082` で起動する。検証用ログインは `demo@example.invalid` / `artificial-only`。初期の記録は2026-09-14。今回、health/CORS/HTTPログインは成功したが、in-app browserからのログインは結果不明となり、Live画面の通し操作は未確認。検証用2プロセスは終了した。
+UI確認用に、`services/backend`から `python tests/serve_artificial.py --artificial-only` を実行できる。loopback 8001に揮発性の人工APIを起動する専用entryで、本番factoryには入らない。クライアントは当該プロセスだけ `EXPO_PUBLIC_API_URL=http://localhost:8001` を指定し、`npm run web -- --host localhost --port 8082` で起動する。検証用ログインは `demo@example.invalid` / `artificial-only`。初期の記録は2026-09-14。2026-09-15にブラウザfetchのreceiverを修正し、ログイン→録音待機→ルーム→本人の文字起こし→保存→録音へ戻る操作を確認した。クラウドAuth・実録音・実モデルの検証とは別の人工確認である。
 
 ## 保存方式と公開契約
 

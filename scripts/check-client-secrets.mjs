@@ -77,6 +77,8 @@ let scanned = 0;
 function scan(directory) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const path = join(directory, entry.name);
+    if (entry.name === ".git")
+      throw new Error("Git metadata detected in client output. Do not upload this archive.");
     if (entry.isDirectory()) {
       scan(path);
       continue;

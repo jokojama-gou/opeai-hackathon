@@ -1,6 +1,6 @@
-[CmdletBinding()]
+[CmdletBinding(PositionalBinding = $false)]
 param(
-    [Parameter(ValueFromRemainingArguments = $true)]
+    [Parameter(Position = 0, ValueFromRemainingArguments = $true)]
     [string[]]$EasArguments = @(),
     [ValidateSet('status', 'init', 'android', 'ios', 'simulator')]
     [string]$Task,

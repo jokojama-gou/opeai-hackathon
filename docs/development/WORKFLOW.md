@@ -4,6 +4,25 @@
 
 ## 現在の状態
 
+### ExpoアプリとクラウドSupabaseの実接続（2026-09-15）
+
+- 依頼/対象：ユーザーのExpoアプリ作成・既存トークン利用・DB操作の依頼。K03/K04/K07、M01/U01/U02/U03/U12/U16の既存接続部分、AC01/02/14/15/19。開始版 `4ecab1d` から、並行するGit同期で `d740f60` へ統合された実装を再確認。同期担当の差分と記録を保持した。
+- 実装：API設定がある開発ビルドも実接続で起動し、ログイン後は録音待機。録音/ルームの2タブと、自分の記録/保存への導線。ブラウザfetchの不正なreceiverによるログイン失敗と、重複React keyによる画面切替後の残像を再現・修正した。相手ルーム/AI会話やOS別デザインの完成ではない。
+- 実クラウド成功：Supabase `nmidnmqnrhogehzehkjh` に `private.app_entities`、private `recordings` bucket、専用DBロールを作成。ロール追加は自動承認レビューの要求に従いユーザー了承後に実行。公式CAでTLS検証し、transaction pooler用接続を調整。人工行のwrite/read/rollback、権限制限、Storage人工バイト列のwrite/read/delete成功。
+- 公開接続成功：一時HTTPSも自動承認レビューの拒否後、Cloudflare/公開範囲を明示してユーザーが了承。API health成功、未認証データ取得401を確認。このPCとトンネルの起動維持が必要。[構成と再起動](EXPO_CLOUD_CONNECTION.md)。
+- 配布成功：Expo `@yokoyamago/hackathon-client` のAndroid preview APKが **FINISHED**（2026-09-15 10:41 JST）。[ビルド](https://expo.dev/accounts/yokoyamago/projects/hackathon-client/builds/065bd0de-c822-4db5-83bc-71b2abbcde8d) / [APK](https://expo.dev/artifacts/eas/rw4Ft2pYvrGRSmzg3mLz_LOjkEhoafZVwfdnehA2aHE.apk)。表示名Setlog、package `com.yokoyamago.hackathonclient`、versionCode 1。ストア提出・実機インストールは未実行。
+- 配布前修正：EASが `.git/` では圧縮Git履歴を除外しないことを検出し、最初の転送を中断（完了・build作成なし）。`.git` 指定へ修正し、Git metadataを拒否する検査/回帰2件を追加。再作成した77ファイルの検査成功後、697KBのソースをEASへ送信した。平文Git共有の5設定もEAS/bundleには含めない。
+- 完成APK検査：73,608,313バイト、ZIP整合性と展開1,403ファイルのキー混入検査が成功。SHA256と取得先は[接続記録](EXPO_CLOUD_CONNECTION.md)。ffprobe 9.0.1を配布元SHA256照合後に配置し、実MediaProbeによる1秒の人工AAC検査成功。sandboxの実行ファイル探索は失敗、稼働APIと同じ通常権限で成功した。APIはffprobeを読込むよう再起動済み。
+- 自己確認成功：統合後のTypeScript 32件、型、Python 57件（依存warning 2件）、全OSバンドル（Web 791KB、iOS/Android約2.1MB）と6出力ファイルのキー検査。人工APIのブラウザでログイン→録音待機→ルーム→本人記録→保存→録音へ戻る操作を確認。実クラウドの認証/実録音の証拠とは分ける。
+- ツール/文書確認：登録7検査中6成功後、残る秘密検査の人工トークン表記を規定のsynthetic接頭辞へ直し、その検査と回帰2件が成功。保管テスト14件・検証入口7件・文書ツール17件が成功。配布前のGit除外判定は失敗→修正→成功を確認した。独立レビューなし。
+- 回答待ち：クラウドAuthの2開発アカウント作成は、自動承認レビューが「永続ログイン資格情報の新規作成に明示了承が必要」と拒否。専用の確認を出して未回答のため未実行。Authユーザー0人を読み取り確認した。アカウント作成後に実ログイン/本人と他人のAPI境界を確認する。
+- 残件：実機録音、iPhoneのMac/Xcode署名、具体ASR/実音声/生成、2入力統合、M15の相手ルーム/AI会話と未決定契約。この接続作業によるcommit/pushはしていない（並行した同期・他操作のcommitとは区別する）。
+
+### このcheckoutのGit同期・競合修復（2026-09-15）
+
+- `4ecab1d` とGitHub側で書き換えられた同内容の履歴の分岐を解消。既存27ファイルと元履歴を退避し、最新mainへ作業差分を統合した。作業中に別操作で作成・pushされた `9f26f8b` / `01f96cb` / `d740f60` も保持。現在のmainは `d740f60`。詳細・検証・退避先は[修復記録](../history/GIT_SYNC_20260915.md)。
+- Expoスクリプトの引数衝突を追加修正。型・文書・契約32件・Python 57件・認証保管12件の自己確認と、実APIを呼ばないExpo引数10ケースが成功。今回の修復担当による追加差分のcommit/pushと実サービス操作は未実行。
+
 ### 当日のチーム設定を復号不要の平文共有へ変更（2026-09-15）
 
 - 人間の判断：ユーザーが同じチームの仲間に当日使わせるため、復号鍵を不要とし平文でのGit共有を明示指定。基準版 `ba3f8a4`。GitHubで既存送信先 `jokojama-gou/opeai-hackathon` がprivate、本人のadmin/push権限ありと再確認した。

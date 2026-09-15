@@ -1,6 +1,6 @@
 # AI IDEからSupabaseを操作する
 
-2026-09-15、このPCのリポジトリルート `.env.supabase.local` に、ユーザーが提供した `SUPABASE_ACCESS_TOKEN` を保存して認証を確認しました。既存の `.gitignore` の `.env.*` で除外されています。ユーザーはハッカソン用認証情報のGit格納も許可していますが、この作業では既存の除外設定を保ち、commit/pushは実行していません。アプリの公開環境変数やbundleへは入れません。他PCの保存場所・認証状態は別に確認してください。
+2026-09-15、このPCのリポジトリルート `.env.supabase.local` にある `SUPABASE_ACCESS_TOKEN` で認証を確認しました。現在はユーザーの明示判断により、当日のprivate Git共有の対象です（[共有手順](../../credentials/README.md)）。アプリの公開環境変数・bundle・EAS送信物には入れません。バックエンド専用のDBパスワード等は `services/backend/.env` に保存し、Git対象外です。他PCの接続は別に確認してください。
 
 PowerShellを実行できるAI IDEは、リポジトリルートから次でアクセスできます。MCPの登録やIDEの再起動は不要な、Management API経由の方式です。
 
@@ -15,7 +15,7 @@ $projects | Select-Object id, name, status
 
 スクリプトはプロセスの `SUPABASE_ACCESS_TOKEN` を優先し、未設定なら認証ファイルを読みます。別の保存先は `-CredentialFile` で指定できます。Supabase公式ホストだけへ送信します。`-Method` と `-BodyFile`（JSONファイル）で更新APIも呼べます。実際の変更はその時点のユーザー依頼の範囲で行ってください。APIの応答には秘密情報を含むエンドポイントもあるため、出力項目は作業に必要なものだけ選びます。
 
-2026-09-12初回確認：プロジェクト一覧の認証成功、1件、状態 `ACTIVE_HEALTHY`。ネットワーク制限のあるAI環境では外部通信の実行権限が必要です。他PCには認証ファイルはGitで配布されません。
+2026-09-12初回確認：プロジェクト一覧の認証成功、1件、状態 `ACTIVE_HEALTHY`。ネットワーク制限のあるAI環境では外部通信の実行権限が必要です。2026-09-15のDB/Storage接続結果と当日の環境は[Expo実接続](EXPO_CLOUD_CONNECTION.md)を参照してください。
 
 ## 操作テスト結果（2026-09-12）
 
