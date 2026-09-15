@@ -24,6 +24,7 @@
     "test:contracts": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts",
     "test": "tsx --test contracts/contracts.test.ts packages/api-ts/src/*.test.ts apps/client/src/data/*.test.ts",
     "start": "npm run start --workspace @hackathon/client --",
+    "start:tunnel": "npm run start:tunnel --workspace @hackathon/client --",
     "web": "npm run web --workspace @hackathon/client --",
     "android": "npm run android --workspace @hackathon/client --",
     "ios": "npm run ios --workspace @hackathon/client --",
@@ -44,6 +45,7 @@
     "security:hooks": "git config --local core.hooksPath .githooks"
   },
   "devDependencies": {
+    "@expo/ngrok": "4.1.0",
     "eas-cli": "24.3.0",
     "json-schema-to-typescript": "15.0.4",
     "supabase": "2.117.0",

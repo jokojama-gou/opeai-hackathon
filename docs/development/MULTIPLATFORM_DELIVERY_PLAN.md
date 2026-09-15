@@ -4,6 +4,10 @@
 
 ## 構成と契約
 
+2026-09-15更新：[MVP_SPEC §9.0](../product/MVP_SPEC.md#contracts)の端末直接ASRを採用。以下のworker担当・K03・接続前提のうち音声の前処理/分割・ASR呼出・結果結合は端末adapterへ移す。ASRキーは当日端末への配布を許可済み。Windows経由をASRの前提に戻さない。共有保存・2入力統合・AI会話の実行場所と、その担当の変更は未決定。旧K定義は移行元として保持し、実装時に新契約へ対応付ける。
+
+追加実装：K02/K03/K07の端末録音・ASR部分として、手元のキーがある6社の書き起こしとpyannoteを端末adapterへ接続し、別LLMによる原文比較を追加。[手順](DIRECT_ASR.md)と[対象版・検証](../history/DIRECT_ASR_IMPLEMENTATION_20260915.md)。本人端末内の `direct-asr-v1` を使用し、共有APIのSource変換・2入力統合・M15へは未接続。各K全体の完了とはしない。
+
 既存 `apps/client` が唯一のアプリ基盤です。状態・通信・本文/権限の意味とブランドは共有し、ナビゲーション・操作部品・モーションは`.ios.tsx`/`.android.tsx`等の境界で分けます。Expo Router/Expo UIを使うnative部品の検証をK02で先行し、全画面を同一JSX/形状に揃えません。必要なSwift/Kotlin拡張はExpo Modulesで追加できますが、独立したSwiftUI/Composeアプリへ分岐しません。
 
 API・保存・処理の仕様は[MVP_SPEC §9](../product/MVP_SPEC.md#contracts)、カレンダーは[§14](../product/MVP_SPEC.md#calendar)、5役割は[§15](../product/MVP_SPEC.md#agents)。APIが認証・区間認可を行い、workerが音声の前処理/分割・外部ASR呼出・結果結合・統合・生成・clip処理を担います。各スマホはWindows側の共通APIへ接続します。端末/開発PCにASR推論環境を構築することを前提にせず、Supabaseの保存/認証とworkerの処理責務を分けます。外部ASRの採用とバックエンドのクラウド移行は別です。 外部ASRの提供者・モデルはGo君の選定結果を受領して確定します。

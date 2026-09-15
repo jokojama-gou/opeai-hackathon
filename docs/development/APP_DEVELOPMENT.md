@@ -4,6 +4,8 @@
 
 ## デモの到達点（2026-09-12ユーザー決定）
 
+スマホWeb版のPWAビルド・ホーム画面への追加・確認手順は[PWA開発手順](PWA.md)を参照。これは既存画面のWeb配信基盤であり、Web録音やSetlog全画面の完成を示さない。
+
 この節は9月12日の人工画面デモの方針を保持したものです。9月15日の録音を含む当日の必達と実機導入は[現在地](WORKFLOW.md)、[端末インストール](DEVICE_INSTALLATION.md)を参照してください。
 
 各自のiPhone・AndroidのExpo Goからアプリを開いてハッカソンのデモを行う。ストア提出、単体APK/IPAの配布は今回の到達点に含めない。既存のEAS Build設定は任意の参考として保持し、デモ準備の前提にしない。
@@ -21,6 +23,16 @@
 参考：[Expo公式の実機起動手順](https://docs.expo.dev/get-started/start-developing/)。複数スマホでの動作は端末接続後に確認する。
 
 ## セットアップと起動
+
+### AndroidのExpo Goから画面デモを開く
+
+リポジトリルートで `npm run start:tunnel` を実行する。Expo CLI互換の `@expo/ngrok` を開発依存に固定した。AndroidのSDK 57対応Expo Goで、起動時のQRコードまたは `exp://` URLを開く。トンネルは外部通信を使うため同一Wi-Fiは不要だが、このPC・開発サーバー・インターネット接続を維持する。再起動でURLが変わる場合がある。
+
+2026-09-15のこの端末では、トンネルからAndroid manifestと開発バンドルをHTTP 200で取得した。現在のURL・PID・検査結果はGit除外の `.npm-cache/expo-go/verification.json` と `server.json`、ログは同フォルダに保存する。Expo Goでは人工データの画面を確認する。実録音・ASR・AI処理・Android端末での表示成功とは区別する。
+
+公式手順：[開発サーバーとトンネル](https://docs.expo.dev/get-started/start-developing/)、[Expo Goの取得](https://expo.dev/go)。
+
+### 通常の開発起動
 
 2026-09-15の[スマホ接続環境と再起動方法](LOCAL_CONNECTION_PREP.md)、[iPhone/Androidへのインストール手順](DEVICE_INSTALLATION.md)を追加。接続用のAuth/DB/Storageは人工音声で確認済み。アプリのSetlog対応・実ASR・実機確認は残る。
 
@@ -107,6 +119,7 @@ AIは完了報告前に、今回変更した内容に該当する対象を下表
 | 認証情報の保管・Git除外・漏出検査 | `npm run verify:security` | 追跡候補の秘密情報検査と、人工キーによる暗号化/改ざん/実行時処理/配布物検査 |
 | 共通契約・APIクライアント・製品画面用データ | `npm run verify -- contracts`（または `npm test`） | mainのTypeScript契約・クライアント・データテスト |
 | UIと文書の両方 | `npm run verify -- ui docs` | 重複を除いて両方を実行 |
+| 端末直接ASR・比較・設定生成 | `npm run verify -- ui contracts tooling docs` | 型、各社adapter・候補保持・引用検査、設定生成。実機/実APIは [DIRECT_ASR](DIRECT_ASR.md) で区別 |
 
 入口は[scripts/verify.mjs](../../scripts/verify.mjs)。対象未指定または `all` は上表の全確認、`--help` は使い方を表示する。追加依存・ネットワーク通信・CI設定は不要で、Node.jsとPowerShell 7（`pwsh`）、UI対象では導入済みの開発依存を使う。型チェックはクライアントの `typecheck` と同じTypeScript・引数を直接起動する。コマンドや新しいテストを追加・変更した場合は、この入口と対応表も更新する。
 
