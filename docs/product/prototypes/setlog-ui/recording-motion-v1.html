@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>声が、かたちになる。 — Setlog 録音の見本</title>
+  <style>
+    @font-face { font-family: "Kosugi Maru"; src: url("fonts/KosugiMaru-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: "Noto Sans JP"; src: url("fonts/noto-sans-jp/NotoSansJP-Variable.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+    :root { --paper: #f8faf7; --ink: #273f37; --muted: #63766c; --line: #dce5dd; --mint: #dcebcf; --red: #ae4651; font-family: "Kosugi Maru", sans-serif; color: var(--ink); background: #eef2ed; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: radial-gradient(ellipse at 80% 25%, #e5eee2 0, transparent 45%), radial-gradient(ellipse at 15% 85%, #ebe6ee 0, transparent 48%), #f2f4ee; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    button:disabled { cursor: default; }
+    button, a { touch-action: manipulation; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #547b68; outline-offset: 5px; }
+    button svg, .icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    h1, h2, h3, .heading, .primary, .tab, .time { font-family: "Noto Sans JP", sans-serif; font-weight: 600; }
+    h1, h2, h3, p { margin: 0; }
+    [hidden] { display: none !important; }
+    .symbols { position: absolute; width: 0; height: 0; overflow: hidden; }
+    .workspace { max-width: 1040px; min-height: 100vh; margin: auto; display: grid; grid-template-columns: 1fr 390px; gap: 100px; align-items: center; padding: 42px 44px; }
+    .intro { max-width: 365px; }
+    .eyebrow { display: flex; gap: 12px; align-items: center; font: 500 11px/1.6 "Noto Sans JP", sans-serif; letter-spacing: .14em; color: #607268; }
+    .eyebrow::before { content: ""; height: 1px; width: 28px; background: #839588; }
+    .intro h1 { margin-top: 24px; font-size: 40px; line-height: 1.55; letter-spacing: -.035em; }
+    .intro-description { margin: 22px 0 32px; font-size: 16px; line-height: 1.9; color: var(--muted); }
+    .demo-note { font-size: 13px; line-height: 1.9; padding: 16px 0; border-top: 1px solid #d4ded4; border-bottom: 1px solid #d4ded4; }
+    .lab { margin-top: 28px; }
+    .lab h2 { font-size: 14px; margin-bottom: 12px; }
+    .volume-options { display: flex; gap: 6px; background: #e4ebe1; border-radius: 16px; padding: 5px; }
+    .volume-option { flex: 1; min-width: 0; min-height: 44px; border: 0; border-radius: 12px; background: transparent; color: #4d6155; font-size: 14px; }
+    .volume-option[aria-pressed="true"] { color: #263f35; background: #fbfcf8; box-shadow: 0 2px 5px #324b3910; }
+    .lab-caption { font-size: 12px; margin-top: 10px; color: var(--muted); line-height: 1.8; }
+    .extra-controls { margin-top: 22px; font-size: 13px; }
+    .extra-controls summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; gap: 8px; }
+    .extra-controls summary::before { content: "+"; font: 400 21px/1 sans-serif; }
+    .extra-controls[open] summary::before { content: "−"; }
+    .check { display: flex; gap: 10px; align-items: center; line-height: 1.7; min-height: 44px; margin-top: 5px; }
+    .check input { width: 18px; height: 18px; accent-color: #4d7158; flex-shrink: 0; }
+    .lab-button { min-height: 44px; padding: 8px 16px; border-radius: 12px; background: transparent; color: var(--ink); border: 1px solid #acbcae; margin-top: 10px; }
+    .lab-button:disabled { color: #718173; opacity: .65; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 30px; font-size: 12px; }
+    a { color: #486650; text-underline-offset: 4px; }
+    .phone { width: 100%; min-width: 0; min-height: 780px; border: 1px solid #ffffff; border-radius: 42px; padding: 20px 24px 18px; background: radial-gradient(ellipse at 90% 45%, #eeebf344, transparent 50%), linear-gradient(155deg, #fffffc, #f7faf4 70%, #f8faf5); box-shadow: 0 32px 65px -34px #304b3944, 0 3px 10px #314d3910, inset 0 0 0 5px #ffffff60; position: relative; display: flex; flex-direction: column; }
+    .system-bar { display: flex; justify-content: space-between; padding: 0 7px 23px; font: 600 12px/1.2 "Noto Sans JP", sans-serif; }
+    .system-icons { display: flex; gap: 5px; align-items: center; }
+    .system-icons svg { width: 14px; height: 14px; }
+    .app-header { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; }
+    .round-button { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #e0e8dd; background: #f6f9f1; color: #38533f; }
+    .app-heading { text-align: center; }
+    .app-heading h2 { font-size: 17px; line-height: 1.6; }
+    .date { font-size: 11px; color: #6b7a6b; margin-top: 2px; }
+    .confirmation { position: relative; }
+    .badge { position: absolute; top: -3px; right: -2px; min-width: 17px; height: 17px; display: grid; place-items: center; border-radius: 50%; background: #f0deb0; font: 600 10px/1 "Noto Sans JP", sans-serif; }
+    .recording-panel { flex: 1; display: flex; flex-direction: column; }
+    .status-area { text-align: center; min-height: 119px; padding-top: 26px; display: flex; flex-direction: column; justify-content: center; }
+    .state-label { font-size: 13px; color: #637566; min-height: 24px; line-height: 1.8; }
+    .state-label::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #90aa7d; vertical-align: middle; margin-right: 7px; }
+    .phone[data-phase="recording"] .state-label::before { background: #be4e5a; }
+    .phone[data-phase="save_failed"] .state-label::before, .phone[data-phase="interrupted"] .state-label::before { background: #aa7c3f; }
+    .idle-copy { font-size: 21px; line-height: 1.6; letter-spacing: .025em; margin-top: 6px; }
+    .time { font-size: 33px; line-height: 1.5; letter-spacing: .045em; font-variant-numeric: tabular-nums; }
+    .orb-stage { position: relative; width: 100%; height: 300px; display: grid; place-items: center; isolation: isolate; }
+    .ambient { position: absolute; inset: 18% 7%; border-radius: 50%; background: radial-gradient(ellipse, #d7e9c963, #e0dced33 50%, transparent 73%); filter: blur(18px); z-index: -1; }
+    .orb { width: 300px; height: 300px; max-width: 110%; overflow: visible; transition: opacity .25s; }
+    .orb-assembly { transform-origin: 160px 145px; transition: transform .7s cubic-bezier(.2,.8,.2,1), opacity .35s; }
+    .orb-shadow { transition: opacity .5s; }
+    .phone[data-phase="preparing"] .orb-assembly { transform: scale(.93,.88) translateY(10px); }
+    .phone[data-phase="saving"] .orb-assembly { transform: scale(.7); }
+    .phone[data-phase="saved"] .orb-assembly { transform: translate(-118px,17px) scale(.12); }
+    .phone[data-phase="saved"] .orb-shadow { opacity: 0; }
+    .phone[data-phase="save_failed"] .orb, .phone[data-phase="interrupted"] .orb { opacity: .42; }
+    .saved-card { position: absolute; left: 0; right: 0; top: 115px; padding: 20px 18px 20px 72px; min-height: 109px; border: 1px solid #dfe7d8; border-radius: 22px; background: #ffffffc9; box-shadow: 0 12px 30px -20px #6f8e6855; opacity: 0; visibility: hidden; transform: translateY(8px); transition: opacity .35s .25s, transform .35s .25s, visibility .35s; z-index: -1; }
+    .phone[data-phase="saved"] .saved-card { opacity: 1; visibility: visible; transform: none; }
+    .saved-card h3 { font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+    .saved-card p { font-size: 12px; color: #62725d; line-height: 1.9; margin-top: 6px; }
+    .saved-card .private-label { display: inline-flex; align-items: center; gap: 3px; }
+    .saved-card .icon { width: 13px; height: 13px; }
+    .action-area { text-align: center; padding: 0 6px 27px; margin-top: auto; }
+    .primary { width: 100%; min-height: 64px; border: 1px solid #d2dfc5; border-radius: 22px; background: #e0ebd5; color: #304a35; display: flex; justify-content: center; align-items: center; gap: 11px; padding: 15px 12px; box-shadow: 0 4px 0 #c4d4b95e, inset 0 1px 0 #ffffffb3; font-size: 17px; transition: transform .15s, background .25s, box-shadow .15s; }
+    .primary:active:not(:disabled) { transform: translateY(3px) scale(.985); box-shadow: 0 1px 0 #c4d4b960; }
+    .primary:disabled { color: #61725b; }
+    .phone[data-phase="recording"] .primary { background: #f9e7e7; border-color: #eed6d7; box-shadow: 0 4px 0 #d9b6b62e, inset 0 1px 0 #fff9; color: #9f3d49; }
+    .phone[data-phase="recording"] .primary svg { width: 19px; height: 19px; }
+    .helper { font-size: 13px; line-height: 1.8; color: #677561; margin-top: 17px; min-height: 47px; overflow-wrap: anywhere; }
+    .bottom-nav { display: flex; flex-shrink: 0; padding: 6px; gap: 6px; border: 1px solid #e7ecdf; border-radius: 25px; background: #fff9; }
+    .tab { width: 50%; min-height: 57px; border: 0; background: transparent; color: #778071; border-radius: 19px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 3px; font-size: 11px; }
+    .tab[aria-current="page"] { color: #3d5c3e; background: #e7efde; }
+    .tab svg { width: 20px; height: 20px; }
+    .home-line { width: 100px; height: 4px; background: #324733; border-radius: 5px; margin: 14px auto 0; opacity: .5; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .room-panel { flex: 1; padding: 32px 0 26px; }
+    .room-panel h3 { font-size: 23px; margin-bottom: 22px; }
+    .room-entry { width: 100%; border-radius: 20px; padding: 22px 18px; border: 1px solid #d9e3d1; color: var(--ink); background: #e5efdc; display: flex; gap: 15px; align-items: center; text-align: left; }
+    .room-entry svg { width: 30px; height: 30px; }
+    .room-entry p { margin-top: 5px; font-size: 12px; color: #61775c; line-height: 1.7; }
+    .room-copy { font-size: 14px; line-height: 1.9; color: var(--muted); margin-top: 22px; }
+    .return-strip { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #ecd1d3; border-radius: 16px; padding: 13px; min-height: 50px; color: #983d49; background: #fbe9e9; font-size: 12px; margin-bottom: 14px; }
+    dialog { color: var(--ink); background: #fafcf6; border: 1px solid #d8e3d1; border-radius: 25px; padding: 26px; max-width: min(350px, calc(100vw - 32px)); box-shadow: 0 24px 80px #172d2c30; }
+    dialog::backdrop { background: #223d363b; backdrop-filter: blur(5px); }
+    dialog h2 { font-size: 20px; margin-bottom: 16px; }
+    dialog p { font-size: 14px; line-height: 1.9; margin-bottom: 16px; }
+    dialog .lab-button { width: 100%; }
+    .font-status { font-size: 11px; color: var(--muted); margin-top: 14px; line-height: 1.8; }
+    .font-status[data-error="true"] { color: #9f3d49; }
+    .motion-reduced .orb-assembly, .motion-reduced .saved-card, .motion-reduced .primary { transition: opacity .15s !important; }
+    .motion-reduced .saved-card { transform: none; }
+    .motion-reduced .phone[data-phase="preparing"] .orb-assembly, .motion-reduced .phone[data-phase="saving"] .orb-assembly { transform: none; }
+    .motion-reduced .primary:active { transform: none; }
+    @media (max-width: 860px) {
+      .workspace { grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; padding: 30px 28px; }
+      .intro h1 { font-size: 32px; }
+    }
+    @media (max-width: 700px) {
+      .workspace { display: flex; flex-direction: column; padding: 18px 14px 32px; gap: 24px; }
+      .intro { display: contents; }
+      .intro-head { width: 100%; max-width: 390px; }
+      .eyebrow { font-size: 10px; }
+      .intro h1, .intro-description { display: none; }
+      .demo-note { margin-top: 12px; padding: 10px 0; font-size: 11px; }
+      .phone { max-width: 390px; order: 2; }
+      .lab { width: 100%; max-width: 390px; order: 3; margin-top: 0; }
+      .intro-footer { order: 4; width: 100%; max-width: 390px; }
+      .footer-links { margin-top: 0; }
+    }
+    @media (max-width: 360px) {
+      .workspace { padding-inline: 8px; }
+      .phone { padding-inline: 16px; border-radius: 32px; }
+      .orb-stage { height: 276px; }
+      .orb { width: 276px; height: 276px; }
+      .saved-card { top: 105px; padding-left: 59px; }
+      .idle-copy { font-size: 19px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <svg class="symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+    <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9H3z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m7 12 3 3 7-7M8 3H5v18h14V3h-3"/><rect x="8" y="2" width="8" height="4" rx="1"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="m9.5 3-.6 2-2 .9L5 5.3 2.5 9.5l1.6 1.4v2.2l-1.6 1.4L5 18.7l1.9-.6 2 .9.6 2h5l.6-2 2-.9 1.9.6 2.5-4.2-1.6-1.4v-2.2l1.6-1.4L19 5.3l-1.9.6-2-.9-.6-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></symbol>
+  </defs></svg>
+  <main class="workspace">
+    <aside class="intro" aria-label="見本の説明と比較操作">
+      <div class="intro-head">
+        <div class="eyebrow">SETLOG STUDY / 01</div>
+        <h1>声が、<br>かたちになる。</h1>
+        <p class="intro-description">押す。話す。そっと残す。<br>いつもの会話に、小さな楽しみを。</p>
+        <p class="demo-note">演出の見本・実際の録音や保存は行いません。<br>声の強弱は、疑似音量で再現しています。</p>
+      </div>
+      <section class="lab" aria-labelledby="lab-title">
+        <h2 id="lab-title">声の雰囲気を変える</h2>
+        <div class="volume-options" role="group" aria-label="疑似音量">
+          <button class="volume-option" data-volume="quiet" aria-pressed="false">静か</button>
+          <button class="volume-option" data-volume="normal" aria-pressed="true">ふつう</button>
+          <button class="volume-option" data-volume="lively" aria-pressed="false">にぎやか</button>
+        </div>
+        <p class="lab-caption">録音中に切り替えると、揺れ方が変わります。</p>
+        <details class="extra-controls">
+          <summary>ほかの状態も試す</summary>
+          <label class="check"><input id="fail-next" type="checkbox">次の保存を失敗させる</label>
+          <label class="check"><input id="reduce-motion" type="checkbox">動きを減らす</label>
+          <button class="lab-button" id="interrupt" disabled>録音を中断する</button>
+          <button class="lab-button" id="near-limit" disabled>5分の直前へ進める</button>
+          <p class="lab-caption">状態確認用の操作です。実アプリの画面には含みません。</p>
+        </details>
+      </section>
+      <div class="intro-footer">
+        <nav class="footer-links" aria-label="参考資料">
+          <a href="01-main-screens-v2.png" target="_blank" rel="noopener">これまでの画面</a>
+          <a href="02-ai-sharing-states-v2.png" target="_blank" rel="noopener">録音中の旧案</a>
+          <a href="README.md">制作メモ</a>
+        </nav>
+        <p class="font-status" id="font-status" role="status">実フォントを読み込み中…</p>
+      </div>
+    </aside>
+    <section class="phone" data-phase="idle" aria-label="録音アプリの見本">
+      <div class="system-bar" aria-hidden="true"><span>9:41</span><span class="system-icons"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 10h2v5H1zm4-3h2v8H5zm4-3h2v11H9zm4-3h2v14h-2z"/></svg><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M1 5q7-6 14 0M4 8q4-4 8 0M6 11q2-2 4 0"/><circle cx="8" cy="14" r=".7" fill="currentColor"/></svg><svg viewBox="0 0 19 12" fill="none" stroke="currentColor"><rect x="1" y="1" width="15" height="10" rx="2"/><path d="M18 4v4"/><rect x="3" y="3" width="11" height="6" rx="1" fill="currentColor"/></svg></span></div>
+      <header class="app-header">
+        <button class="round-button" id="settings" aria-label="設定"><svg><use href="#i-settings"/></svg></button>
+        <div class="app-heading"><h2 id="page-title">録音</h2><p class="date" id="today"></p></div>
+        <button class="round-button confirmation" id="confirmation" aria-label="確認、あなたの対応1件"><svg><use href="#i-check"/></svg><span class="badge" aria-hidden="true">1</span></button>
+      </header>
+      <section class="recording-panel" id="recording-panel" aria-label="録音操作">
+        <div class="status-area">
+          <p class="state-label" id="state-label">まだ、話していないことも。</p>
+          <p class="idle-copy" id="idle-copy">今日の声を、残そう。</p>
+          <p class="time" id="elapsed" role="timer" aria-label="録音の経過時間" hidden>00:00</p>
+        </div>
+        <div class="orb-stage" aria-label="声に合わせて揺れる立体">
+          <div class="ambient" aria-hidden="true"></div>
+          <svg class="orb" viewBox="0 0 320 320" aria-hidden="true">
+            <defs>
+              <radialGradient id="body-color" cx=".28" cy=".2" r=".94"><stop offset="0" stop-color="#fffffd"/><stop offset=".29" stop-color="#e4efd2"/><stop offset=".55" stop-color="#c1d8b8"/><stop offset=".78" stop-color="#d7d5e9"/><stop offset=".95" stop-color="#b7ccc0"/><stop offset="1" stop-color="#eef4e4"/></radialGradient>
+              <radialGradient id="pearl-color" cx=".6" cy=".4" r=".6"><stop stop-color="#fff" stop-opacity=".92"/><stop offset=".4" stop-color="#f9fbda" stop-opacity=".58"/><stop offset="1" stop-color="#e8c9e9" stop-opacity="0"/></radialGradient>
+              <radialGradient id="lavender-color"><stop stop-color="#c8b5e8" stop-opacity=".8"/><stop offset="1" stop-color="#d6ccea" stop-opacity="0"/></radialGradient>
+              <radialGradient id="green-color"><stop stop-color="#6d9c75" stop-opacity=".42"/><stop offset="1" stop-color="#97bc8a" stop-opacity="0"/></radialGradient>
+              <linearGradient id="rim-color" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset=".35" stop-color="#e9f3df" stop-opacity=".7"/><stop offset=".7" stop-color="#f8efff"/><stop offset="1" stop-color="#abc5b0" stop-opacity=".6"/></linearGradient>
+              <filter id="soft-light" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+              <filter id="shine-soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2"/></filter>
+              <filter id="ground-soft" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="8"/></filter>
+              <clipPath id="orb-clip"><path id="clip-shape"/></clipPath>
+            </defs>
+            <g class="orb-shadow"><ellipse cx="159" cy="275" rx="73" ry="10" fill="#6b8964" opacity=".16" filter="url(#ground-soft)"/><ellipse cx="159" cy="273" rx="92" ry="21" fill="none" stroke="#cad8c4" stroke-width=".7" opacity=".5"/></g>
+            <g class="orb-assembly">
+              <g id="floating-orb">
+                <path id="orb-shape" fill="url(#body-color)" stroke="url(#rim-color)" stroke-width="2"/>
+                <g clip-path="url(#orb-clip)">
+                  <ellipse id="inner-light" cx="142" cy="118" rx="95" ry="91" fill="url(#pearl-color)"/>
+                  <ellipse cx="220" cy="188" rx="88" ry="110" fill="url(#lavender-color)"/>
+                  <ellipse cx="114" cy="226" rx="84" ry="90" fill="url(#green-color)"/>
+                  <ellipse cx="151" cy="106" rx="60" ry="40" fill="#ffffed" opacity=".65" filter="url(#soft-light)"/>
+                  <path d="M81 131C83 91 105 62 143 60" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".8" filter="url(#shine-soft)"/>
+                  <path d="M226 208C210 235 183 246 149 243" fill="none" stroke="#fffff2" stroke-width="2" stroke-linecap="round" opacity=".65" filter="url(#shine-soft)"/>
+                  <ellipse cx="113" cy="84" rx="20" ry="8" transform="rotate(-35 113 84)" fill="#fff" opacity=".75" filter="url(#shine-soft)"/>
+                </g>
+              </g>
+            </g>
+          </svg>
+          <article class="saved-card" id="saved-card" aria-hidden="true">
+            <h3 id="saved-title"></h3><p><span id="saved-duration"></span> · <span class="private-label"><svg class="icon"><use href="#i-lock"/></svg>自分のみ</span><br>自分の記録に保存しました</p>
+          </article>
+        </div>
+        <div class="action-area">
+          <button class="primary" id="primary"><svg aria-hidden="true"><use id="primary-icon" href="#i-mic"/></svg><span id="primary-label">記録を始める</span></button>
+          <p class="helper" id="helper">相手を選ばずに始められます。<br>話したことを、あとから見返す。</p>
+        </div>
+      </section>
+      <section class="room-panel" id="room-panel" hidden aria-label="ルームの見本">
+        <h3>自分の記録</h3>
+        <button class="room-entry" id="room-entry"><svg><use href="#i-folder"/></svg><span><span class="heading">自分の記録</span><p id="room-count">この見本の記録はまだありません</p></span></button>
+        <p class="room-copy">録音したものは、まずここへ。<br>自分だけで見返せる場所です。</p>
+      </section>
+      <button class="return-strip" id="return-strip" hidden><span id="strip-text">録音中 00:00</span><span>録音に戻る →</span></button>
+      <nav class="bottom-nav" aria-label="アプリのタブ">
+        <button class="tab" id="record-tab" aria-current="page"><svg aria-hidden="true"><use href="#i-mic"/></svg>録音</button>
+        <button class="tab" id="room-tab"><svg aria-hidden="true"><use href="#i-folder"/></svg>ルーム</button>
+      </nav>
+      <div class="home-line" aria-hidden="true"></div>
+      <p class="sr-only" id="announcement" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <dialog id="info-dialog" aria-labelledby="dialog-title"><h2 id="dialog-title"></h2><p id="dialog-copy"></p><form method="dialog"><button class="lab-button">閉じる</button></form></dialog>
+  <script>
+    'use strict';
+    const byId = id => document.getElementById(id);
+    const phone = document.querySelector('.phone');
+    const systemMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const LIMIT = 5 * 60 * 1000;
+    let phase = 'idle';
+    let volume = 'normal';
+    let tab = 'recording';
+    let startedAt = 0;
+    let startedDate = null;
+    let elapsedMs = 0;
+    let phaseTimeout = null;
+    let phaseVersion = 0;
+    let hasRecord = false;
+    let failedSave = false;
+    let capped = false;
+    let amplitude = 0;
+    let reduced = systemMotion.matches;
+    let lastFrameAt = 0;
+    let lastTextSecond = -1;
+    let rafId = null;
+    byId('reduce-motion').checked = reduced;
+    const formatTime = ms => {
+      const seconds = Math.floor(Math.max(0, Math.min(LIMIT, ms)) / 1000);
+      return String(Math.floor(seconds / 60)).padStart(2, '0') + ':' + String(seconds % 60).padStart(2, '0');
+    };
+    const formatDate = date => new Intl.DateTimeFormat('ja-JP', { month: 'long', day: 'numeric', weekday: 'short' }).format(date);
+    byId('today').textContent = formatDate(new Date());
+    function announce(text) { byId('announcement').textContent = text; }
+    function defer(ms, next) {
+      clearTimeout(phaseTimeout);
+      const version = phaseVersion;
+      phaseTimeout = setTimeout(() => { phaseTimeout = null; if (version === phaseVersion) next(); }, ms);
+    }
+    function changePhase(next) {
+      clearTimeout(phaseTimeout);
+      phaseTimeout = null;
+      phaseVersion++;
+      phase = next;
+      phone.dataset.phase = phase;
+      render();
+      announce(byId('state-label').textContent);
+    }
+    function updateTime() {
+      const second = Math.floor(elapsedMs / 1000);
+      if (second !== lastTextSecond) {
+        byId('elapsed').textContent = formatTime(elapsedMs);
+        byId('strip-text').textContent = '録音中 ' + formatTime(elapsedMs);
+        lastTextSecond = second;
+      }
+    }
+    const content = {
+      idle: ['まだ、話していないことも。', '記録を始める', '相手を選ばずに始められます。\n話したことを、あとから見返す。', '#i-mic'],
+      preparing: ['はじめます', 'はじめています', '今日の声を、残そう。', '#i-mic'],
+      recording: ['録音中', '録音を停止', 'いつもの調子で、どうぞ。\n声に合わせて、かたちがゆれます。', '#i-stop'],
+      saving: ['保存中', '保存しています', '話した時間を、ひとつの記録に。', '#i-folder'],
+      saved: ['ひとつ、残せました。', 'もう一度録音', 'この声は「自分の記録」に。\n好きなときに、振り返れます。', '#i-replay'],
+      save_failed: ['録音を保存できませんでした', '保存を再試行', 'もう一度、保存を試せます。\nまだ保存は完了していません。', '#i-replay'],
+      interrupted: ['録音が中断しました', '待機に戻る', 'この記録は保存されていません。\n新しい録音を始められます。', '#i-replay']
+    };
+    function render() {
+      const [state, button, helper, icon] = content[phase];
+      byId('state-label').textContent = state;
+      byId('primary-label').textContent = button;
+      byId('primary-icon').setAttribute('href', icon);
+      byId('primary').disabled = ['preparing', 'saving'].includes(phase);
+      byId('helper').textContent = capped && phase === 'saving' ? '5分になったため、録音を停止しました。\n記録を保存しています。' : capped && phase === 'saved' ? '5分の記録を「自分の記録」に。\n好きなときに、振り返れます。' : helper;
+      byId('helper').style.whiteSpace = 'pre-line';
+      byId('idle-copy').hidden = !['idle', 'preparing'].includes(phase);
+      byId('elapsed').hidden = ['idle', 'preparing', 'saved'].includes(phase);
+      byId('saved-card').setAttribute('aria-hidden', phase === 'saved' ? 'false' : 'true');
+      byId('interrupt').disabled = phase !== 'recording';
+      byId('near-limit').disabled = phase !== 'recording';
+      byId('room-count').textContent = hasRecord ? 'この見本で残した記録 · 1件' : 'この見本の記録はまだありません';
+      byId('return-strip').hidden = tab !== 'room' || phase !== 'recording';
+      lastTextSecond = -1;
+      updateTime();
+    }
+    function start() {
+      if (phase !== 'idle') return;
+      elapsedMs = 0; capped = false; failedSave = false;
+      changePhase('preparing');
+      defer(300, () => {
+        startedAt = performance.now(); startedDate = new Date();
+        changePhase('recording');
+      });
+    }
+    function stop(atLimit = false) {
+      if (phase !== 'recording') return;
+      elapsedMs = Math.min(LIMIT, performance.now() - startedAt);
+      capped = atLimit;
+      if (atLimit) elapsedMs = LIMIT;
+      failedSave = byId('fail-next').checked;
+      byId('fail-next').checked = false;
+      save();
+    }
+    function save() {
+      changePhase('saving');
+      defer(900, () => {
+        if (failedSave) { changePhase('save_failed'); return; }
+        hasRecord = true;
+        const date = startedDate || new Date();
+        const name = new Intl.DateTimeFormat('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(date);
+        byId('saved-title').textContent = name + 'の記録';
+        byId('saved-duration').textContent = formatTime(elapsedMs);
+        changePhase('saved');
+      });
+    }
+    function primaryAction() {
+      if (phase === 'idle') start();
+      else if (phase === 'recording') stop();
+      else if (phase === 'save_failed') { failedSave = false; save(); }
+      else if (phase === 'saved' || phase === 'interrupted') { elapsedMs = 0; capped = false; changePhase('idle'); }
+    }
+    byId('primary').addEventListener('click', primaryAction);
+    byId('interrupt').addEventListener('click', () => {
+      if (phase !== 'recording') return;
+      elapsedMs = Math.min(LIMIT, performance.now() - startedAt);
+      changePhase('interrupted');
+    });
+    byId('near-limit').addEventListener('click', () => {
+      if (phase !== 'recording') return;
+      startedAt = performance.now() - (LIMIT - 2000);
+      announce('見本の経過時間を4分58秒へ進めました');
+    });
+    document.querySelectorAll('[data-volume]').forEach(button => button.addEventListener('click', () => {
+      volume = button.dataset.volume;
+      document.querySelectorAll('[data-volume]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    }));
+    function setTab(next) {
+      tab = next;
+      byId('recording-panel').hidden = tab !== 'recording';
+      byId('room-panel').hidden = tab !== 'room';
+      byId('page-title').textContent = tab === 'recording' ? '録音' : 'ルーム';
+      for (const [id, active] of [['record-tab', tab === 'recording'], ['room-tab', tab === 'room']]) {
+        if (active) byId(id).setAttribute('aria-current', 'page'); else byId(id).removeAttribute('aria-current');
+      }
+      render();
+    }
+    byId('record-tab').addEventListener('click', () => setTab('recording'));
+    byId('room-tab').addEventListener('click', () => setTab('room'));
+    byId('return-strip').addEventListener('click', () => { setTab('recording'); byId('primary').focus(); });
+    function showInfo(title, copy) { byId('dialog-title').textContent = title; byId('dialog-copy').textContent = copy; byId('info-dialog').showModal(); }
+    byId('settings').addEventListener('click', () => showInfo('設定の入口', 'この見本では、画面の外から動きの強さや表示を試せます。録音・保存・共有の設定は変更しません。'));
+    byId('confirmation').addEventListener('click', () => showInfo('確認の入口', '「朝の相談」の共有範囲を確認する、架空の1件です。録音画面の演出を確かめるための見本なので、共有操作は行いません。'));
+    byId('room-entry').addEventListener('click', () => showInfo('自分の記録', hasRecord ? byId('saved-title').textContent + ' / ' + byId('saved-duration').textContent + ' / 自分のみ。この記録は見本の中だけにあり、再読み込みすると消えます。' : 'この見本の記録はまだありません。「録音」へ戻って試せます。'));
+    function applyMotion() { reduced = systemMotion.matches || byId('reduce-motion').checked; document.documentElement.classList.toggle('motion-reduced', reduced); }
+    byId('reduce-motion').addEventListener('change', applyMotion);
+    systemMotion.addEventListener('change', () => { byId('reduce-motion').checked = systemMotion.matches; applyMotion(); });
+    applyMotion();
+    // A closed, smooth contour; all voice values are generated locally, without audio input.
+    function contour(t, amount) {
+      const points = [];
+      const count = 12;
+      for (let i = 0; i < count; i++) {
+        const angle = i / count * Math.PI * 2;
+        const radius = 101 + 4 * Math.sin(angle * 3 + t * .5) + amount * (8 * Math.sin(angle * 3 - t * 1.6) + 5 * Math.cos(angle * 5 + t));
+        points.push([160 + Math.cos(angle) * radius, 145 + Math.sin(angle) * radius * 1.02]);
+      }
+      let path = 'M' + points[0].join(',');
+      for (let i = 0; i < count; i++) {
+        const p0 = points[(i - 1 + count) % count], p1 = points[i], p2 = points[(i + 1) % count], p3 = points[(i + 2) % count];
+        const c1 = p1.map((v, n) => v + (p2[n] - p0[n]) / 6);
+        const c2 = p2.map((v, n) => v - (p3[n] - p1[n]) / 6);
+        path += 'C' + c1.join(',') + ' ' + c2.join(',') + ' ' + p2.join(',');
+      }
+      return path + 'Z';
+    }
+    function draw(now) {
+      rafId = null;
+      const dt = Math.min(80, now - (lastFrameAt || now)); lastFrameAt = now;
+      if (phase === 'recording') {
+        elapsedMs = Math.min(LIMIT, now - startedAt);
+        updateTime();
+        if (elapsedMs >= LIMIT) stop(true);
+      }
+      const moving = !reduced && !document.hidden && tab === 'recording';
+      const t = moving ? now / 1000 : 0;
+      const speechTime = (now - startedAt) / 1000;
+      const phrase = Math.pow(Math.max(0, Math.sin(speechTime * 1.2)), .65);
+      const syllable = .4 + .6 * Math.abs(Math.sin(speechTime * 7.5) * Math.cos(speechTime * 2.8));
+      const strength = { quiet: .08, normal: .55, lively: 1 }[volume];
+      const target = phase === 'recording' ? strength * phrase * syllable : 0;
+      amplitude += (target - amplitude) * (1 - Math.exp(-dt / (target > amplitude ? 90 : 300)));
+      const active = ['idle', 'recording'].includes(phase);
+      const amount = moving && active ? amplitude : 0;
+      const breathe = moving && active ? Math.sin(t * Math.PI * 2 / 5) : 0;
+      const scale = 1 + breathe * .015 + amount * .12;
+      const floatY = moving && active ? -3 * breathe : 0;
+      const d = contour(moving && active ? t : 0, amount);
+      byId('orb-shape').setAttribute('d', d);
+      byId('clip-shape').setAttribute('d', d);
+      byId('floating-orb').setAttribute('transform', 'translate(160 ' + (145 + floatY) + ') scale(' + scale + ') translate(-160 -145)');
+      byId('inner-light').setAttribute('cx', String(142 + (moving && active ? Math.sin(t * .35) * 12 + amount * 8 : 0)));
+      scheduleFrame();
+    }
+    function scheduleFrame() { if (rafId === null && !document.hidden) rafId = requestAnimationFrame(draw); }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { if (rafId !== null) cancelAnimationFrame(rafId); rafId = null; }
+      else {
+        if (phase === 'recording' && performance.now() - startedAt >= LIMIT) stop(true);
+        lastFrameAt = 0; scheduleFrame();
+      }
+    });
+    // A separate deadline keeps the five-minute cap independent of rendering visibility.
+    const deadlineCheck = setInterval(() => { if (phase === 'recording' && performance.now() - startedAt >= LIMIT) stop(true); }, 200);
+    render(); scheduleFrame();
+    Promise.all([
+      document.fonts.load('400 17px "Kosugi Maru"', '今日の声を残そう'),
+      document.fonts.load('600 20px "Noto Sans JP"', '記録を始める')
+    ]).then(groups => {
+      if (groups.some(fonts => !fonts.length || fonts.some(font => font.status !== 'loaded'))) throw new Error('Font not loaded');
+      byId('font-status').textContent = '本文 Kosugi Maru / 見出し Noto Sans JP';
+    }).catch(() => { byId('font-status').textContent = '書体を読み込めませんでした。ページを開き直してください。'; byId('font-status').dataset.error = 'true'; });
+  </script>
+</body>
+</html>

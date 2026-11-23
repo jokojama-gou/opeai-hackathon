@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Voicemark",
+    "slug": "hackathon-client",
+    "scheme": "voicemark",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.yokoyamago.hackathonclient",
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "143962b8-7d31-413d-9b43-74ea32106cff"
+      }
+    },
+    "owner": "yokoyamago",
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "会話を記録するためにマイクを使用します。録音は自分で開始・停止できます。",
+          "enableBackgroundRecording": true,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      ["expo-secure-store", { "configureAndroidBackup": false }],
+      "./plugins/with-recording-backup-exclusion.cjs"
+    ]
+  }
+}

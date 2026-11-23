@@ -1,0 +1,122 @@
+{
+  "contract_version": "mvp-2.2-k01-v1",
+  "case_id": "pending",
+  "viewer_id": "person-a",
+  "now": "2026-09-14T03:00:00.000Z",
+  "scenarios": [
+    {
+      "id": "pending",
+      "label": "相手の共有確認を待っています",
+      "kind": "pending",
+      "response_status": 200,
+      "recordings": [
+        {
+          "id": "recording-a",
+          "owner_id": "person-a",
+          "installation_id": "device-person-a",
+          "mode": "normal",
+          "duration_ms": 60000,
+          "stopped_at": "2026-09-14T02:00:00.000Z",
+          "capture_status": "saved",
+          "upload_status": "ready",
+          "audio_expires_at": "2026-09-21T02:00:00.000Z",
+          "text_expires_at": "2026-10-14T02:00:00.000Z",
+          "version": 1
+        }
+      ],
+      "sources": [
+        {
+          "id": "a1",
+          "recording_id": "recording-a",
+          "original_text": "展示のアイデアを話そう🌱",
+          "start_ms": 1000,
+          "end_ms": 5000,
+          "timing_quality": "estimated",
+          "speaker_label": null,
+          "version": 1
+        }
+      ],
+      "conversation": null,
+      "connection": {
+        "connection_id": "connection-pending",
+        "status": "pending",
+        "expires_at": "2026-09-15T02:00:00.000Z",
+        "peer_display": "相手（人工データ）",
+        "verification_code": "4729",
+        "match_id": "match-pending",
+        "match_version": 1,
+        "scope_id": "scope-pending",
+        "scope_version": 1,
+        "own_selection": [
+          {
+            "source_id": "a1",
+            "source_version": 1,
+            "char_start": 0,
+            "char_end": 12,
+            "start_ms": 1000,
+            "end_ms": 5000
+          }
+        ],
+        "confirmation_states": {
+          "person-a": "confirmed",
+          "person-b": "confirmed"
+        },
+        "share_states": {
+          "person-a": "allowed",
+          "person-b": "pending"
+        },
+        "continuing_state": "inactive",
+        "conversation_id": null,
+        "job_id": null,
+        "next_actions": [
+          "wait"
+        ]
+      },
+      "expected": {
+        "script_count": 0,
+        "source_count": 1,
+        "audio_available": true,
+        "next_screen": "U03"
+      }
+    },
+    {
+      "id": "needs-confirmation",
+      "label": "範囲の確認が必要です",
+      "kind": "shared",
+      "response_status": 200,
+      "recordings": [
+        {
+          "id": "recording-a",
+          "owner_id": "person-a",
+          "installation_id": "device-person-a",
+          "mode": "normal",
+          "duration_ms": 60000,
+          "stopped_at": "2026-09-14T02:00:00.000Z",
+          "capture_status": "saved",
+          "upload_status": "ready",
+          "audio_expires_at": "2026-09-21T02:00:00.000Z",
+          "text_expires_at": "2026-10-14T02:00:00.000Z",
+          "version": 1
+        }
+      ],
+      "sources": [],
+      "conversation": {
+        "id": "conversation-confirmation",
+        "mode": "normal",
+        "revision": 1,
+        "access_revision": 1,
+        "status": "needs_confirmation",
+        "script": [],
+        "highlights": [],
+        "confirmation_reason": "alignment_unresolved"
+      },
+      "connection": null,
+      "expected": {
+        "script_count": 0,
+        "source_count": 0,
+        "audio_available": false,
+        "next_screen": "U04"
+      }
+    }
+  ]
+}

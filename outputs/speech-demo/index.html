@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 音声デモ | 文字起こし・話者分離・ノイズ除去・ライブ字幕</title>
+  <style>
+    :root {
+      --primary: #28694f;
+      --primary-hover: #1e523d;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --danger: #dc2626;
+      --border: #e2e8f0;
+      --green-light: #f0fdf4;
+      --green-border: #86efac;
+      --blue-light: #eff6ff;
+      --blue-border: #93c5fd;
+      --purple-light: #faf5ff;
+      --purple-border: #d8b4fe;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; }
+    .container { width: 100%; max-width: 620px; display: flex; flex-direction: column; gap: 16px; }
+
+    header { text-align: center; margin-bottom: 4px; }
+    h1 { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+    p.subtitle { color: var(--muted); font-size: 13px; }
+
+    /* モード切替タブ */
+    .mode-nav { display: flex; background: #e2e8f0; border-radius: 14px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+    .mode-tab { flex: 1 1 45%; padding: 10px 6px; text-align: center; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.2s; border: none; background: transparent; }
+    .mode-tab.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
+
+    .card { background: var(--card-bg); border-radius: 20px; padding: 20px; border: 2px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .card-main { border-color: var(--primary); text-align: center; }
+
+    .mic-circle { width: 72px; height: 72px; border-radius: 36px; background: #e8f0e9; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto; font-size: 32px; transition: transform 0.2s; }
+    .recording .mic-circle { animation: pulse 1.2s infinite; background: #fee2e2; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); } }
+
+    .instruction { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+
+    .btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border-radius: 14px; font-size: 17px; font-weight: 800; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .loading-box { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; color: var(--primary); font-weight: 700; font-size: 14px; }
+    .spinner { width: 20px; height: 20px; border: 3px solid rgba(40,105,79,0.2); border-radius: 50%; border-top-color: var(--primary); animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result-card { display: flex; flex-direction: column; gap: 12px; }
+    .result-title { font-size: 15px; font-weight: 700; color: var(--text); display: flex; justify-content: space-between; align-items: center; }
+    .badge { background: var(--green-light); color: var(--primary); font-size: 12px; padding: 4px 10px; border-radius: 12px; border: 1px solid var(--green-border); font-weight: 700; }
+
+    .result-box { background: var(--green-light); border: 2px solid var(--green-border); border-radius: 14px; padding: 16px; font-size: 16px; font-weight: 700; line-height: 1.6; color: #064e3b; min-height: 70px; word-break: break-word; }
+    .live-stream-box { background: var(--blue-light); border: 2px solid var(--blue-border); color: #1e40af; }
+    .empty-result { background: #f8fafc; border: 1px dashed var(--border); border-radius: 14px; padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+
+    /* 話者分離スタイル */
+    .speaker-container { display: flex; flex-direction: column; gap: 10px; }
+    .speaker-bubble { background: #ffffff; border: 2px solid #e2e8f0; border-radius: 14px; padding: 12px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .speaker-label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 8px; margin-bottom: 6px; }
+    .spk-0 { background: #dbeafe; color: #1e40af; }
+    .spk-1 { background: #fce7f3; color: #9d174d; }
+    .spk-2 { background: #fef3c7; color: #92400e; }
+    .speaker-text { font-size: 15px; font-weight: 600; color: #1e293b; line-height: 1.5; }
+
+    .audio-player-box { margin-top: 12px; background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+    .audio-player-label { font-size: 13px; font-weight: 700; margin-bottom: 6px; display: block; color: var(--text); }
+    audio { width: 100%; border-radius: 8px; }
+
+    footer { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎙️ AI 音声フル機能デモ</h1>
+      <p class="subtitle">文字起こし・話者分離・ノイズ除去・ライブ字幕</p>
+    </header>
+
+    <details class="card" open>
+      <summary>APIキーの入力</summary>
+      <p>まとめて文字起こしはOpenAI、話者分離はElevenLabs、ノイズ除去は両方のキーを使います。ライブ字幕は入力不要です。</p>
+      <label for="openaiKey">OpenAI APIキー</label>
+      <input id="openaiKey" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" style="display: block; width: 100%; padding: 10px; margin: 6px 0 12px;">
+      <label for="elevenlabsKey">ElevenLabs APIキー</label>
+      <input id="elevenlabsKey" type="password" autocomplete="off" spellcheck="false" autocapitalize="none" style="display: block; width: 100%; padding: 10px; margin: 6px 0 12px;">
+      <p>キーはこのページを開いている間だけ使用し、再読み込みすると消えます。</p>
+    </details>
+
+    <!-- モード選択ナビゲーション -->
+    <div class="mode-nav">
+      <button class="mode-tab active" id="tab-batch" onclick="switchMode('batch')">📝 まとめて文字起こし</button>
+      <button class="mode-tab" id="tab-diarize" onclick="switchMode('diarize')">👥 話者分離 (Diarization)</button>
+      <button class="mode-tab" id="tab-live" onclick="switchMode('live')">⚡ ライブ字幕</button>
+      <button class="mode-tab" id="tab-denoise" onclick="switchMode('denoise')">✨ ノイズ除去</button>
+    </div>
+
+    <!-- メイン録音カード -->
+    <div class="card card-main" id="mainCard">
+      <div class="mic-circle" id="micCircle">🎤</div>
+      <div class="instruction" id="instruction">ボタンを押してマイクに向かって喋ってください</div>
+
+      <button id="recordBtn" class="btn btn-primary" onclick="handleBtnClick()">
+        🔴 ボタンを押して喋る
+      </button>
+
+      <div class="loading-box" id="loadingBox" style="display: none;">
+        <div class="spinner"></div>
+        <span id="loadingMsg">AIが処理中...</span>
+      </div>
+    </div>
+
+    <!-- 結果表示領域 -->
+    <div class="card result-card">
+      <div class="result-title">
+        <span id="resultTitleLabel">💬 結果プレビュー</span>
+        <span class="badge" id="modeBadge">まとめて文字起こし</span>
+      </div>
+
+      <div id="resultContainer">
+        <div class="empty-result" id="emptyPlaceholder">
+          「ボタンを押して喋る」と、ここにAIの解析結果が表示されます
+        </div>
+      </div>
+
+      <!-- ノイズ除去プレイヤーエリア -->
+      <div id="denoisePlayerArea" style="display: none;">
+        <div class="audio-player-box" style="margin-bottom: 10px;">
+          <span class="audio-player-label">🔊 あなたの元の声 (原音)</span>
+          <audio id="originalAudio" controls></audio>
+        </div>
+
+        <div class="audio-player-box" style="background: #f0fdf4; border-color: #86efac;">
+          <span class="audio-player-label" style="color: #166534;">✨ ElevenLabs Voice Isolator ノイズ除去後の声</span>
+          <audio id="denoisedAudio" controls></audio>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Powered by OpenAI Whisper & ElevenLabs Scribe STT / Voice Isolator
+    </footer>
+  </div>
+
+  <script>
+    let OPENAI_KEY = "";
+    let ELEVENLABS_KEY = "";
+
+    let activeMode = 'batch'; // 'batch' | 'diarize' | 'live' | 'denoise'
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    // Web Speech API (ライブ字幕用)
+    let speechRecognition = null;
+    let liveTranscriptText = "";
+
+    function switchMode(mode) {
+      if (isRecording) stopRecording();
+      activeMode = mode;
+
+      document.getElementById('tab-batch').className = mode === 'batch' ? 'mode-tab active' : 'mode-tab';
+      document.getElementById('tab-diarize').className = mode === 'diarize' ? 'mode-tab active' : 'mode-tab';
+      document.getElementById('tab-live').className = mode === 'live' ? 'mode-tab active' : 'mode-tab';
+      document.getElementById('tab-denoise').className = mode === 'denoise' ? 'mode-tab active' : 'mode-tab';
+
+      const modeBadge = document.getElementById('modeBadge');
+      const denoiseArea = document.getElementById('denoisePlayerArea');
+      denoiseArea.style.display = 'none';
+
+      if (mode === 'batch') {
+        modeBadge.innerText = 'まとめて文字起こし';
+        document.getElementById('instruction').innerText = 'ボタンを押して喋った後、まとめて文字起こしします';
+      } else if (mode === 'diarize') {
+        modeBadge.innerText = '話者分離 (Scribe)';
+        document.getElementById('instruction').innerText = '複数人で話すと、誰が発言したかを識別して書き起こします';
+      } else if (mode === 'live') {
+        modeBadge.innerText = 'リアルタイムライブ字幕';
+        document.getElementById('instruction').innerText = 'ボタンを押して喋ると、リアルタイムで字幕が流れます';
+      } else if (mode === 'denoise') {
+        modeBadge.innerText = 'ノイズ除去 (Voice Isolator)';
+        document.getElementById('instruction').innerText = '録音した音声のノイズをElevenLabsで除去して試聴できます';
+      }
+
+      document.getElementById('resultContainer').innerHTML = `
+        <div class="empty-result">
+          「ボタンを押して喋る」と、ここに結果が表示されます
+        </div>
+      `;
+    }
+
+    async function handleBtnClick() {
+      if (!isRecording) {
+        await startRecording();
+      } else {
+        stopRecording();
+      }
+    }
+
+    async function startRecording() {
+      if (activeMode === 'live') {
+        startLiveSpeechRecognition();
+        return;
+      }
+
+      OPENAI_KEY = document.getElementById('openaiKey').value.trim();
+      ELEVENLABS_KEY = document.getElementById('elevenlabsKey').value.trim();
+      const needsOpenAI = activeMode === 'batch' || activeMode === 'denoise';
+      const needsElevenLabs = activeMode === 'diarize' || activeMode === 'denoise';
+      if ((needsOpenAI && !OPENAI_KEY) || (needsElevenLabs && !ELEVENLABS_KEY)) {
+        alert('このモードで使うAPIキーを入力してください。');
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstop = async () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const audioUrl = URL.createObjectURL(audioBlob);
+          document.getElementById('originalAudio').src = audioUrl;
+
+          if (activeMode === 'batch') {
+            await processBatchTranscribe(audioBlob);
+          } else if (activeMode === 'diarize') {
+            await processSpeakerDiarization(audioBlob);
+          } else if (activeMode === 'denoise') {
+            await processVoiceIsolation(audioBlob);
+          }
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        updateUIState(true);
+      } catch (err) {
+        alert('マイクのアクセス許可が必要です: ' + err.message);
+      }
+    }
+
+    function stopRecording() {
+      if (activeMode === 'live' && speechRecognition) {
+        speechRecognition.stop();
+        isRecording = false;
+        updateUIState(false);
+        return;
+      }
+
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        isRecording = false;
+        updateUIState(false);
+      }
+    }
+
+    function updateUIState(recording) {
+      const mainCard = document.getElementById('mainCard');
+      const micCircle = document.getElementById('micCircle');
+      const btn = document.getElementById('recordBtn');
+
+      if (recording) {
+        mainCard.classList.add('recording');
+        micCircle.innerText = '🎙️';
+        btn.innerText = '⏹️ 停止する';
+        btn.className = 'btn btn-danger';
+      } else {
+        mainCard.classList.remove('recording');
+        micCircle.innerText = '🎤';
+        btn.innerText = '🔴 ボタンを押して喋る';
+        btn.className = 'btn btn-primary';
+      }
+    }
+
+    // ⚡ モード1: ライブリアルタイム字幕
+    function startLiveSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('お使いのブラウザはライブ字幕API非対応です。まとめて文字起こしをお使いください。');
+        return;
+      }
+
+      speechRecognition = new SpeechRecognition();
+      speechRecognition.lang = 'ja-JP';
+      speechRecognition.continuous = true;
+      speechRecognition.interimResults = true;
+
+      liveTranscriptText = "";
+      document.getElementById('resultContainer').innerHTML = `
+        <div class="result-box live-stream-box">
+          ⚡ リアルタイム字幕:<br>
+          <span id="liveTextDisplay">聞き取り待機中...</span>
+        </div>
+      `;
+
+      speechRecognition.onresult = (event) => {
+        let interim = "";
+        let final = "";
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final += event.results[i][0].transcript;
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+
+        if (final) liveTranscriptText += final + " ";
+        document.getElementById('liveTextDisplay').innerText = liveTranscriptText + interim;
+      };
+
+      speechRecognition.onerror = (e) => {
+        console.warn('Speech recognition error:', e);
+      };
+
+      speechRecognition.start();
+      isRecording = true;
+      updateUIState(true);
+    }
+
+    // 📝 モード2: まとめて文字起こし (Whisper)
+    async function processBatchTranscribe(audioBlob) {
+      showLoading(true, 'AIがまとめて高精度文字起こし中...');
+      try {
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'speech.webm');
+        formData.append('model', 'whisper-1');
+        formData.append('language', 'ja');
+
+        const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${OPENAI_KEY}` },
+          body: formData
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const text = data.text || '音声が検出されませんでした。';
+
+        // Whisperの無音ハルシネーション対策（無音・小声時にYouTube等の定型句が出力される問題）
+        const isHallucination = text.includes('ご視聴ありがと') || text.includes('チャンネル登録') || text.includes('視聴ありがと');
+        if (isHallucination) {
+          document.getElementById('resultContainer').innerHTML = `
+            <div class="result-box" style="background: #fffbe6; border-color: #ffe58f; color: #873800;">
+              🔇 声が入っていないか、無音でした。<br>
+              <span style="font-size: 13px; font-weight: normal; margin-top: 4px; display: block;">マイクの近くではっきりと喋ってもう一度お試しください。</span>
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="result-box">
+            ✨ あなたの発言:<br>
+            「${text}」
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="result-box" style="background: #fff5f5; border-color: #fca5a5; color: #991b1b;">
+            ⚠️ 文字起こし失敗: ${err.message}
+          </div>
+        `;
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // 👥 モード3: 話者分離 (ElevenLabs Scribe STT with Diarization)
+    async function processSpeakerDiarization(audioBlob) {
+      showLoading(true, 'ElevenLabs Scribe で話者を特定・分離中...');
+      try {
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'speech.webm');
+        formData.append('model_id', 'scribe_v1');
+        formData.append('diarize', 'true');
+        formData.append('tag_audio_events', 'true');
+
+        const res = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
+          method: 'POST',
+          headers: { 'xi-api-key': ELEVENLABS_KEY },
+          body: formData
+        });
+
+        if (!res.ok) {
+          const errJson = await res.json().catch(() => ({}));
+          throw new Error(errJson.detail?.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        // 話者ごとに単語をグループ化
+        const speakerBlocks = [];
+        let currentSpeaker = null;
+        let currentText = "";
+
+        if (data.words && data.words.length > 0) {
+          data.words.forEach(w => {
+            const spk = w.speaker_id || 'speaker_0';
+            if (spk !== currentSpeaker) {
+              if (currentText.trim()) {
+                speakerBlocks.push({ speaker: currentSpeaker, text: currentText.trim() });
+              }
+              currentSpeaker = spk;
+              currentText = w.text;
+            } else {
+              currentText += w.text;
+            }
+          });
+          if (currentText.trim()) {
+            speakerBlocks.push({ speaker: currentSpeaker, text: currentText.trim() });
+          }
+        }
+
+        if (speakerBlocks.length === 0) {
+          const text = data.text || '音声が検出されませんでした。';
+          document.getElementById('resultContainer').innerHTML = `
+            <div class="result-box">
+              👥 識別結果:<br>「${text}」
+            </div>
+          `;
+          return;
+        }
+
+        const speakerNames = {
+          'speaker_0': '話者 A',
+          'speaker_1': '話者 B',
+          'speaker_2': '話者 C',
+          'speaker_3': '話者 D'
+        };
+
+        const speakerClassMap = {
+          'speaker_0': 'spk-0',
+          'speaker_1': 'spk-1',
+          'speaker_2': 'spk-2'
+        };
+
+        let html = '<div class="speaker-container">';
+        speakerBlocks.forEach(b => {
+          const sName = speakerNames[b.speaker] || b.speaker;
+          const sClass = speakerClassMap[b.speaker] || 'spk-0';
+          html += `
+            <div class="speaker-bubble">
+              <span class="speaker-label ${sClass}">👤 ${sName}</span>
+              <div class="speaker-text">「${b.text}」</div>
+            </div>
+          `;
+        });
+        html += '</div>';
+
+        document.getElementById('resultContainer').innerHTML = html;
+
+      } catch (err) {
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="result-box" style="background: #fff5f5; border-color: #fca5a5; color: #991b1b;">
+            ⚠️ 話者分離失敗: ${err.message}
+          </div>
+        `;
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // ✨ モード4: ノイズ除去 (ElevenLabs Voice Isolator)
+    async function processVoiceIsolation(audioBlob) {
+      showLoading(true, 'ElevenLabs Voice Isolator でノイズ除去中...');
+      document.getElementById('denoisePlayerArea').style.display = 'block';
+
+      try {
+        const isoFormData = new FormData();
+        isoFormData.append('audio', audioBlob, 'speech.webm');
+
+        const isoRes = await fetch('https://api.elevenlabs.io/v1/audio-isolation', {
+          method: 'POST',
+          headers: { 'xi-api-key': ELEVENLABS_KEY },
+          body: isoFormData
+        });
+
+        if (isoRes.ok) {
+          const denoisedBlob = await isoRes.blob();
+          const denoisedUrl = URL.createObjectURL(denoisedBlob);
+          document.getElementById('denoisedAudio').src = denoisedUrl;
+        }
+
+        const formData = new FormData();
+        formData.append('file', audioBlob, 'speech.webm');
+        formData.append('model', 'whisper-1');
+        formData.append('language', 'ja');
+
+        const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${OPENAI_KEY}` },
+          body: formData
+        });
+
+        const data = await res.json();
+        const text = data.text || '音声が検出されませんでした。';
+
+        const isHallucination = text.includes('ご視聴ありがと') || text.includes('チャンネル登録') || text.includes('視聴ありがと');
+        if (isHallucination) {
+          document.getElementById('resultContainer').innerHTML = `
+            <div class="result-box" style="background: #fffbe6; border-color: #ffe58f; color: #873800;">
+              🔇 声が入っていないか、無音でした。<br>
+              <span style="font-size: 13px; font-weight: normal; margin-top: 4px; display: block;">マイクの近くではっきりと喋ってもう一度お試しください。</span>
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="result-box">
+            ✨ ノイズ除去適用後の文字起こし:<br>
+            「${text}」
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('resultContainer').innerHTML = `
+          <div class="result-box" style="background: #fff5f5; border-color: #fca5a5; color: #991b1b;">
+            ⚠️ 処理エラー: ${err.message}
+          </div>
+        `;
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function showLoading(show, msg = '') {
+      const box = document.getElementById('loadingBox');
+      const btn = document.getElementById('recordBtn');
+      if (show) {
+        box.style.display = 'flex';
+        document.getElementById('loadingMsg').innerText = msg;
+        btn.disabled = true;
+      } else {
+        box.style.display = 'none';
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+interface:
+  display_name: "要求・差分・証拠のレビュー"
+  short_description: "今回のハッカソンで要求・差分・証拠のレビューを正本と証拠に沿って進める"
+  default_prompt: "$aidd-lite-review を使い、今回の依頼範囲に沿って要求・差分・証拠のレビューを進めてください。"
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,6 @@
+interface:
+  display_name: "引き継ぎ・文書整合"
+  short_description: "今回のハッカソンで引き継ぎ・文書整合を正本と証拠に沿って進める"
+  default_prompt: "$aidd-lite-handoff を使い、今回の依頼範囲に沿って引き継ぎ・文書整合を進めてください。"
+policy:
+  allow_implicit_invocation: true

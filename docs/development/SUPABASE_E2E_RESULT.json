@@ -1,0 +1,103 @@
+{
+  "startedAt": "2026-09-12T09:15:08.115Z",
+  "project": "nmidnmqnrhogehzehkjh",
+  "resources": {
+    "table": "codex_e2e_08a970663a4e",
+    "bucket": "codex-e2e-08a970663a4e",
+    "function": "codex-e2e-08a970663a4e",
+    "policy": "codex_e2e_08a970663a4e",
+    "userIds": [
+      "ffb30561-20ea-4e70-89c2-21cc1a4addd6",
+      "db5e9bb6-c34b-4c44-b75c-bd5c40c6120e"
+    ]
+  },
+  "tests": [
+    {
+      "name": "Project API credentials available (not logged)",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 2926
+    },
+    {
+      "name": "Auth: create 2 users, password login and user verification",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 4315
+    },
+    {
+      "name": "Auth: session refresh",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 305
+    },
+    {
+      "name": "DB: committed test table with owner RLS and Realtime publication",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 7135
+    },
+    {
+      "name": "REST: user CRUD, persistence, other-user and anonymous RLS isolation",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 5230
+    },
+    {
+      "name": "Realtime: two-client Broadcast and Presence",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 3240
+    },
+    {
+      "name": "Realtime: committed PostgreSQL INSERT event",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 5446
+    },
+    {
+      "name": "Storage: private bucket, user upload/download/update/delete and isolation",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 11104
+    },
+    {
+      "name": "Edge Functions: deploy, authenticated invocation and unauthenticated denial",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 3323
+    },
+    {
+      "name": "Auth: logout and refresh-token revocation",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 919
+    },
+    {
+      "name": "Cleanup: delete test Edge Function and verify absence",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 3088
+    },
+    {
+      "name": "Cleanup: empty/delete test bucket and remove storage policy",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 3871
+    },
+    {
+      "name": "Cleanup: drop test table and verify absence",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 2756
+    },
+    {
+      "name": "Cleanup: delete test users and verify absence",
+      "status": "PASS",
+      "detail": "Verified",
+      "ms": 2548
+    }
+  ],
+  "finishedAt": "2026-09-12T09:16:04.382Z",
+  "passed": 14,
+  "failed": 0
+}

@@ -1,0 +1,74 @@
+{
+  "opened": true,
+  "width": 1920.0,
+  "height": 1080.0,
+  "fps": 24.0,
+  "frames": 2880.0,
+  "bytes": 19496513,
+  "sample_frames": [
+    {
+      "time": 0,
+      "decoded": true
+    },
+    {
+      "time": 5,
+      "decoded": true
+    },
+    {
+      "time": 24,
+      "decoded": true
+    },
+    {
+      "time": 30,
+      "decoded": true
+    },
+    {
+      "time": 31,
+      "decoded": true
+    },
+    {
+      "time": 35,
+      "decoded": true
+    },
+    {
+      "time": 44,
+      "decoded": true
+    },
+    {
+      "time": 47,
+      "decoded": true
+    },
+    {
+      "time": 63,
+      "decoded": true
+    },
+    {
+      "time": 73,
+      "decoded": true
+    },
+    {
+      "time": 85,
+      "decoded": true
+    },
+    {
+      "time": 94,
+      "decoded": true
+    },
+    {
+      "time": 100,
+      "decoded": true
+    },
+    {
+      "time": 110,
+      "decoded": true
+    },
+    {
+      "time": 119.8,
+      "decoded": true
+    }
+  ],
+  "seconds": 120.0,
+  "decode_exit": 0,
+  "decode_errors": "",
+  "all_narration_fits": true
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>会話をみんなの文脈として残す プロダクト構想</title>
+<style>
+:root{--ink:#182c37;--muted:#536771;--accent:#176e68;--paper:#fff;--bg:#edf1ef;--line:#d4dfdb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.85 'Yu Gothic','Meiryo',sans-serif}main{max-width:960px;margin:40px auto}section{background:var(--paper);padding:52px 64px;margin:0 0 24px;border-radius:8px}h1{font-size:40px;line-height:1.45;letter-spacing:.025em;margin:24px 0}h2{font-size:27px;line-height:1.5;margin:12px 0 24px}h3{font-size:18px;margin:0 0 8px}p{margin:12px 0 18px}.eyebrow{font-size:12px;letter-spacing:.13em;color:var(--accent);font-weight:bold}.lead{font-size:20px;line-height:1.9}.muted,figcaption{color:var(--muted);font-size:13px}.two{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:28px 0}.two article{border-top:2px solid var(--line);padding-top:18px}.number{color:var(--accent);font-size:12px;letter-spacing:.12em}.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:28px 0}.flow article{padding:18px;background:#f1f7f4;border-radius:5px}.flow p{font-size:14px;margin-bottom:0}.note{border-top:1px solid var(--line);padding-top:18px;margin-top:26px}strong{font-weight:700}figure{margin:24px 0}svg{display:block;width:100%;height:auto}table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:13px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}th{background:#f1f7f4}ol{padding-left:24px}li{padding:5px 0}a{color:var(--accent);overflow-wrap:anywhere}footer{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;border-top:1px solid var(--line);padding-top:18px;margin-top:30px}.pill{display:inline-block;font-size:12px;color:var(--accent);background:#e9f3ee;padding:3px 10px;border-radius:20px}.printhelp{text-align:center;font-size:13px;color:var(--muted);padding:0 20px 20px}
+@media(max-width:640px){main{margin:12px}section{padding:28px 22px}h1{font-size:29px}h2{font-size:23px}.lead{font-size:18px}.two,.flow{grid-template-columns:1fr;gap:18px}table{font-size:13px}td,th{padding:10px 6px}footer{gap:15px}}
+@media print{@page{size:A4;margin:14mm}body{background:white;font-size:10.5pt;line-height:1.65}main{margin:0;max-width:none}section{margin:0;padding:8mm 3mm;border-radius:0;break-after:page}section:last-of-type{break-after:auto}h1{font-size:29pt}h2{font-size:21pt}.lead{font-size:14pt}.two{gap:20px;margin:20px 0}.flow{gap:12px;margin:20px 0}.flow article{padding:12px}.flow p,table{font-size:10pt}.printhelp{display:none}figure,article,tr{break-inside:avoid}footer{margin-top:20px}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body><main>
+<section>
+<div class="eyebrow">PRODUCT CONCEPT · TEAM DISCUSSION · 2026.09.12</div>
+<h1>会話をみんなの<br>文脈として残す</h1>
+<p class="lead">それぞれの端末に残った記録を重ね合わせ、<br>一緒に話した時間を、人とAIが後から使えるものにする。</p>
+<p>食事中に生まれたアイデア。何気なく交わした約束。作業の途中で教わった理由。会議以外の時間にも、残しておきたい情報があります。</p>
+<p>私たちは、日常の会話を記録することが、写真を撮るように自然になる文化を目指しています。今回のハッカソンでは、会議の枠を超えて、友人との会話や何気ないやり取りを気軽に残せる2C向けアプリを作ることを目指します。現場での2B利用にも応用できる構想です。</p>
+<div class="two"><article><h3>この資料で共有したいこと</h3><p>作りたい体験と、その根本にある考えです。チームで読み、価値や使い方への意見を集めるための資料です。</p></article><article><h3>これから決めること</h3><p>ハッカソンで作る機能の範囲と、技術方式。以下の図や場面は、完成済みの機能ではなく構想を表しています。</p></article></div>
+<footer><span>製品名未定 · 構想共有版 0.3</span><span>01 / なぜ作るか</span></footer>
+</section>
+<section>
+<div class="number">02 / THE PROBLEM</div><h2>話の結論だけでは、<br>後から分からなくなることがある</h2>
+<p>きっかけの一つは、チームの対面での打ち合わせでした。3人で話した内容を一人のGoogle Meetから記録したところ、議事録では全員の発言が同じ利用者の発言として扱われていました。</p>
+<p>誰の提案だったかが失われると、話の背景もつかみにくくなります。その記録を後からAIへ渡しても、元の会話を十分に伝えられません。</p>
+<div class="two"><article><h3>何気ない約束で</h3><p>「今度ここへ行こう」と話した。後から思い返すと、どんな案が出て、なぜ行きたくなったのかを思い出せない。</p></article><article><h3>友人との時間で</h3><p>「それ、面白いね」と盛り上がった。翌日続きを考えようとすると、何がきっかけだったか思い出せない。</p></article></div>
+<p class="lead">残したいのは、<strong>誰が何を話し、なぜその話になったか</strong>。その背景があれば、確認も、振り返りも、次の相談も始めやすくなります。</p>
+<p class="muted">打ち合わせの記述はチームの原体験です。既存の議事録サービス全般が同じ動作をする、という主張ではありません。</p>
+<footer><span>会話の価値を、会話の後にも残す</span><span>02 / 何が失われているか</span></footer>
+</section>
+<section>
+<div class="number">03 / THE EXPERIENCE</div><h2>各自の記録から、同じ会話を見つける</h2>
+<div class="flow"><article><span class="pill">記録する</span><h3>本人が開始</h3><p>集まりや勤務の始まりに、それぞれが録音を始める。</p></article><article><span class="pill">合わせる</span><h3>同じ会話を照合</h3><p>独立した記録から対応する部分を見つけ、聞こえ方の違いを補う。</p></article><article><span class="pill">使う</span><h3>共通の文脈へ</h3><p>参加者が会話を見返し、振り返りやAIとの相談に活用する。</p></article></div>
+<figure><svg viewBox="0 0 780 235" role="img" aria-labelledby="merge-title merge-desc"><title id="merge-title">AとBの独立した記録が共通の会話へ統合される図</title><desc id="merge-desc">Aの記録とBの記録に同じ会話の対応部分があり、それを照合して共通の会話ノートへまとめる。単なる話題の類似では統合しない。</desc><rect x="5" y="20" width="270" height="70" rx="8" fill="#edf5f0"/><text x="24" y="48" font-size="17" fill="#182c37">Aの記録</text><text x="24" y="73" font-size="14" fill="#536771">よく録れた発言 ＋ 欠けた部分</text><rect x="5" y="140" width="270" height="70" rx="8" fill="#edf1f8"/><text x="24" y="168" font-size="17" fill="#182c37">Bの記録</text><text x="24" y="193" font-size="14" fill="#536771">別の発言や背景を補える可能性</text><path d="M285 55 L355 55 L390 112 L480 112 M285 175 L355 175 L390 112" fill="none" stroke="#176e68" stroke-width="3"/><path d="M468 104 L480 112 L468 120" fill="none" stroke="#176e68" stroke-width="3"/><rect x="490" y="67" width="280" height="100" rx="8" fill="#176e68"/><text x="512" y="103" font-size="20" fill="white">共通の会話ノート</text><text x="512" y="132" font-size="14" fill="white">話者・内容・背景を合わせて残す</text></svg><figcaption>「Gitのように」は、独立した記録を突き合わせる考え方の比喩です。特定の実装方式を指しません。</figcaption></figure>
+<p>通常の利用では、固定グループを先に作る必要はありません。<strong>共通の知人であることではなく、同じ会話に参加したこと</strong>を共有の根拠にします。</p>
+<p class="muted">「似た話題」と「同じ現実の会話」は別です。同一会話の判定方法と、複数端末でどの程度品質が改善するかは、これから検証します。</p>
+<footer><span>複数の記録を持ち寄ることが、設計の中心</span><span>03 / 核となる仕組み</span></footer>
+</section>
+<section>
+<div class="number">04 / SHARING</div><h2>同じノートでも、共有する時間を分ける</h2>
+<p>AとBの会話にCが加わる場合、<strong>Cに共有するのは、Cの最初の発言から</strong>です。先にその場で聞いていたとしても、それ以前の会話へは遡りません。黙って聞いているだけの人は、通常共有の参加者に含めません。</p>
+<figure><svg viewBox="0 0 780 210" role="img" aria-labelledby="time-title time-desc"><title id="time-title">途中参加者Cへの共有範囲</title><desc id="time-desc">AとBの会話開始後、Cが来て聞き、初めて発言し、その後退出する。Cに共有するのは初めての発言から終了判定まで。時間軸は概念図。</desc><line x1="65" y1="53" x2="720" y2="53" stroke="#b8c8c1" stroke-width="2"/><g fill="#182c37" font-size="14"><text x="35" y="29">A・B開始</text><text x="226" y="29">Cが来て聞く</text><text x="426" y="29">Cの初発言</text><text x="645" y="29">Cの退出等</text></g><g fill="#176e68"><circle cx="65" cy="53" r="5"/><circle cx="270" cy="53" r="5"/><circle cx="470" cy="53" r="5"/><circle cx="700" cy="53" r="5"/></g><rect x="65" y="84" width="635" height="33" rx="4" fill="#e8efeb"/><text x="84" y="107" fill="#182c37" font-size="14">A・Bの会話の記録</text><rect x="470" y="136" width="230" height="35" rx="4" fill="#176e68"/><text x="485" y="160" fill="white" font-size="14">Cへの共有区間</text><text x="65" y="160" fill="#536771" font-size="14">この区間はCへ共有しない</text></svg><figcaption>終了は近距離通信による離脱の検知、またはスイッチ停止を使う構想です。具体的な判定方式は未検証です。</figcaption></figure>
+<p>通常共有では、Cの参加前の話はC向けの要約・検索結果・AI回答にも含めません。その時間に話していたA・Bは引き続き利用できます。途中参加者にも知らせるグループ共有を使う場合は、グループの共有ルールに従います。</p>
+<div class="two"><article><h3>共有は毎回確認、継続承認で自動に</h3><p>通常共有は会話ごとに双方へ確認します。双方が今後の自動共有を承認した相手とは、明確な会話を自動で統合・共有します。継続承認は解除でき、解除後は毎回確認に戻ります。曖昧な判定は確認し、録音自体は本人が開始します。具体的な確認画面は<a href="MVP_SPEC.md">MVP仕様書</a>に採用仕様をまとめています。</p></article><article><h3>続けて集まる仲間にはグループを</h3><p>学生の制作チームや職場など、一定期間活動する仲間の会話を蓄積し、前回の続きから始められる機能を設けます。所属だけで個人の記録は流れず、グループ用として明示的に始めた記録を扱います。欠席した現メンバーも加入期間中の記録を閲覧でき、途中加入者は加入後の区間から閲覧できます。グループ退出後は過去分もグループ経由で閲覧できなくなります。</p></article></div>
+<footer><span>関係の近さだけで、会話を共有しない</span><span>04 / 共有の考え方</span></footer>
+</section>
+<section>
+<div class="number">05 / VALUE</div><h2>残した会話から、続きを始められる</h2>
+<p class="lead">「今度行こうと話していた場所、どこだった？」<br>「昨日のあのアイデア、もう少し考えたい」</p>
+<p>発言者と背景が残っていれば、会話の後もその内容を使えます。指示の確認、自分の振り返り、思い出として残すこと、そしてAIへ文脈を引き継ぐことが、目指す価値です。</p>
+<table><thead><tr><th>場面</th><th>価値の候補</th><th>位置付け</th></tr></thead><tbody><tr><td>友人との時間</td><td>アイデア・約束・思い出を背景ごと残す</td><td>今回の2C体験の候補</td></tr><tr><td>日常の振り返り</td><td>残した会話から、続きを話したり考えたりする</td><td>今回の2C体験の候補</td></tr><tr><td>現場の口頭指示</td><td>内容と理由を聞き直さず確認する</td><td>2Bへの応用可能性</td></tr><tr><td>熟練者との作業</td><td>判断理由やコツを復習する</td><td>追加の利用仮説</td></tr><tr><td>共同制作・開発</td><td>案の経緯を取り戻し、続きを考える</td><td>追加の利用仮説</td></tr></tbody></table>
+<p class="note">今回確かめたいのは、日常の会話を残しやすく、後から「記録してよかった」と感じられる体験です。記録を始める負担、本人と相手の理解、振り返る価値、また使いたい理由を確認します。文化の定着や継続利用は、短いデモだけでは実証できません。具体的な場面・閲覧方法・保存の仕組みは<a href="MVP_SPEC.md">MVP仕様書</a>に採用仕様をまとめています。</p>
+<p>将来の入口として、スマホのボタン、時計、グラスなども考えています。SNSへの統合も展開候補です。初期の対応先と開発方式は<a href="PRODUCT_CORE.md">製品方針</a>にまとめています。対応OSバージョン・配布方式、時計・グラス等への対応は未決定です。</p>
+<footer><span>会議を超えて、日常の会話を残す文化へ</span><span>05 / 届けたい価値</span></footer>
+</section>
+<section>
+<div class="number">06 / DISCUSSION</div><h2>この構想について、意見をください</h2>
+<p>思想はここまで揃いました。次は「本当に使いたい場面」と「技術的に成立する範囲」を照らし合わせ、ハッカソンで作るものを決めます。</p>
+<div class="two"><article><h3>今、決まっていること</h3><p>本人が録音を開始すること。各自の記録を統合すること。参加者と時間に応じて共有すること。通常は会話ごとに双方へ確認すること。双方の継続承認が有効で、同一会話・本人帰属・参加範囲が明確な場合だけ自動共有し、曖昧な場合は確認すること。</p></article><article><h3>これから決めること</h3><p>対応OSバージョン・配布方式、実接続先、後続の自動発見やグループ管理。初回の機能・処理・保持はMVP仕様書で採用済みです。「完璧な履歴」は目標であり、性能保証ではありません。</p></article></div>
+<ol><li><strong>日常のどんな会話なら、残しておきたいですか？</strong><br>食事・雑談・遊びなど、残したい理由や後から使う場面も教えてください。</li><li><strong>記録が残っていて助かった経験、残せず困った経験はありますか？</strong><br>案・約束・思い出と、その背景を思い浮かべてください。</li><li><strong>集まりの始めに録音し、後から会話がまとまる体験をどう感じますか？</strong><br>本人と相手の立場で、始めやすさやまた使いたい理由を考えてください。</li><li><strong>自動統合や共有で、意図と違うことが起きそうな場面はありますか？</strong><br>途中参加、近くの別会話、通信の切断などを含めてください。</li></ol>
+<p class="muted">意見を残すときは「具体的な場面／困りごと／欲しい結果／気になる点」の順で書くと、次の設計につながります。</p>
+<p class="note muted">出典：チームの企画メモと、2026年9月10〜11日の構想ヒアリング。技術・利用仮説は未検証です。詳細な決定一覧と未決定事項は <a href="PRODUCT_CORE.md">AI向け資料</a> に整理しています。原資料の共有範囲は別に管理します。審査員向けピッチは、後で別に作成します。</p>
+<footer><span>チームの意見を集めるための資料</span><span>06 / 次に話したいこと</span></footer>
+</section>
+</main><p class="printhelp">ブラウザで読める資料です。Ctrl＋Pから印刷・PDF保存できます。</p></body></html>
